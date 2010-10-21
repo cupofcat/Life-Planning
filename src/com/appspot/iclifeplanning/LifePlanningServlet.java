@@ -25,22 +25,30 @@ public class LifePlanningServlet extends HttpServlet {
 	public void doGet(HttpServletRequest req, HttpServletResponse resp)
 			throws IOException {
 
-		if (sessionToken != null) {
-			displayCalendarList(resp);
-		} else {
-			User user = ensureUserLoggedIn(req, resp);
-			sessionToken = getToken(user, req, resp);
+		User user = ensureUserLoggedIn(req, resp);
+		boolean success = true;
+		if (user != null) {
+			sessionToken = TokenStore.getToken(user.getUserId());
 		}
+		if (sessionToken != null) {
+			success = displayCalendarList(req, resp);
+		}
+		if (success == false || sessionToken == null) {
+			sessionToken = getToken(req, resp);
+			if (sessionToken != null) {
+	        	TokenStore.addToken(user.getUserId(), sessionToken);
+			}
+			displayCalendarList(req, resp);
+		}	
 	}
 
-	private String getToken(User user, HttpServletRequest req, HttpServletResponse resp) throws IOException{
-		String token = TokenStore.getToken(user.getUserId());
-		if (token == null) {
+	private String getToken(HttpServletRequest req, HttpServletResponse resp) throws IOException{
+		String token = null;
+		if (req.getQueryString() != null) {
 	        token = AuthSubUtil.getTokenFromReply(req.getQueryString());
 	        try {
 				token = AuthSubUtil.exchangeForSessionToken(token, null);
 	        	myService.setAuthSubToken(token);
-	        	TokenStore.addToken(user.getUserId(), token);
 			} catch (GeneralSecurityException e) {
 				resp.getWriter().println("GeneralSecurityException!");
 				e.printStackTrace();
@@ -67,31 +75,33 @@ public class LifePlanningServlet extends HttpServlet {
 		return token;
 	}
 
-	private void displayCalendarList(HttpServletResponse resp) throws IOException{
+	private boolean displayCalendarList(HttpServletRequest req, HttpServletResponse resp) throws IOException{
         URL feedUrl = null;
         CalendarFeed resultFeed = null;
 		try {
 			feedUrl = new URL("http://www.google.com/calendar/feeds/default/allcalendars/full");
-		    resp.setContentType("text/plain");    
 			resultFeed = myService.getFeed(feedUrl, CalendarFeed.class);
+
+		    resp.setContentType("text/plain");
+			resp.getWriter().println("Your calendars: ");
+			resp.getWriter().println();
+	   
+	        for (int i = 0; i < resultFeed.getEntries().size(); i++) {
+	          CalendarEntry entry = resultFeed.getEntries().get(i);
+	  		  resp.getWriter().println(entry.getTitle().getPlainText());
+	        }	
 		} catch (MalformedURLException e) {
 			resp.getWriter().println("MalformedURLException!");
 			e.printStackTrace();
+			return false;
 		} catch (IOException e) {
 			resp.getWriter().println("IOException!");
 			e.printStackTrace();
+			return false;
 		} catch (ServiceException e) {
-			resp.getWriter().println("ServiceException!");
-			e.printStackTrace();
-		}
-		  
-		resp.getWriter().println("Your calendars: ");
-		resp.getWriter().println();
-   
-        for (int i = 0; i < resultFeed.getEntries().size(); i++) {
-          CalendarEntry entry = resultFeed.getEntries().get(i);
-  		  resp.getWriter().println(entry.getTitle().getPlainText());
-        }		
+			return false;
+		}	
+		return true;
 	}
 
 	private User ensureUserLoggedIn(HttpServletRequest req, HttpServletResponse resp) throws IOException {
