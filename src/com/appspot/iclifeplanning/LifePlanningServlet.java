@@ -1,7 +1,6 @@
 package com.appspot.iclifeplanning;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 
@@ -19,98 +18,83 @@ import com.google.gdata.util.ServiceException;
 
 @SuppressWarnings("serial")
 public class LifePlanningServlet extends HttpServlet {
-	private CalendarService myService = new CalendarService("exampleCo-exampleApp-1.0");
-	private String sessionToken = null;
 
-	public void doGet(HttpServletRequest req, HttpServletResponse resp)
+	private UserService userService = UserServiceFactory.getUserService();
+
+	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+	    // Initialize a client to talk to Google Data API services.
+	    CalendarService client = new CalendarService("google-feedfetcher-v1");
 
-		User user = ensureUserLoggedIn(req, resp);
-		boolean success = true;
-		if (user != null) {
-			sessionToken = TokenStore.getToken(user.getUserId());
-		}
-		if (sessionToken != null) {
-			success = displayCalendarList(req, resp);
-		}
-		if (success == false || sessionToken == null) {
-			sessionToken = getToken(req, resp);
-			if (sessionToken != null) {
-	        	TokenStore.addToken(user.getUserId(), sessionToken);
+	    String sessionToken = null;
+
+	    if (userService.isUserLoggedIn()) {
+	        User user = userService.getCurrentUser();
+	        sessionToken = TokenStore.getToken(user.getUserId());
+        }
+
+	    try {
+	      // Find the AuthSub token and upgrade it to a session token.
+	      String authToken = AuthSubUtil.getTokenFromReply(
+	          request.getQueryString());
+
+	      // Upgrade the single-use token to a multi-use session token.
+	      sessionToken = AuthSubUtil.exchangeForSessionToken(authToken, null);
+	    } catch (AuthenticationException e) {
+	      // Handle
+	    } catch (GeneralSecurityException e) {
+	      // Handle
+	    } catch (NullPointerException e) {
+	      // Ignore
+	    }
+
+	    if (sessionToken != null) {
+	      if (userService.isUserLoggedIn()) {
+	          User user = userService.getCurrentUser();
+	          TokenStore.addToken(user.getUserId(), sessionToken);
+	      }
+	      // Set the session token as a field of the Service object. Since a new
+	      // Service object is created with each get call, we don't need to
+	      // worry about the anonymous token being used by other users.
+	      client.setAuthSubToken(sessionToken);
+	      
+	        URL feedUrl = new URL("http://www.google.com/calendar/feeds/default/allcalendars/full");
+			CalendarFeed resultFeed = null;
+			try {
+				resultFeed = client.getFeed(feedUrl, CalendarFeed.class);
+			} catch (ServiceException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
 			}
-			displayCalendarList(req, resp);
-		}	
-	}
 
-	private String getToken(HttpServletRequest req, HttpServletResponse resp) throws IOException{
-		String token = null;
-		if (req.getQueryString() != null) {
-	        token = AuthSubUtil.getTokenFromReply(req.getQueryString());
-	        try {
-				token = AuthSubUtil.exchangeForSessionToken(token, null);
-	        	myService.setAuthSubToken(token);
-			} catch (GeneralSecurityException e) {
-				resp.getWriter().println("GeneralSecurityException!");
-				e.printStackTrace();
-			} catch (AuthenticationException e) {
-				resp.getWriter().println("AuthenticationException!");
-				e.printStackTrace();
-			}	
-		}
-		
-		if (token == null) {
-			String next = req.getRequestURL().toString();
-			String requestUrl =
-				  AuthSubUtil.getRequestUrl(next,
-				      "http://www.google.com/calendar/feeds/default/allcalendars/full",
-				      false, true);
-	
-			String suggestAuthorization = "<p>LifePlanning needs access to your" +
-		        "Google Calendar account to read your Calendar feed. Please, " +
-				"<a href=\"" + requestUrl + "\">authorize</a> LifePlanning to access your account.</p>";
-
-			resp.setContentType("text/html");    
-			resp.getWriter().println(suggestAuthorization);
-		}
-		return token;
-	}
-
-	private boolean displayCalendarList(HttpServletRequest req, HttpServletResponse resp) throws IOException{
-        URL feedUrl = null;
-        CalendarFeed resultFeed = null;
-		try {
-			feedUrl = new URL("http://www.google.com/calendar/feeds/default/allcalendars/full");
-			resultFeed = myService.getFeed(feedUrl, CalendarFeed.class);
-
-		    resp.setContentType("text/plain");
-			resp.getWriter().println("Your calendars: ");
-			resp.getWriter().println();
+		    response.setContentType("text/plain");
+			response.getWriter().println("Your calendars: ");
+			response.getWriter().println();
 	   
 	        for (int i = 0; i < resultFeed.getEntries().size(); i++) {
 	          CalendarEntry entry = resultFeed.getEntries().get(i);
-	  		  resp.getWriter().println(entry.getTitle().getPlainText());
-	        }	
-		} catch (MalformedURLException e) {
-			resp.getWriter().println("MalformedURLException!");
-			e.printStackTrace();
-			return false;
-		} catch (IOException e) {
-			resp.getWriter().println("IOException!");
-			e.printStackTrace();
-			return false;
-		} catch (ServiceException e) {
-			return false;
-		}	
-		return true;
-	}
+	  		  response.getWriter().println(entry.getTitle().getPlainText());
+	        }
 
-	private User ensureUserLoggedIn(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        UserService userService = UserServiceFactory.getUserService();
-        User user = userService.getCurrentUser();
+	    } else {
+	      // If no session token is set, allow users to authorize this sample app
+	      // to fetch personal Google Data feeds by directing them to an
+	      // authorization page.
 
-        if (user == null) {
-            resp.sendRedirect(userService.createLoginURL(req.getRequestURI()));
-        }
-        return user;
+	      // Generate AuthSub URL
+	      String nextUrl = request.getRequestURL().toString();
+	      String requestUrl = AuthSubUtil.getRequestUrl(nextUrl,
+	          "http://www.google.com/calendar/feeds/default/allcalendars/full", false, true);
+
+	      // Write AuthSub URL to response
+	      response.setContentType("text/html");
+	      response.getWriter().print("<h3>A Google Data session token could not " +
+	          "be found for your account.</h3>");
+	      response.getWriter().print("<p>In order to see your data, you must " +
+	          "first authorize access to your personal feeds. Start this " +
+	        "process by choosing a service from the list below:</p>");
+	      response.getWriter().print("<ul><li><a href=\"" + requestUrl + "\">" +
+	          "Google Calendar</a></li></ul>");
+	    }
 	}
 }
