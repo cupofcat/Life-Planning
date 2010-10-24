@@ -1,4 +1,4 @@
-package com.appspot.iclifeplanning;
+package com.appspot.iclifeplanning.authentication;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;

@@ -1,4 +1,4 @@
-package com.appspot.iclifeplanning;
+package com.appspot.iclifeplanning.authentication;
 
 import javax.jdo.annotations.PersistenceCapable;
 import javax.jdo.annotations.Persistent;

@@ -1,4 +1,4 @@
-package com.appspot.iclifeplanning;
+package com.appspot.iclifeplanning.authentication;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
