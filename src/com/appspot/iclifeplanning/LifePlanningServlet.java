@@ -61,12 +61,14 @@ public class LifePlanningServlet extends HttpServlet {
 		try {
 			resultFeed = client.getFeed(feedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
-			e.printStackTrace();
+			authService.revokeToken();
+			response.sendRedirect(request.getRequestURI());
+			return;
 		}
 
         response.setContentType("text/html");
 		response.getWriter().println("<h3>Your calendars: </h3>");
-   
+
         for (int i = 0; i < resultFeed.getEntries().size(); i++) {
           CalendarEntry entry = resultFeed.getEntries().get(i);
   		  response.getWriter().println("<ul><li>" + entry.getTitle().getPlainText() + "</li></ul>");

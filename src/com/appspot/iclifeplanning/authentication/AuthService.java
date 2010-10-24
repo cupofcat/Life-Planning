@@ -97,14 +97,18 @@ public class AuthService {
 
 	/** Stores token for the currently logged-in user in the datastore */
 	public void registerToken(String token){
-		 if (userService.isUserLoggedIn()) {
-	          User user = userService.getCurrentUser();
-	          System.out.println("Saving token");
-	          TokenStore.addToken(user.getUserId(), token);
-	      }
+	 if (userService.isUserLoggedIn()) {
+          User user = userService.getCurrentUser();
+          System.out.println("Saving token");
+          TokenStore.addToken(user.getUserId(), token);
+      }
 	}
 
 	public String getLogOutURL(HttpServletRequest request) {
 		return userService.createLogoutURL(request.getRequestURI());
+	}
+
+	public void revokeToken() {
+		TokenStore.deleteTokend(userService.getCurrentUser().getUserId());
 	}
 }
