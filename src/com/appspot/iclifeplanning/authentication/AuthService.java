@@ -2,6 +2,7 @@ package com.appspot.iclifeplanning.authentication;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -28,11 +29,20 @@ public class AuthService {
 	/**Service used to monitor the currently the users of the application*/
 	private static UserService userService = UserServiceFactory.getUserService();
 
-	/**Feed-url giving access to all calendars owned by a give user*/
+	/**Feed-url giving access to all calendars accesible by a give user*/
 	public static final  String CALENDAR_FULL_FEED_REQUEST_URL 
 	    = "http://www.google.com/calendar/feeds/default/allcalendars/full";
 
-	/**Countructor for singleton pattern*/
+	/**Feed-url giving access to all events owned by a give user*/
+	public static final  String EVENT_FULL_FEED_REQUEST_URL 
+	    = "https://www.google.com/calendar/feeds/default/private/full";
+
+	public static final  String DEFAULT_FULL_FEED_REQUEST_URL 
+		= "http://www.google.com/calendar/feeds/default";
+
+	private static final Logger log = Logger.getLogger("AuthService");
+
+	/**Constructor for singleton pattern*/
 	private AuthService() {}
 	
 	public static AuthService getAuthServiceInstance() {
@@ -40,7 +50,7 @@ public class AuthService {
 		return authServiceInstance;
 	}
 	
-	public static void requestCalendarAccess(HttpServletRequest request, HttpServletResponse response)
+	public void requestCalendarAccess(HttpServletRequest request, HttpServletResponse response)
 	    throws IOException{
 	      // If no session token is set, allow users to authorize this sample app
 	      // to fetch personal Google Data feeds by directing them to an
@@ -48,8 +58,8 @@ public class AuthService {
 	      // Generate AuthSub URL
 	      String nextUrl = request.getRequestURL().toString();
 	      String requestUrl = AuthSubUtil.getRequestUrl(nextUrl,
-	          CALENDAR_FULL_FEED_REQUEST_URL, false, true);
-
+	          DEFAULT_FULL_FEED_REQUEST_URL, false, true);
+	      
 	      // Write AuthSub URL to response
 	      response.setContentType("text/html");
 	      response.getWriter().print("<h3>A Google Data session token could not " +
@@ -62,11 +72,11 @@ public class AuthService {
 	}
 
 	/**
-	 * Retrieves a token enabling acces to Google calendar for the currently logged-in user.
+	 * Retrieves a token enabling access to Google calendar for the currently logged-in user.
 	 * You might think this method is not working well or is sub-optimal. You ARE wrong.
 	 * It's fine. Trust me.
 	 */
-	public static String getToken(HttpServletRequest request, HttpServletResponse response) 
+	public String getToken(HttpServletRequest request, HttpServletResponse response) 
 	    throws IOException{
 		
 		String sessionToken = null;
@@ -110,5 +120,9 @@ public class AuthService {
 
 	public void revokeToken() {
 		TokenStore.deleteTokend(userService.getCurrentUser().getUserId());
+	}
+
+	public String getCurrentUserId() {
+		return userService.getCurrentUser().getUserId();
 	}
 }
