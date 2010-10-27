@@ -2,7 +2,6 @@ package com.appspot.iclifeplanning.authentication;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -35,12 +34,10 @@ public class AuthService {
 
 	/**Feed-url giving access to all events owned by a give user*/
 	public static final  String EVENT_FULL_FEED_REQUEST_URL 
-	    = "https://www.google.com/calendar/feeds/default/private/full";
+	    = "https://www.google.com/calendar/feeds/default/allcalendars/full";
 
 	public static final  String DEFAULT_FULL_FEED_REQUEST_URL 
 		= "http://www.google.com/calendar/feeds/default";
-
-	private static final Logger log = Logger.getLogger("AuthService");
 
 	/**Constructor for singleton pattern*/
 	private AuthService() {}

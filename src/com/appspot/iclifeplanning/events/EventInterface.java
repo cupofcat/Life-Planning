@@ -15,5 +15,6 @@ public interface EventInterface {
 	public void setEndTime(DateTime endTime);
 	public Set<String> getKeywords();
 	public void setKeywords(Set<String> keywords);
-
+	public boolean canReschedule();
+	public String getCalendarTitle();
 }

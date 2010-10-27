@@ -54,10 +54,11 @@ public class LifePlanningServlet extends HttpServlet {
 
 	private void printEvents(Set<Event> events) throws IOException {
         response.setContentType("text/html");
-		response.getWriter().println("<h3>Your calendars: </h3>");
+		response.getWriter().println("<h3>Your events: </h3>");
 
         for (Event e : events) {
   		  response.getWriter().println("<ul><li>" + e.getDescription().getPlainText() + "</li></ul>");
+  		//response.getWriter().println("<ul><li>" + e.getCalendarTitle() + "</li></ul>");
   		  for (String keyword : e.getKeywords()) {
   			response.getWriter().println("<ul><li>" + keyword + "</li></ul>");
   		  }
