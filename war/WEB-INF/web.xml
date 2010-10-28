@@ -4,6 +4,9 @@ xmlns="http://java.sun.com/xml/ns/javaee"
 xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee
 http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
+
+	<!-- Servlet responsible for displaying something (Currently a list of calendars). 
+	Be sure to update this comment when we decide what exactly -->
 	<servlet>
 		<servlet-name>LifePlanning</servlet-name>
 		<servlet-class>com.appspot.iclifeplanning.LifePlanningServlet</servlet-class>
@@ -12,6 +15,8 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>LifePlanning</servlet-name>
 		<url-pattern>/lifeplanning</url-pattern>
 	</servlet-mapping>
+
+	<!-- Top-level web-page for our app -->
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
