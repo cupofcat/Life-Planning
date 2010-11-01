@@ -1,5 +1,6 @@
 package com.appspot.iclifeplanning.events;
 
+import java.util.Map;
 import java.util.Set;
 
 import com.google.gdata.data.DateTime;
@@ -17,4 +18,5 @@ public interface EventInterface {
 	public void setKeywords(Set<String> keywords);
 	public boolean canReschedule();
 	public String getCalendarTitle();
+	public Map<String, Integer> getSpheres();
 }

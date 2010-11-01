@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gdata.client.calendar.CalendarService;
 import com.google.gdata.client.http.AuthSubUtil;
 import com.google.gdata.util.AuthenticationException;
 
@@ -32,12 +33,10 @@ public class AuthService {
 	public static final  String CALENDAR_FULL_FEED_REQUEST_URL 
 	    = "http://www.google.com/calendar/feeds/default/allcalendars/full";
 
-	/**Feed-url giving access to all events owned by a give user*/
-	public static final  String EVENT_FULL_FEED_REQUEST_URL 
-	    = "https://www.google.com/calendar/feeds/default/allcalendars/full";
-
 	public static final  String DEFAULT_FULL_FEED_REQUEST_URL 
 		= "http://www.google.com/calendar/feeds/default";
+	
+	public static CalendarService client = new CalendarService("ic-lifeplanning-v1");
 
 	/**Constructor for singleton pattern*/
 	private AuthService() {}
