@@ -1,10 +1,12 @@
 package com.appspot.iclifeplanning.events;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.appspot.datastore.SphereName;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.TextConstruct;
 import com.google.gdata.data.calendar.CalendarEventEntry;
@@ -106,9 +108,19 @@ public class Event implements EventInterface {
 	private boolean isKeyword(String string) {
 		return true;
 	}
-
-	public Map<String, Integer> getSpheres() {
-		return UClasifier.analyse(description);
+//zobaczyc czy dziala
+	public Map<SphereName, Integer> getSpheres() {
+		Map<String, Integer> tmp = UClasifier.analyse(description);
+		Map<SphereName, Integer> res = new HashMap<SphereName, Integer>();
+		for(String key : tmp.keySet()){		
+			for(SphereName name : SphereName.values()){
+				if(key.equalsIgnoreCase(name.toString())){
+					res.put(name, tmp.get(key));
+					break;
+				}
+			}
+		}
+		return res;
 	}
 
 	public boolean canReschedule() {

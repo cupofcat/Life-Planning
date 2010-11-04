@@ -3,6 +3,7 @@ package com.appspot.iclifeplanning.events;
 import java.util.Map;
 import java.util.Set;
 
+import com.appspot.datastore.SphereName;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.TextConstruct;
 
@@ -18,5 +19,5 @@ public interface EventInterface {
 	public void setKeywords(Set<String> keywords);
 	public boolean canReschedule();
 	public String getCalendarTitle();
-	public Map<String, Integer> getSpheres();
+	public Map<SphereName, Integer> getSpheres();
 }
