@@ -7,6 +7,8 @@ import com.appspot.iclifeplanning.events.*;
 
 public class Analyzer {
 	
+	public static final double CONFIDENCE = 0.1;
+	
 	private double[] times;
 	private double[] currentRatios;
 	

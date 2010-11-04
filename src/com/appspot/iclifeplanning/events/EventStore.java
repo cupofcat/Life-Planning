@@ -69,7 +69,7 @@ public class EventStore {
 		  allCalendarEvents = eventResultFeed.getEntries();
 		  for (int j = 0; j < allCalendarEvents.size(); j++) {
 			  event = new Event(allCalendarEvents.get(j));
-			  event.setCalendarTitle(calendarEntry.getTitle().toString());
+			  event.setTitle(calendarEntry.getTitle());
 			  allEvents.add(event);
 		  }
         }

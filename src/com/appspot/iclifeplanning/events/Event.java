@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import com.appspot.analyser.BaseCalendarSlot;
+import com.appspot.analyser.IEvent;
 import com.appspot.datastore.SphereName;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.TextConstruct;
@@ -13,7 +15,7 @@ import com.google.gdata.data.calendar.CalendarEventEntry;
 
 // TODO (amadurska): Ensure keywords come from both title & description
 // TODO (amadurska): Keywords should be really replaced by spheres.
-public class Event implements EventInterface {
+public class Event extends BaseCalendarSlot implements IEvent {
 	private CalendarEventEntry calendarEventEntry;
 	private DateTime startTime;
 	private DateTime endTime;
@@ -27,24 +29,14 @@ public class Event implements EventInterface {
 	private static final Logger log = Logger.getLogger("EventStore");
 
 	public Event(CalendarEventEntry calendarEventEntry) {
+		super(calendarEventEntry);
 		this.calendarEventEntry = calendarEventEntry;
-		startTime = calendarEventEntry.getTimes().get(0).getStartTime();
-		endTime = calendarEventEntry.getTimes().get(0).getEndTime();
-		description = calendarEventEntry.getTitle();
 		childEvents = null;
 		id = calendarEventEntry.getId();
 		canReschedule = calendarEventEntry.getCanEdit();
 		isRecurring = calendarEventEntry.getRecurrence() != null;
 		parseKeywords(description);
 		log.severe("Sphere: " + getSpheres());
-	}
-
-	public String getCalendarTitle() {
-		return calendarTitle;
-	}
-
-	public void setCalendarTitle(String calendarTitle) {
-		this.calendarTitle = calendarTitle;
 	}
 
 	public String getId() {
@@ -63,30 +55,6 @@ public class Event implements EventInterface {
 				keywords.add(words[i]);
 			}
 		}
-	}
-
-	public TextConstruct getDescription() {
-		return description;
-	}
-
-	public void setDescription(TextConstruct description) {
-		this.description = description;
-	}
-
-	public DateTime getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(DateTime startTime) {
-		this.startTime = startTime;
-	}
-
-	public DateTime getEndTime() {
-		return endTime;
-	}
-
-	public void setEndTime(DateTime endTime) {
-		this.endTime = endTime;
 	}
 
 	public Set<String> getKeywords() {
@@ -129,5 +97,13 @@ public class Event implements EventInterface {
 
 	public boolean isRecurring() {
 		return isRecurring;
+	}
+
+	public double minDuration() {
+		return 0;
+	}
+
+	public double maxDuration() {
+		return 0;
 	}
 }

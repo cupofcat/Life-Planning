@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.appspot.analyser.IEvent;
 import com.appspot.datastore.*;
 import com.appspot.iclifeplanning.authentication.AuthService;
 import com.appspot.iclifeplanning.events.Event;
@@ -39,8 +40,8 @@ public class LifePlanningServlet extends HttpServlet {
 	    this.response = response;
 	    this.sessionToken = authService.getToken(request, response);
 
-	    if (sessionToken != null) {
-	      authService.registerToken(sessionToken);
+	    //if (sessionToken != null) {
+//	      authService.registerToken(sessionToken);
 	      PersistenceManager pm = PMF.get().getPersistenceManager();
 	      String user = "iclifeplanning";
 
@@ -53,7 +54,7 @@ public class LifePlanningServlet extends HttpServlet {
 	      // Set the session token as a field of the Service object. Since a new
 	      // Service object is created with each get call, we don't need to
 	      // worry about the anonymous token being used by other users.
-	      AuthService.client.setAuthSubToken(sessionToken);	      
+//	      AuthService.client.setAuthSubToken(sessionToken);	      
 	      printCalendars();
 	      EventStore.getInstance().initizalize();
 	      
@@ -62,25 +63,21 @@ public class LifePlanningServlet extends HttpServlet {
 	      for(SphereInfo i : l2)
 	    	  response.getWriter().println(i);
 	      //printEvents(EventStore.getInstance().getEvents());
-	    } else {
-	    	authService.requestCalendarAccess(request, response);
-	    }
+	    //} else {
+	    	//authService.requestCalendarAccess(request, response);
+	    //}
 	}
 	
-	public List<SphereInfo> checkGoals(Collection<? extends EventInterface> events, Map<SphereName, Double> choices) throws IOException{	
+	public List<SphereInfo> checkGoals(Collection<? extends IEvent> events, Map<SphereName, Double> choices) throws IOException{	
 		
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
 		initializeTimes(times, choices.keySet());
 		Map<SphereName, Double> currentRatios = new HashMap<SphereName, Double>();
 		double sum = 0;
 		response.setContentType("text/html");
-		for(EventInterface event : events){			
-			Calendar startTime = new GregorianCalendar();
-			startTime.setTimeInMillis(event.getStartTime().getValue());
-			Calendar endTime = new GregorianCalendar();
-			endTime.setTimeInMillis(event.getEndTime().getValue() + 60*60*1000);
+		for(IEvent event : events){
 			//jebane strefy czasowe........
-			int durationInMins = getTimeDifference(startTime, endTime);
+			int durationInMins = getTimeDifference(event.getStartDate(), event.getEndDate());
 			Map<SphereName, Integer> sphereResults = event.getSpheres();
 			Set<SphereName> keys = sphereResults.keySet();
 			for(SphereName key : keys){
@@ -120,7 +117,7 @@ public class LifePlanningServlet extends HttpServlet {
 
         for (Event e : events) {
   		  response.getWriter().println("<ul><li>" + 
-  		      e.getDescription().getPlainText() + " List of spheres: " +"</li></ul>");
+  		      e.getDescription() + " List of spheres: " +"</li></ul>");
   		  for (SphereName k : e.getSpheres().keySet())
   			  response.getWriter().print(k.toString() + " " + String.valueOf((Integer)e.getSpheres().get(k.toString())));
         }

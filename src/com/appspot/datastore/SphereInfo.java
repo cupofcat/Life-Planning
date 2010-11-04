@@ -6,7 +6,6 @@ public class SphereInfo {
 	
 	private double currentRatio;
 	private double targetRatio;
-	
 	private double timeDifference;
 
 	public SphereInfo(SphereName name, double currentRatio, double targetRatio) {
@@ -43,6 +42,10 @@ public class SphereInfo {
 	
 	public void setTimeDifference(double diff){
 		this.timeDifference = diff;
+	}
+	
+	public boolean isWithinConfidenceInterval(){
+		return (Math.abs(currentRatio - targetRatio) )/targetRatio < Analyzer.CONFIDENCE;
 	}
 	
 	public String toString(){
