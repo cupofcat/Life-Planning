@@ -1,3 +1,20 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" isELIgnored="false" %>
+<%@ taglib uri="http://java.sun.com/jstl/core" prefix="c" %>
+
+<%@ page import="com.google.appengine.api.users.UserService" %>
+<%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
+
+<%
+  UserService userService = UserServiceFactory.getUserService();
+  String signupUrl = "";
+
+  if (userService.isUserLoggedIn()) {
+    //response.sendRedirect("/dashboard");
+  } else {
+    signupUrl = userService.createLoginURL("/dashboard");
+  }
+%>
+
 <html>
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
@@ -27,20 +44,20 @@
       <div id="header-long">
         <div id="strip"></div>
         <div id="header">
-          <div id="header-left">
+          <div id="header-top">
             <div id="logo"><h1>Life Planning.</h1></div>
-            <div id="header-text">
-              The advent of mobile broadband and the "always connected" experience encourages the development of services offering persistent storage of personal data. Services could then use this data to provide intelligent, personalised and contextual support for all activities of an individual’s life. Such a service would combine aspects of planning, scheduling, calendar maintenance and consumer advice. The service would mediate between the user and all the complex information sources available on the Internet (e.g. transport feeds, product descriptions, third-party services) to provide contextualised and personalised decision support (c.f. price comparison sites such as confused.com). The business model is that the Life Planning service would always operate in the user’s best interest and have no other obligations.
-            </div>
-          </div>
-          <div id="header-right">
             <div id="menu">
               <ul class="lamp" id="lavaLampMenu">
                   <li><a href="#home">Home</a></li>
                   <li><a href="#">Help</a></li>
                   <li><a href="#step1">Tour</a></li>
-                  <li><a href="#">Login</a></li>
+                  <li><a href="<%= signupUrl %>">Login</a></li>
               </ul>
+            </div>
+          </div>
+          <div id="header-bottom">
+            <div id="header-text">
+              The advent of mobile broadband and the "always connected" experience encourages the development of services offering persistent storage of personal data. Services could then use this data to provide intelligent, personalised and contextual support for all activities of an individual’s life. Such a service would combine aspects of planning, scheduling, calendar maintenance and consumer advice. The service would mediate between the user and all the complex information sources available on the Internet (e.g. transport feeds, product descriptions, third-party services) to provide contextualised and personalised decision support (c.f. price comparison sites such as confused.com). The business model is that the Life Planning service would always operate in the user’s best interest and have no other obligations.
             </div>
             <div id="header-box">
               <div id="slogan">
@@ -55,7 +72,7 @@
                 <p>the act or process of making a plan or plans.</p>
               </div>
             </div>
-          </div>
+          </div>  
         </div>
       </div>
       <div id="body">
@@ -79,7 +96,7 @@
                       The Life Planning service would counteract this by allowing individuals to specify the goals they would like to achieve across all aspects of their life and then combine the planning system with stochastic optimisation to help users plan their choices to ensure, over time, that their life goals would be met.
                     </div>
                     <div id="signup">
-                      <a href="">Sign up with your Google Account</a>
+                      <a href="<%= signupUrl %>">Sign up with your Google Account</a>
                     </div>
                   </div>
                 </div>

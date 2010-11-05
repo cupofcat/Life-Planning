@@ -1,7 +1,8 @@
 #lavaLampMenu {
-	position: relative;
+	posi tion: relative;
 	height: 85px;
-	width: 300px;
+	width: 290px;
+	text-align: center;
 	overflow: hidden;
 	border: 0;
 	margin: 0px auto;
@@ -33,7 +34,8 @@
 	position: relative;
 	vertical-align: center;
 	display: block;
-	width: 75px;
+	wi dth: 75px;
+	padding: 0 10px;
 	height: 35px;
 	top: 0px;
 }
