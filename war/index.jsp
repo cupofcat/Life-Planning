@@ -9,7 +9,7 @@
   String signupUrl = "";
 
   if (userService.isUserLoggedIn()) {
-    //response.sendRedirect("/dashboard");
+    response.sendRedirect("/dashboard");
   } else {
     signupUrl = userService.createLoginURL("/dashboard");
   }
@@ -45,7 +45,7 @@
         <div id="strip"></div>
         <div id="header">
           <div id="header-top">
-            <div id="logo"><h1>Life Planning.</h1></div>
+            <div id="logo"><div id="bg"></div><h1>Life Planning.</h1></div>
             <div id="menu">
               <ul class="lamp" id="lavaLampMenu">
                   <li><a href="#home">Home</a></li>

@@ -1,0 +1,118 @@
+ul#drw_tabs {
+	width: 360px;
+	margin: 0 auto;
+	background: red;
+	list-style     : none;
+	position       : relative;
+}
+
+ul#drw_tabs li {
+	background: #247da2;
+	padding: 0 10px 0 10px;
+	float          : left;
+}
+
+*+html ul#drw_tabs li.last {
+	position       : absolute;
+	float          : right;
+}
+
+* html ul#drw_tabs li.last {
+	position       : absolute;
+	float          : right;
+}
+
+ul#drw_tabs a {
+	font-family: Futura;
+	font-size      : 20px;
+	text-align     : center;
+	text-decoration: none;
+	text-transform: uppercase;
+	line-height    : 35px;
+	background     : ;
+	height         : 35px;
+	display        : block;
+	color: #fff;
+}
+
+ul#drw_tabs a:hover {
+	color: #000;
+}
+
+ul#drw_tabs li.first a {
+	background-position: left 0;
+	border-left        : none;
+}
+
+ul#drw_tabs li.last  a {
+	background-position: right 0;
+	border-right       : none;
+}
+
+ul#drw_tabs          a#drw_tabs_focus { background-position: center -35px; }
+ul#drw_tabs li.first a#drw_tabs_focus { background-position: left   -35px; }
+ul#drw_tabs li.last  a#drw_tabs_focus { background-position: right  -35px; }
+
+
+
+/** Drawer */
+/**************************************/
+div#drw {
+	margin         : 0 auto;
+	overflow       : hidden;
+}
+
+div#drw div#drw_close {
+	display: none;
+	text-align: center;
+	clear: both;
+}
+
+div#drw div#drw_close a {
+	background     : url("drw.gif");
+
+	margin         : 0 0 0 auto;
+	display        : block;
+}
+
+div#drw div#drw_loader {
+	text-indent    : -9999px;
+	background     : url("loader.gif") center center no-repeat;
+	height         : 50px;
+	margin         : 10px 0 0 0;
+}
+
+/** Clearfix */
+/**************************************/
+ul#drw_tabs:after,
+ul.drw_icon_view:after,
+ul.drw_icon_view li:after,
+ul.drw_list_view a:after {
+	content        : ".";
+	height         : 0px;
+	clear          : both;
+	visibility     : hidden;
+	display        : block;
+}
+
+ul#drw_tabs,
+ul.drw_icon_view,
+ul.drw_icon_view li,
+ul.drw_list_view a {
+	display        : inline-block;
+}
+
+/*\*/
+* html ul#drw_tabs,
+* html ul.drw_icon_view,
+* html ul.drw_icon_view li,
+* html ul.drw_list_view a {
+	height         : 1%;
+}
+
+ul#drw_tabs,
+ul.drw_icon_view,
+ul.drw_icon_view li,
+ul.drw_list_view a {
+	display        : block;
+}
