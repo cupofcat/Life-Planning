@@ -111,7 +111,7 @@
  * jQuery Easing Library 1.3 available here:  http://plugins.jquery.com/project/Easing
  * 
  * Example LavaLamp initializing statement:
- * $(function() { $("ul.lavaLamp").lavaLamp({ fx: "easeOutBack", speed: 700}) });
+ * jQuery(function() { jQuery("ul.lavaLamp").lavaLamp({ fx: "easeOutBack", speed: 700}) });
  * finds all UL elements in the document with the class of 'lavaLamp' and attaches the 
  * LavaLamp plugin using an easing library fx of OutBack and an animate speed of 
  * 700 milliseconds or 7/10ths of a second.
@@ -292,17 +292,17 @@ jQuery.fn.lavaLamp = function(o) {
 			var pathmatch_len=0, $pathel;
 	
 			$lt.each(function(){ 
-				var thishref = $('a:first',this).attr('href');
+				var thishref = jQuery('a:first',this).attr('href');
 				//console.log(thishref+' size:'+thishref.length);
 				if (path.indexOf(thishref)>-1 && thishref.length > pathmatch_len )
 				{
-					$pathel = $(this);
+					$pathel = jQuery(this);
 					pathmatch_len = thishref.length;
 				}
 	
 			});
 			if (pathmatch_len>0) {
-				//console.log('found match:'+$('a:first',$pathel).attr('href'));
+				//console.log('found match:'+jQuery('a:first',$pathel).attr('href'));
 				$selected = $pathel;
 			}
 			//else 
