@@ -1,0 +1,33 @@
+#wrapper {
+    width: 960px;
+	margin-top: 10px;
+}
+
+#slider {
+    width: 100%;
+    margin: 0 auto;
+    position: relative;
+}
+
+.scroll {
+    height: 350px;
+    width: 960px;
+    overflow: auto;
+    overflow-x: hidden;
+    position: relative;
+    clear: left;
+}
+
+.scrollContainer div.panel {
+    padding: 0;
+    height: 350px;
+    width: 960px;
+}
+
+ul.navigation {
+    display: none;
+}
+
+.hide {
+    display: none;
+}

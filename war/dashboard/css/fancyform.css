@@ -1,0 +1,21 @@
+/* FancyForm styles */
+label {
+display: block;
+padding: 0.5em;
+padding-left: 32px;
+background-position: 8px center;
+background-repeat: no-repeat;
+border: 1px solid #252525;
+clear: both;
+cursor: pointer;
+color: #fff;
+}
+.f_checkbox,.f_radio{background-repeat:no-repeat;background-position:3px center;height:16px;display:block;cursor:pointer;cursor:hand;line-height:120%}
+.checked,.selected{color:#f0f0f0}
+.f_radio:hover,.f_checkbox:hover{color:#fff !important}
+.f_radio{padding:4px 24px}
+.f_checkbox{padding:0.5em 24px}
+.unchecked{background-image:url(chk_off.png)}
+.checked{background-image:url(chk_on.png)}
+.unselected{background-image:url(rdo_off.png)}
+.selected{background-image:url(rdo_on.png)}
