@@ -1,7 +1,8 @@
-package com.appspot.iclifeplanning.authentication;
+package com.appspot.datastore;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
+
 
 public class TokenStore {
 

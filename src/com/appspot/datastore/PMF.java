@@ -1,4 +1,4 @@
-package com.appspot.iclifeplanning.authentication;
+package com.appspot.datastore;
 
 import javax.jdo.JDOHelper;
 import javax.jdo.PersistenceManagerFactory;

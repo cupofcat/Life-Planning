@@ -2,14 +2,15 @@ package com.appspot.iclifeplanning.authentication;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
-import java.util.logging.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.appspot.datastore.TokenStore;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
+import com.google.gdata.client.calendar.CalendarService;
 import com.google.gdata.client.http.AuthSubUtil;
 import com.google.gdata.util.AuthenticationException;
 
@@ -33,14 +34,10 @@ public class AuthService {
 	public static final  String CALENDAR_FULL_FEED_REQUEST_URL 
 	    = "http://www.google.com/calendar/feeds/default/allcalendars/full";
 
-	/**Feed-url giving access to all events owned by a give user*/
-	public static final  String EVENT_FULL_FEED_REQUEST_URL 
-	    = "https://www.google.com/calendar/feeds/default/private/full";
-
 	public static final  String DEFAULT_FULL_FEED_REQUEST_URL 
 		= "http://www.google.com/calendar/feeds/default";
-
-	private static final Logger log = Logger.getLogger("AuthService");
+	
+	public static CalendarService client = new CalendarService("ic-lifeplanning-v1");
 
 	/**Constructor for singleton pattern*/
 	private AuthService() {}
