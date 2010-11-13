@@ -32,7 +32,7 @@ import com.google.gdata.util.ServiceException;
 public class CalendarUtils {
 
 	/** AuthService instance for singleton-based design*/
-	private static CalendarUtils authServiceInstance = null;
+	private static CalendarUtils calendarUtilsInstance = null;
 
 	/**Service used to monitor the currently the users of the application*/
 	private static UserService userService = UserServiceFactory.getUserService();
@@ -49,12 +49,14 @@ public class CalendarUtils {
 	/**Constructor for singleton pattern*/
 	private CalendarUtils() {}
 	
-	public static CalendarUtils getAuthServiceInstance() {
-		if (authServiceInstance == null) authServiceInstance = new CalendarUtils();
-		return authServiceInstance;
+	public static CalendarUtils getCalendarUtils() {
+		if (calendarUtilsInstance == null) {
+			calendarUtilsInstance = new CalendarUtils();
+		}
+		return calendarUtilsInstance;
 	}
 	
-	public String requestCalendarAccessUrl(String nextUrl)
+	public String getCalendarAccessUrl(String nextUrl)
 	    throws IOException{
 	      
 	      String requestUrl = AuthSubUtil.getRequestUrl(nextUrl,
@@ -87,10 +89,6 @@ public class CalendarUtils {
 		return userService.createLogoutURL(request.getRequestURI());
 	}
 
-	public void revokeToken() {
-		TokenStore.deleteTokend(userService.getCurrentUser().getUserId());
-	}
-
 	public String getCurrentUserId() {
 		return userService.getCurrentUser().getUserId();
 	}
@@ -111,6 +109,7 @@ public class CalendarUtils {
 		try {
 			calendarResultFeed = AuthService.client.getFeed(calendarFeedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
+			TokenStore.deleteTokend(userService.getCurrentUser().getUserId());
 			throw new TokenException(); 
 		} catch (MalformedURLException e1) {
 			assert false;
@@ -122,12 +121,15 @@ public class CalendarUtils {
 
         for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
           calendarEntry = calendarResultFeed.getEntries().get(i);
-	  	  eventFeedLink = calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
-		  try {
+	  	  eventFeedLink
+	  	  	= calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
+		  
+	  	  try {
 			eventFeedUrl = new URL(eventFeedLink.getHref());
-		} catch (MalformedURLException e) {
+		  } catch (MalformedURLException e) {
 			assert false;
-		}
+		  }
+		  
 		  urls.add(eventFeedUrl);
         }
 
