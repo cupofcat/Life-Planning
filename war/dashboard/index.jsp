@@ -3,9 +3,40 @@
 
 <%@ page import="com.google.appengine.api.users.UserService" %>
 <%@ page import="com.google.appengine.api.users.UserServiceFactory" %>
+<%@ page import="com.appspot.iclifeplanning.authentication.CalendarUtils" %>
+<%@ page import="com.appspot.iclifeplanning.authentication.TokenException" %>
+
+<%@ page import="java.lang.NullPointerException" %>
+<%@ page import="java.io.IOException" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.net.URL" %>
 
 <%
   UserService userService = UserServiceFactory.getUserService();
+  //TODO: check if the token is there first:
+  String setTokenDiv = "<h1>Setting ok</h1>";
+  try {
+    CalendarUtils.getCalendarUtils().setTokenFromReply(request.getQueryString());
+  } catch (NullPointerException e) {
+    setTokenDiv = "e.toString()";
+  }
+  String noTokenDiv = "<br />";
+  String calendarsDiv = "<hr />";
+
+  try {
+    Set<URL> feeds = CalendarUtils.getCalendarUtils().getCalendarURLs();
+    calendarsDiv = "<div><ul>";
+    for(URL url : feeds) {
+      calendarsDiv += "<li>" + url.toString() + "</li>";
+    }
+    calendarsDiv +="</ul></div>";
+  } catch (TokenException e) {
+    noTokenDiv = "<div>No token, go to <a href=\"" +
+    CalendarUtils.getCalendarUtils().getCalendarAccessUrl(request.getRequestURL().toString()) +
+    "\">link</a>!</div>";
+  } catch (IOException e) {
+    
+  }
 %>
 
 <html>
@@ -65,6 +96,9 @@
             <a href="#">Optimise my life!</a>
           </div>
         </div>
+        <%= setTokenDiv %>
+        <%= noTokenDiv %>
+        <%= calendarsDiv %>
       <div id="calendar_suggestions">
         <div class='demo'>
           <form action='' method='post' class='centre'> 
