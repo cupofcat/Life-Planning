@@ -1,0 +1,41 @@
+#lavaLampMenu {
+	posi tion: relative;
+	height: 85px;
+	width: 290px;
+	text-align: center;
+	overflow: hidden;
+	border: 0;
+	margin: 0px auto;
+}
+#lavaLampMenu li {
+	float: left;
+    list-style: none;
+	position: relative;
+	top: 25px;
+	padding-top: 6px;
+	height: 27px;
+}
+#lavaLampMenu li.backLava {
+	border: 0;
+	background: url("../img/000000-70.png");
+	width: 9px;
+	z-index: 8;
+	position: absolute;
+}
+#lavaLampMenu li a {
+	font-family: Futura;
+	font-size: 18px;
+	text-transform: uppercase;
+	text-decoration: none;
+	color: #fff;
+	text-align: center;
+
+	z-index: 10;
+	position: relative;
+	vertical-align: center;
+	display: block;
+	wi dth: 75px;
+	padding: 0 10px;
+	height: 35px;
+	top: 0px;
+}
