@@ -1,0 +1,114 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>Highcharts Example</title>
+		
+		
+		<!-- 1. Add these JavaScript inclusions in the head of your page -->
+		<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+		<script type="text/javascript" src="../js/highcharts.js"></script>
+		
+		<!-- 1a) Optional: the exporting module -->
+		<script type="text/javascript" src="../js/modules/exporting.js"></script>
+		
+		
+		<!-- 2. Add the JavaScript to initialize the chart on document ready -->
+		<script type="text/javascript">
+		
+		var serverData = {
+			masterCharts: [],
+			// other data might be placed in this container
+			
+		};
+		
+		var chart;
+		
+								
+		// gets data from the server
+		$.getJSON("plan-achievement", {"sphere": "Russia"}, function(data){
+			
+			seriesFromServer = data.series;
+			
+			for(i=0; i<seriesFromServer.length; i++)
+			{
+				currentSeries = {
+						name: seriesFromServer[i].name,
+						data: seriesFromServer[i].data
+					};
+					
+				serverData.masterCharts.push(currentSeries);
+			}
+			
+			chart = new Highcharts.Chart({
+					chart: {
+						renderTo: 'container', 
+						defaultSeriesType: 'area'
+					},
+					title: {
+						text: 'US and USSR nuclear stockpiles'
+					},
+					subtitle: {
+						text: 'Source: <a href="http://thebulletin.metapress.com/content/c4120650912x74k7/fulltext.pdf">'+
+							'thebulletin.metapress.com</a>'
+					},
+					xAxis: {
+					},
+					yAxis: {
+						title: {
+							text: 'Nuclear weapon states'
+						},
+						labels: {
+							formatter: function() {
+								return this.value / 1000 +'k';
+							}
+						}
+					},
+					tooltip: {
+						formatter: function() {
+							return this.series.name +' produced <b>'+
+								Highcharts.numberFormat(this.y, 0, null, ' ') +'</b><br/>warheads in '+ this.x;
+						}
+					},
+					plotOptions: {
+						area: {
+							pointStart: 1940,
+							marker: {
+								enabled: false,
+								symbol: 'circle',
+								radius: 2,
+								states: {
+									hover: {
+										enabled: true
+									}
+								}
+							}
+						}
+					},
+					legend: {
+						enabled: true
+					},
+					credits: {
+						enabled: false
+					},
+					series: serverData.masterCharts
+				});
+		});
+		
+		
+			
+		$(document).ready(function() {
+			
+		});
+				
+		</script>
+		
+	</head>
+	<body>
+		
+		<!-- 3. Add the container -->
+		<div id="container" style="width: 800px; height: 400px; margin: 0 auto"></div>
+		
+				
+	</body>
+</html>

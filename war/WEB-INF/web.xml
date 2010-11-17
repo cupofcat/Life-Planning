@@ -15,7 +15,31 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>LifePlanning</servlet-name>
 		<url-pattern>/lifeplanning</url-pattern>
 	</servlet-mapping>
-
+	<servlet>
+		<servlet-name>ChosenPriorities</servlet-name>
+		<servlet-class>com.appspot.iclifeplanning.charts.ChosenPrioritiesServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>ChosenPriorities</servlet-name>
+		<url-pattern>/chosen-priorities</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>SpheresHistory</servlet-name>
+		<servlet-class>com.appspot.iclifeplanning.charts.SpheresHistoryServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>SpheresHistory</servlet-name>
+		<url-pattern>/spheres-history</url-pattern>
+	</servlet-mapping>
+	<servlet>
+		<servlet-name>PlanAchievement</servlet-name>
+		<servlet-class>com.appspot.iclifeplanning.charts.PlanAchievementServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>PlanAchievement</servlet-name>
+		<url-pattern>/plan-achievement</url-pattern>
+	</servlet-mapping>
+	
 	<!-- Top-level web-page for our app -->
 	<welcome-file-list>
 	    <welcome-file>index.jsp</welcome-file>
