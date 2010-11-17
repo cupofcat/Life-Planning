@@ -3,17 +3,34 @@ package com.appspot.analyser;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
+import javax.jdo.annotations.*;
+
+import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.User;
 import com.google.gdata.data.TextConstruct;
 import com.google.gdata.data.calendar.CalendarEventEntry;
 
+@PersistenceCapable
+@Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
 public class BaseCalendarSlot implements ICalendarSlot {
-	private String title;
-	private String description;
-	private Calendar startDate;
-	private Calendar endDate;
-	private User user;
-
+	
+	@PrimaryKey
+    @Persistent
+    protected Key key;
+	@Persistent
+	protected String title;
+	@Persistent
+	protected String description;
+	@Persistent
+	protected Calendar startDate;
+	@Persistent
+	protected Calendar endDate;
+	@Persistent
+	protected User user;
+	
+	protected BaseCalendarSlot(){
+	}
+	
 	public BaseCalendarSlot(CalendarEventEntry calendarEventEntry) {
 		Calendar start, end;
 		start = new GregorianCalendar();
@@ -26,15 +43,15 @@ public class BaseCalendarSlot implements ICalendarSlot {
 		title = calendarEventEntry.getTitle().getPlainText();
 	}
 	
-	public BaseCalendarSlot(Calendar startDate, Calendar endDate, User user) {
+	public BaseCalendarSlot(Calendar startDate, Calendar endDate) {
 		this.user = user;
 		this.startDate = startDate;
 		this.endDate = endDate;
 	}
 	
 	public BaseCalendarSlot(String title, String description, Calendar startDate,
-			Calendar endDate, User user) {
-		this(startDate, endDate, user);
+			Calendar endDate) {
+		this(startDate, endDate);
 		this.title = title;
 		this.description = description;
 	}
@@ -71,10 +88,6 @@ public class BaseCalendarSlot implements ICalendarSlot {
 		this.endDate = endDate;
 	}
 
-	public User getUser() {
-		return user;
-	}
-
 	public double getDuration() {
 		return (endDate.get(Calendar.DAY_OF_MONTH) - startDate.get(Calendar.DAY_OF_MONTH)) * 1440
 		+ (endDate.get(Calendar.HOUR_OF_DAY) - startDate.get(Calendar.HOUR_OF_DAY)) * 60
@@ -82,10 +95,6 @@ public class BaseCalendarSlot implements ICalendarSlot {
 	}
 	
 	public int compareTo(ICalendarSlot slot){
-		if(startDate.before(slot))
-			return -1;
-		else if(startDate.after(slot))
-			return 1;
-		return 0;
+		return startDate.compareTo(slot.getStartDate());
 	}
 }

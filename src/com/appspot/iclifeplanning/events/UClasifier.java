@@ -17,17 +17,17 @@ public class UClasifier {
 	private static final String WRITE_KEY = "QQNFLRrBi2U5JL0fxFdzGadWg40";
 	private static final String SPHERES_CLASIFIER = "Spheres";
 
-	public static Map<String, Integer> analyse(TextConstruct description) {
+	public static Map<String, Double> analyse(TextConstruct description) {
 		final UClassifyClientFactory factory = UClassifyClientFactory.newInstance(READ_KEY, null);
 		final UClassifyClient client = factory.createUClassifyClient();
 		String desc = description.getPlainText();
 		Map<String, Classification> resultMap = client.classify(USER_NAME, SPHERES_CLASIFIER, Arrays.asList(desc));
 		Classification c = resultMap.get(desc);
 		List<Class> cz = c.getClazz();
-		Map<String, Integer> result = new HashMap<String, Integer>();
-		int percentage;
+		Map<String, Double> result = new HashMap<String, Double>();
+		double percentage;
 		for (Class cls : cz) {
-			percentage = (int) (cls.getP() * 100);
+			percentage = (cls.getP() * 100);
 			result.put(cls.getClassName(), percentage);
 		}
 		return result;

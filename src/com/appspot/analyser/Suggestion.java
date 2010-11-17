@@ -8,48 +8,66 @@ import com.google.appengine.api.users.User;
 
 
 public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
-	private double minDuration;
-	private double maxDuration;
 	private boolean isRecurring;
 	private boolean canReschedule;
-	private Map<SphereName, Integer> spheres;
+	private Map<SphereName, Double> spheres;
+	private Pair<Double, Double> durationInterval;
 	
 	public Suggestion(String title, String description, Calendar startDate,
-			Calendar endDate, User user, double minDuration, double maxDuration) {
-		super(title, description, startDate, endDate, user);
-		this.minDuration = minDuration;
-		this.maxDuration = maxDuration;
-		isRecurring = false;
-		canReschedule = false;
+			Calendar endDate){
+		super(title, description, startDate, endDate);
+	}
+	
+	public Suggestion(BaseCalendarSlot slot){
+		super(slot.getTitle(), slot.getDescription(), slot.getStartDate(), slot.getEndDate());
+	}
+	
+	public Suggestion(IEvent e){
+		this(e.getTitle(), e.getDescription(), e.getStartDate(), e.getEndDate(), 
+				e.getDurationInterval().getFirst(), e.getDurationInterval().getSecond(),
+				e.isRecurring(), e.canReschedule(), e.getSpheres());
 	}
 
 	public Suggestion(String title, String description, Calendar startDate,
-			Calendar endDate, User user, double minDuration, double maxDuration,
-			boolean isRecurring, boolean canReschedule) {
-		this(title, description, startDate, endDate, user, minDuration, maxDuration);
-		this.isRecurring = isRecurring;
-		this.canReschedule = canReschedule;
-	}
-	
-	public double minDuration() {
-		return 0;
-	}
-
-	public double maxDuration() {
-		return 0;
+			Calendar endDate, double minDuration, double maxDuration,
+			boolean isRecurring, boolean canReschedule, Map<SphereName, Double> s) {
+		this(title, description, startDate, endDate);
+		durationInterval = new Pair<Double, Double>(minDuration, maxDuration);
+		setRecurring(isRecurring);
+		setReschedule(canReschedule);
+		setSpheres(s);
 	}
 
 	public boolean isRecurring() {
-		return false;
+		return isRecurring;
+	}
+	
+	public void setRecurring(boolean r){
+		isRecurring = r;
 	}
 
 	public boolean canReschedule() {
-		return false;
+		return canReschedule;
+	}
+	
+	public void setReschedule(boolean can){
+		canReschedule = can;
 	}
 
-	public Map<SphereName, Integer> getSpheres() {
-		return null;
+	public Map<SphereName, Double> getSpheres() {
+		return spheres;
+	}
+	
+	public void setSpheres(Map<SphereName,Double> spheres){
+		this.spheres = spheres;
 	}
 
-
+	public Pair<Double, Double> getDurationInterval() {
+		return durationInterval;
+	}
+	
+	public void setDeurationInterval(double min, double max){
+		durationInterval = new Pair<Double, Double>(min, max);
+	}
+	
 }

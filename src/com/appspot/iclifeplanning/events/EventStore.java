@@ -20,6 +20,7 @@ public class EventStore {
 
 	private static EventStore eventStore = null;
 	private Set<Event> allEvents = new HashSet<Event>();
+	private Set<URL> urls = new HashSet<URL>();
 	private static final Logger log = Logger.getLogger("EventStore");
 	
 	private EventStore() {}
@@ -34,7 +35,6 @@ public class EventStore {
 
 		allEvents = new HashSet<Event>();
 
-		// Connect to Google Calendar and gather data
         URL calendarFeedUrl = new URL(AuthService.CALENDAR_FULL_FEED_REQUEST_URL);
 		CalendarFeed calendarResultFeed = null;
 
@@ -57,6 +57,7 @@ public class EventStore {
           calendarEntry = calendarResultFeed.getEntries().get(i);
 	  	  eventFeedLink = calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
 		  eventFeedUrl = new URL(eventFeedLink.getHref());
+		  urls.add(eventFeedUrl);
 		  query = new CalendarQuery(eventFeedUrl);
 		  query.setStringCustomParameter("singleevents", "true");
 
@@ -73,6 +74,10 @@ public class EventStore {
 			  allEvents.add(event);
 		  }
         }
+	}
+
+	public Set<URL> getCalendarURLs() {		
+		return urls;
 	}
 
 	public Set<Event> getEvents() {
