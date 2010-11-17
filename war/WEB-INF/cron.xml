@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+  <cron>
+    <url>/notifications</url>
+    <description>Send notifications to users every day</description>
+    <schedule>every day 00:00</schedule>
+  </cron>
+</cronentries>
