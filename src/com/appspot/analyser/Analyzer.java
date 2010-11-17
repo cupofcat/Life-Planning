@@ -43,7 +43,7 @@ public class Analyzer {
 			Pair<Double, Double> eventDurationInterval = event.getDurationInterval();
 			for(SphereName sphere : sphereInfluences.keySet()) {
 				SphereInfo info = sphereResults.get(sphere);
-				Double accuracy = info.getRatioAccuracy(sphereInfluences.get(sphere) * eventLength, userBusyTime + eventLength);
+				//Double accuracy = info.getRatioAccuracy(sphereInfluences.get(sphere) * eventLength, userBusyTime + eventLength);
 			}
 		}
 		return null;
