@@ -58,6 +58,11 @@
     <script type="text/javascript" src="../js/jquery.easing.1.3.js"></script>
     <script type="text/javascript" src="../js/jquery.lavalamp-1.3.4b2.js"></script>
     <script type="text/javascript" src="js/drawer.js"></script>
+	
+	<!--  Highcharts libraries: -->
+	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
+	<script type="text/javascript" src="js/highcharts.js"></script>
+	<script type="text/javascript" src="js/modules/exporting.js"></script>
 
     <script type="text/javascript">
       jQuery.noConflict();
@@ -65,6 +70,16 @@
         jQuery("#lavaLampMenu").lavaLamp({fx: "swing", speed: 200});
       });
     </script>
+	
+	
+	<!-- Loads historic chart -->
+	<script type="text/javascript" src="js/chosen-priorities.js"></script>
+	<script type="text/javascript" src="js/spheres-history.js"></script>
+	<script type="text/javascript">
+	var sphereOfInterest = {"sphere": "Russia"};
+	</script>
+	<script type="text/javascript" src="js/plan-achievement.js"></script>
+	
   </head>
   <body>
     <div id="main">
@@ -85,39 +100,11 @@
         </div>
       </div>
       <div id="body">
-        <ul id="drw_tabs">
-        	<li><a href="#calendar_div" rel="drw">Calendar</a></li>
-        	<!--<li><a href="#calendar_changes" rel="drw">Suggested changes</a></li>-->
-        </ul>
-        <div id="drw"></div>
-        <div id="calendar_div" class="sample">
-        	<iframe class="calendar" src="https://www.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;height=500&amp;wkst=2&amp;bgcolor=%23ffffff" style=" border-width:0 "></iframe>
-          <div id="optimize_button">
-            <a href="#">Optimise my life!</a>
-          </div>
-        </div>
-        <%= setTokenDiv %>
-        <%= noTokenDiv %>
-        <%= calendarsDiv %>
-      <div id="calendar_suggestions">
-        <div class='demo'>
-          <form action='' method='post' class='centre'> 
-          	<ul> 
-            	<li class='tip' title='Checkbox :: Again, easily styled to behave like a normal checkbox, but prettily.'> 
-            		<strong>Suggestions:</strong> 
-            		<label class='f_checkbox'><input type='checkbox' name='s1' checked='checked'>
-            		  <p>Suggestion 1</p><p> aslkja klasjf klsdfjalskjdf asdlfkjaldfjalkfj slSuggestion 1lSuggestion 1lSuggestionestion fkjd d d  d f Suggestion 1Suggestion 1Suggestion 1Suggestion asdSuggestion 1 dalkfjasfl sldkfjasldfkj sldkfjaslkfj woeirumn 92034 09asdf aslfkjasdf sadflkj</p>
-            		</label> 
-            		<label class='f_checkbox'><input type='checkbox' name='s2' checked='checked'>Suggestiosn 2</label> 
-            		<label class='f_checkbox'><input type='checkbox' name='s3' checked='checked'>Suggestion 3</label> 
-            	</li> 
-            	<li class='centre' style='margin-top:4px'> 
-            		<input type='reset' value='Reset'> <input type='submit' name='submit' value='Submit Form'> 
-            	</li> 
-          </ul> 
-          </form>
-        </div>
-      </div>
+	  
+       <div id="priorities-chart" style="width: 800px; height: 400px; margin: 0 auto"></div>
+	   <div id="historicChart" style="width: 800px; height: 400px; margin: 0 auto"></div>
+	   <div id="plan-achievement" style="width: 800px; height: 400px; margin: 0 auto"></div>
+	   
       </div>
       <div id="footer">
       </div>
