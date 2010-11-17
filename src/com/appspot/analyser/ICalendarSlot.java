@@ -14,9 +14,7 @@ public interface ICalendarSlot extends Comparable<ICalendarSlot> {
 	public Calendar getStartDate();
 	public void setStartDate(Calendar start);
 	public Calendar getEndDate();
-	public void setEndDate(Calendar end);
-	public User getUser();
-	
+	public void setEndDate(Calendar end);	
 	public double getDuration();
 
 }

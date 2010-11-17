@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import com.appspot.analyser.BaseCalendarSlot;
 import com.appspot.analyser.IEvent;
+import com.appspot.analyser.Pair;
 import com.appspot.datastore.SphereName;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.TextConstruct;
@@ -77,9 +78,9 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		return true;
 	}
 //zobaczyc czy dziala
-	public Map<SphereName, Integer> getSpheres() {
-		Map<String, Integer> tmp = UClasifier.analyse(description);
-		Map<SphereName, Integer> res = new HashMap<SphereName, Integer>();
+	public Map<SphereName, Double> getSpheres() {
+		Map<String, Double> tmp = UClasifier.analyse(description);
+		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
 		for(String key : tmp.keySet()){		
 			for(SphereName name : SphereName.values()){
 				if(key.equalsIgnoreCase(name.toString())){
@@ -105,5 +106,17 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	public double maxDuration() {
 		return 0;
+	}
+
+	@Override
+	public Pair<Double> getDurationInterval() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public void makePersistent() {
+		// TODO Auto-generated method stub
+		
 	}
 }
