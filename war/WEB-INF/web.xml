@@ -16,9 +16,20 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/lifeplanning</url-pattern>
 	</servlet-mapping>
 
+	<!-- Servlet responsible notification. Used for scheduled cron jobs -->
+	<servlet>
+		<servlet-name>Notifications</servlet-name>
+		<servlet-class>com.appspot.iclifeplanning.notifications.NotificationServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Notifications</servlet-name>
+		<url-pattern>/notifications</url-pattern>
+	</servlet-mapping>
+
 	<!-- Top-level web-page for our app -->
 	<welcome-file-list>
 	    <welcome-file>index.jsp</welcome-file>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
+
 </web-app>
