@@ -76,7 +76,7 @@ public class EventStore {
         }
 	}
 
-	public Set<URL> getCalendarURLs() {		
+	public Set<URL> getCalendarURLs() {
 		return urls;
 	}
 

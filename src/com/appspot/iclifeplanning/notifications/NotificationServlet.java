@@ -36,6 +36,7 @@ public class NotificationServlet extends HttpServlet {
 			throws IOException {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+		// Does this work?
 	    Set<Email> emails = (Set<Email>) pm.getManagedObjects(Email.class);
 	    MailService ms = new MailService();
 		
