@@ -93,8 +93,8 @@ public class CalendarUtils {
 		return userService.getCurrentUser().getUserId();
 	}
 
-	public Set<URL> getCalendarURLs() throws IOException, TokenException {		
-		Set<URL> urls = new HashSet<URL>();
+	public Set<String> getCalendarURLs() throws IOException, TokenException {		
+		Set<String> urls = new HashSet<String>();
 
         URL calendarFeedUrl = null;
 		try {
@@ -119,19 +119,16 @@ public class CalendarUtils {
 
 		CalendarEntry calendarEntry;
 		Link eventFeedLink;
-		URL eventFeedUrl = null;
+		String eventFeedUrl = null;
 
         for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
           calendarEntry = calendarResultFeed.getEntries().get(i);
 	  	  eventFeedLink
 	  	  	= calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
 		  
-	  	  try {
-			eventFeedUrl = new URL(eventFeedLink.getHref());
-		  } catch (MalformedURLException e) {
-			assert false;
-		  }
-		  
+		  eventFeedUrl = eventFeedLink.getHref();
+		  eventFeedUrl = eventFeedUrl.substring(37, eventFeedUrl.length() - 13);
+
 		  urls.add(eventFeedUrl);
         }
 

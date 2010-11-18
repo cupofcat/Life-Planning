@@ -14,24 +14,21 @@
 <%
   UserService userService = UserServiceFactory.getUserService();
   //TODO: check if the token is there first:
-  String setTokenDiv = "<h1>Setting ok</h1>";
   try {
     CalendarUtils.getCalendarUtils().setTokenFromReply(request.getQueryString());
   } catch (NullPointerException e) {
-    setTokenDiv = "e.toString()";
+    //This is expected in most cases
   }
   String noTokenDiv = "<br />";
-  String calendarsDiv = "<hr />";
+  String calendars = "";
 
   try {
-    Set<URL> feeds = CalendarUtils.getCalendarUtils().getCalendarURLs();
-    calendarsDiv = "<div><ul>";
-    for(URL url : feeds) {
-      calendarsDiv += "<li>" + url.toString() + "</li>";
+    Set<String> feeds = CalendarUtils.getCalendarUtils().getCalendarURLs();
+    for(String url : feeds) {
+      calendars += "&amp;src=" + url;
     }
-    calendarsDiv +="</ul></div>";
   } catch (TokenException e) {
-    noTokenDiv = "<div>No token, go to <a href=\"" +
+    noTokenDiv = "<div style=\"text-align: center; font-size: 20px; font-face: Futura; text-transform: capitalize; \">No token, go to <a href=\"" +
     CalendarUtils.getCalendarUtils().getCalendarAccessUrl(request.getRequestURL().toString()) +
     "\">link</a>!</div>";
   } catch (IOException e) {
@@ -91,14 +88,12 @@
         </ul>
         <div id="drw"></div>
         <div id="calendar_div" class="sample">
-        	<iframe class="calendar" src="https://www.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;height=500&amp;wkst=2&amp;bgcolor=%23ffffff" style=" border-width:0 "></iframe>
+        	<iframe class="calendar" src="https://www.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;height=500&amp;wkst=2&amp;bgcolor=%23ffffff<%= calendars %>" style=" border-width:0 "></iframe>
           <div id="optimize_button">
             <a href="#">Optimise my life!</a>
           </div>
         </div>
-        <%= setTokenDiv %>
         <%= noTokenDiv %>
-        <%= calendarsDiv %>
       <div id="calendar_suggestions">
         <div class='demo'>
           <form action='' method='post' class='centre'> 
