@@ -65,7 +65,6 @@
           $.getJSON("../suggestions", function(sugs){
             $formContainer = $("#calendar_suggestions .demo");
             $frm = "<form action='' method='post' class='centre'><ul>";
-            $frm += "<li class='tip' title='This is a tip'>";
             $.each(sugs, function(i, s){
               $frm += "<label class='f_checkbox'><input type='checkbox' name='s" + i + "' checked='checked'>";
               $frm += "<div class=\"title\">" + s.title + "</div>";
@@ -76,7 +75,7 @@
               })
               $frm += "</div></label>";
             })
-            $frm += "</li></ul></form>";
+            $frm += "<br /><br /><input type=\"submit\"></ul></form>";
             $formContainer.html($frm);
             $.getScript("js/moocheck.js");
           });
@@ -97,7 +96,7 @@
               <ul class="lamp" id="lavaLampMenu">
                   <li><a href="">Dashboard</a></li>
                   <li><a href="">Settings</a></li>
-                  <li><a href="">Help</a></li>
+                  <li><a href="stats.jsp">Stats</a></li>
                   <li><a href="<%= userService.createLogoutURL("/") %>">Logout</a></li>
               </ul>
             </div>
@@ -116,10 +115,12 @@
           </div>
         </div>
         <%= noTokenDiv %>
+        <br /><br />
       <div id="calendar_suggestions">
         <div class='demo'>
         </div>
       </div>
+      <br /><br />
       </div>
       <div id="footer">
       </div>

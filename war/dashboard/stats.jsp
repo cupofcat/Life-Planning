@@ -13,30 +13,6 @@
 
 <%
   UserService userService = UserServiceFactory.getUserService();
-  //TODO: check if the token is there first:
-  String setTokenDiv = "<h1>Setting ok</h1>";
-  try {
-    CalendarUtils.getCalendarUtils().setTokenFromReply(request.getQueryString());
-  } catch (NullPointerException e) {
-    setTokenDiv = "e.toString()";
-  }
-  String noTokenDiv = "<br />";
-  String calendarsDiv = "<hr />";
-
-  try {
-    Set<URL> feeds = CalendarUtils.getCalendarUtils().getCalendarURLs();
-    calendarsDiv = "<div><ul>";
-    for(URL url : feeds) {
-      calendarsDiv += "<li>" + url.toString() + "</li>";
-    }
-    calendarsDiv +="</ul></div>";
-  } catch (TokenException e) {
-    noTokenDiv = "<div>No token, go to <a href=\"" +
-    CalendarUtils.getCalendarUtils().getCalendarAccessUrl(request.getRequestURL().toString()) +
-    "\">link</a>!</div>";
-  } catch (IOException e) {
-    
-  }
 %>
 
 <html>
@@ -90,9 +66,9 @@
             <div id="logo"><div id="bg"></div><h1><%= request.getUserPrincipal().getName() %></h1></div>
             <div id="menu">
               <ul class="lamp" id="lavaLampMenu">
-                  <li><a href="">Dashboard</a></li>
+                  <li><a href="index.jsp">Dashboard</a></li>
                   <li><a href="">Settings</a></li>
-                  <li><a href="">Help</a></li>
+                  <li><a href="">Stats</a></li>
                   <li><a href="<%= userService.createLogoutURL("/") %>">Logout</a></li>
               </ul>
             </div>
@@ -100,10 +76,10 @@
         </div>
       </div>
       <div id="body">
-	  
-       <div id="priorities-chart" style="width: 800px; height: 400px; margin: 0 auto"></div>
-	   <div id="historicChart" style="width: 800px; height: 400px; margin: 0 auto"></div>
-	   <div id="plan-achievement" style="width: 800px; height: 400px; margin: 0 auto"></div>
+	  <br /><br />
+       <div id="priorities-chart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
+	   <div id="historicChart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
+	   <div id="plan-achievement" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
 	   
       </div>
       <div id="footer">
