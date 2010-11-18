@@ -39,6 +39,7 @@ import com.appspot.analyser.BaseCalendarSlot;
 >>>>>>> Adding more dummy events.
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
+import com.appspot.analyser.Pair;
 import com.appspot.analyser.Proposal;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
@@ -81,6 +82,7 @@ public class SuggestionServlet extends HttpServlet {
 		IEvent event1 = (IEvent)events.toArray()[0];
 		IEvent event2 = (IEvent)events.toArray()[1];
 		IEvent event3 = (IEvent)events.toArray()[2];
+
 
 		Suggestion sug = new DeleteSuggestion(event1);
 		suggestions.add(sug);
