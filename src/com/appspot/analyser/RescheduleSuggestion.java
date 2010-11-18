@@ -43,4 +43,9 @@ public class RescheduleSuggestion extends Suggestion {
 		// lub alter running time
 	}
 
+	@Override
+	public String getType() {
+		return "Rescedule";
+	}
+
 }
