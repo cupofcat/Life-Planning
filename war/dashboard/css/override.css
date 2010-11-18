@@ -57,3 +57,11 @@ div#calendar_suggestions .times {
 	float: lef t;
 	color: $ddd;
 }
+
+div#calendar_suggestions .spheres {
+	font-family: Futura;
+	font-size: 10px;
+	margin-bottom: 10px;
+	float: right;
+	color: $ddd;
+}

@@ -71,11 +71,12 @@
             $.each(sugs, function(i, s){
               $frm += "<label class='f_checkbox'><input type='checkbox' name='s" + i + "' checked='checked'>";
               $frm += "<div class=\"title\">" + s.title + "</div>";
-              $frm += "<div class=\"time\">"+ s.startDateTime + " - " + s.endDateTime + "</div>";
+              $frm += "<div class=\"times\">"+ s.startDateTime + " - " + s.endDateTime + "</div>";
+              $frm += "<div class=\"spheres\">"
               $.each(s.spheres, function(j, sph){
-                $frm += sph;
+                $frm += sph + " ";
               })
-              $frm += "</label>";
+              $frm += "</div></label>";
             })
             $frm += "</li></ul></form>";
             $formContainer.html($frm);
@@ -121,30 +122,6 @@
         <%= calendarsDiv %>
       <div id="calendar_suggestions">
         <div class='demo'>
-          <form action='' method='post' class='centre'> 
-                    	<ul> 
-                      	<li class='tip' title=''> 
-                      		<label class='f_checkbox'><input type='checkbox' name='s1' checked='checked'>
-                      		  <div class="title">Title</div>
-                      		  <div class="times"> (2010-12-13 - 2011-12-12)</times>
-                      		    HEALTHBALBLAFOO
-                      		</label> 
-                      		<label class='f_checkbox'><input type='checkbox' name='s2' checked='checked'>
-                      		  <div class="title">Title</div>
-                      		  <div class="times"> (2010-12-13 - 2011-12-12)</times>
-                      		    HEALTHBALBLAFOO
-                      		</label>
-                      		<label class='f_checkbox'><input type='checkbox' name='s3' checked='checked'>
-                          		  <div class="title">Title</div>
-                          		  <div class="times">2010-12-13 - 2011-12-12</times>
-                          		    HEALTHBALBLAFOO
-                          		</label>
-                      	</li> 
-                      	<li class='centre' style='margin-top:4px'> 
-                      		<input type='reset' value='Reset'> <input type='submit' name='submit' value='Submit Form'> 
-                      	</li> 
-                    </ul> 
-                    </form>
         </div>
       </div>
       </div>
