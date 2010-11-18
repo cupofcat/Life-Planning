@@ -78,11 +78,9 @@ public class SuggestionServlet extends HttpServlet {
 		// Analyzer analyser = new Analyzer();
 		List<Suggestion> suggestions = new ArrayList();// analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
 
-
 		IEvent event1 = (IEvent)events.toArray()[0];
 		IEvent event2 = (IEvent)events.toArray()[1];
 		IEvent event3 = (IEvent)events.toArray()[2];
-
 
 		Suggestion sug = new DeleteSuggestion(event1);
 		suggestions.add(sug);
