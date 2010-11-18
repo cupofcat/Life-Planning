@@ -65,11 +65,13 @@
 	<script type="text/javascript" src="js/modules/exporting.js"></script>
 
     <script type="text/javascript">
-      jQuery.noConflict();
+      //jQuery.noConflict();
       jQuery(function() {
         jQuery("#lavaLampMenu").lavaLamp({fx: "swing", speed: 200});
       });
     </script>
+	
+	<script type="text/javascript" src="js/highcharts-options.js"></script>
 	
 	
 	<!-- Loads historic chart -->
