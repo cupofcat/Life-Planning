@@ -85,11 +85,11 @@ public class CalendarUtils {
 		}
 	}
 
-	public String getLogOutURL(HttpServletRequest request) {
+	public static String getLogOutURL(HttpServletRequest request) {
 		return userService.createLogoutURL(request.getRequestURI());
 	}
 
-	public String getCurrentUserId() {
+	public static String getCurrentUserId() {
 		return userService.getCurrentUser().getUserId();
 	}
 

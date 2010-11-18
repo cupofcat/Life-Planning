@@ -16,6 +16,14 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/lifeplanning</url-pattern>
 	</servlet-mapping>
 	<servlet>
+		<servlet-name>Suggestions</servlet-name>
+		<servlet-class>com.appspot.iclifeplanning.SuggestionServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Suggestions</servlet-name>
+		<url-pattern>/suggestions</url-pattern>
+	</servlet-mapping>
+	<servlet>
 		<servlet-name>ChosenPriorities</servlet-name>
 		<servlet-class>com.appspot.iclifeplanning.charts.ChosenPrioritiesServlet</servlet-class>
 	</servlet>
