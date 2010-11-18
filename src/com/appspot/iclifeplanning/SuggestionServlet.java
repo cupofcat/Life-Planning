@@ -48,27 +48,10 @@ public class SuggestionServlet extends HttpServlet {
 		// ------------------- Dummy data
 		// Analyzer analyser = new Analyzer();
 		List<Suggestion> suggestions = new ArrayList();// analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
-		Calendar startCalendar = new GregorianCalendar(110, 11, 19, 14, 00);
-		Calendar endCalendar = new GregorianCalendar(110, 11, 19, 15, 00);
-		Proposal p = new Proposal("Go for a walk", "", startCalendar, endCalendar);
-		double first = 1;
-		double second = 2;
-		p.setDurationInterval(new Pair(first, second));
-		IEvent event1 = p;
-		startCalendar = new GregorianCalendar(110, 11, 20, 12, 00);
-		endCalendar = new GregorianCalendar(110, 11, 20, 13, 00);
-		p = new Proposal("Meet Sarah for lunch", "", startCalendar, endCalendar);
-		first = 1;
-		second = 2;
-		p.setDurationInterval(new Pair(first, second));
-		IEvent event2 = p;
-		startCalendar = new GregorianCalendar(110, 11, 20, 16, 00);
-		endCalendar = new GregorianCalendar(110, 11, 20, 17, 00);
-		p = new Proposal("Pick up Rich from school", "", startCalendar, endCalendar);
-		first = 1;
-		second = 2;
-		p.setDurationInterval(new Pair(first, second));
-		IEvent event3 = p;
+
+		IEvent event1 = (IEvent)events.toArray()[0];
+		IEvent event2 = (IEvent)events.toArray()[1];
+		IEvent event3 = (IEvent)events.toArray()[2];
 		Suggestion sug = new DeleteSuggestion(event1);
 		suggestions.add(sug);
 		sug = new DeleteSuggestion(event2);
