@@ -69,5 +69,7 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 	public void setDeurationInterval(double min, double max){
 		durationInterval = new Pair<Double, Double>(min, max);
 	}
+
+	public abstract String getType();
 	
 }

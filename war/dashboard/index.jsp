@@ -20,7 +20,7 @@
   } catch (NullPointerException e) {
     setTokenDiv = "e.toString()";
   }
-  String noTokenDiv = "<br />";
+  String noTokenDiv = "";
   String calendarsDiv = "<hr />";
 
   try {
@@ -33,7 +33,7 @@
   } catch (TokenException e) {
     noTokenDiv = "<div>No token, go to <a href=\"" +
     CalendarUtils.getCalendarUtils().getCalendarAccessUrl(request.getRequestURL().toString()) +
-    "\">link</a>!</div>";
+    "\">link</a>!</div><script>jQuery(\"#calendar_div\").hide();</script>";
   } catch (IOException e) {
     
   }
@@ -57,14 +57,36 @@
     
     <script type="text/javascript" src="../js/jquery.easing.1.3.js"></script>
     <script type="text/javascript" src="../js/jquery.lavalamp-1.3.4b2.js"></script>
-    <script type="text/javascript" src="js/drawer.js"></script>
+    <!--<script type="text/javascript" src="js/drawer.js"></script>-->
 
     <script type="text/javascript">
       jQuery.noConflict();
-      jQuery(function() {
+      jQuery(document).ready(function($) {
+        $("#optimize_button a").click(function(e){
+          e.preventDefault();
+          $.getJSON("../suggestions", function(sugs){
+            $formContainer = $("#calendar_suggestions .demo");
+            $frm = "<form action='' method='post' class='centre'><ul>";
+            $frm += "<li class='tip' title='This is a tip'>";
+            $.each(sugs, function(i, s){
+              $frm += "<label class='f_checkbox'><input type='checkbox' name='s" + i + "' checked='checked'>";
+              $frm += "<div class=\"title\">" + s.title + "</div>";
+              $frm += "<div class=\"times\">"+ s.startDateTime + " - " + s.endDateTime + "</div>";
+              $frm += "<div class=\"spheres\">"
+              $.each(s.spheres, function(j, sph){
+                $frm += sph + " ";
+              })
+              $frm += "</div></label>";
+            })
+            $frm += "</li></ul></form>";
+            $formContainer.html($frm);
+            $.getScript("js/moocheck.js");
+          });
+        });
         jQuery("#lavaLampMenu").lavaLamp({fx: "swing", speed: 200});
       });
     </script>
+    
   </head>
   <body>
     <div id="main">
@@ -85,11 +107,10 @@
         </div>
       </div>
       <div id="body">
-        <ul id="drw_tabs">
+        <!--<ul id="drw_tabs">
         	<li><a href="#calendar_div" rel="drw">Calendar</a></li>
-        	<!--<li><a href="#calendar_changes" rel="drw">Suggested changes</a></li>-->
         </ul>
-        <div id="drw"></div>
+        <div id="drw"></div>-->
         <div id="calendar_div" class="sample">
         	<iframe class="calendar" src="https://www.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;height=500&amp;wkst=2&amp;bgcolor=%23ffffff" style=" border-width:0 "></iframe>
           <div id="optimize_button">
@@ -101,21 +122,6 @@
         <%= calendarsDiv %>
       <div id="calendar_suggestions">
         <div class='demo'>
-          <form action='' method='post' class='centre'> 
-          	<ul> 
-            	<li class='tip' title='Checkbox :: Again, easily styled to behave like a normal checkbox, but prettily.'> 
-            		<strong>Suggestions:</strong> 
-            		<label class='f_checkbox'><input type='checkbox' name='s1' checked='checked'>
-            		  <p>Suggestion 1</p><p> aslkja klasjf klsdfjalskjdf asdlfkjaldfjalkfj slSuggestion 1lSuggestion 1lSuggestionestion fkjd d d  d f Suggestion 1Suggestion 1Suggestion 1Suggestion asdSuggestion 1 dalkfjasfl sldkfjasldfkj sldkfjaslkfj woeirumn 92034 09asdf aslfkjasdf sadflkj</p>
-            		</label> 
-            		<label class='f_checkbox'><input type='checkbox' name='s2' checked='checked'>Suggestiosn 2</label> 
-            		<label class='f_checkbox'><input type='checkbox' name='s3' checked='checked'>Suggestion 3</label> 
-            	</li> 
-            	<li class='centre' style='margin-top:4px'> 
-            		<input type='reset' value='Reset'> <input type='submit' name='submit' value='Submit Form'> 
-            	</li> 
-          </ul> 
-          </form>
         </div>
       </div>
       </div>

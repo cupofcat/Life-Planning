@@ -36,7 +36,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		id = calendarEventEntry.getId();
 		canReschedule = calendarEventEntry.getCanEdit();
 		isRecurring = calendarEventEntry.getRecurrence() != null;
-		parseKeywords(description);
+		parseKeywords(title);
 		log.severe("Sphere: " + getSpheres());
 	}
 
@@ -48,8 +48,8 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		this.id = id;
 	}
 
-	private void parseKeywords(TextConstruct description) {
-		String[] words = description.getPlainText().split("[\\s]+");
+	private void parseKeywords(String title) {
+		String[] words = title.split("[\\s]+");
 		
 		for(int i = 0; i < words.length; i++) {
 			if (isKeyword(words[i])) {
@@ -79,7 +79,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 //zobaczyc czy dziala
 	public Map<SphereName, Double> getSpheres() {
-		Map<String, Double> tmp = UClasifier.analyse(description);
+		Map<String, Double> tmp = UClasifier.analyse(title);
 		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
 		for(String key : tmp.keySet()){		
 			for(SphereName name : SphereName.values()){
@@ -108,15 +108,15 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		return 0;
 	}
 
-	@Override
-	public Pair<Double, Double> getDurationInterval() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void makePersistent() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Pair<Double, Double> getDurationInterval() {
+		// TODO Auto-generated method stub
+		double first = 1;
+		double second = 2;
+		return new Pair(first, second);
 	}
 }
