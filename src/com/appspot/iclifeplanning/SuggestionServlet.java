@@ -15,6 +15,7 @@ import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
+import com.appspot.datastore.TokenStore;
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.appspot.iclifeplanning.events.Event;
 import com.appspot.iclifeplanning.events.EventStore;
@@ -34,6 +35,8 @@ public class SuggestionServlet extends HttpServlet {
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+		String token = TokenStore.getToken(CalendarUtils.getCurrentUserId());
+		CalendarUtils.client.setAuthSubToken(token);
 		EventStore eventStore = EventStore.getInstance();
 		eventStore.initizalize();
 		Collection<Event> events = eventStore.getEvents();
@@ -60,7 +63,7 @@ public class SuggestionServlet extends HttpServlet {
 			
 			SimpleDateFormat date = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
 			suggestionObject.put("startDateTime", date.format(s.getStartDate().getTime()));
-			suggestionObject.put("endDateTime", date.format(s.getEndDate()));
+			suggestionObject.put("endDateTime", date.format(s.getEndDate().getTime()));
 			
 			List<String> spheres = new ArrayList<String>();
 			for (SphereName sphere : s.getSpheres().keySet()) {
@@ -72,6 +75,6 @@ public class SuggestionServlet extends HttpServlet {
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
-		return null;
+		return suggestionObject;
 	}
 }

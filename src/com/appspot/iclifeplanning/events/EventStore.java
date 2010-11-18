@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.appspot.iclifeplanning.authentication.AuthService;
+import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.google.gdata.client.calendar.CalendarQuery;
 import com.google.gdata.data.Link;
 import com.google.gdata.data.calendar.CalendarEntry;
@@ -40,8 +41,9 @@ public class EventStore {
 
 		// Connect to Google Calendar and gather data
 		try {
-			calendarResultFeed = AuthService.client.getFeed(calendarFeedUrl, CalendarFeed.class);
+			calendarResultFeed = CalendarUtils.client.getFeed(calendarFeedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
+			System.out.println("BOOOO");
 			return;
 		}
 
@@ -62,7 +64,7 @@ public class EventStore {
 		  query.setStringCustomParameter("singleevents", "true");
 
   		  try {
-			  eventResultFeed = AuthService.client.getFeed(query, CalendarEventFeed.class);
+			  eventResultFeed = CalendarUtils.client.getFeed(query, CalendarEventFeed.class);
 		  } catch (ServiceException e) {
 			  return;
 		  }
@@ -74,6 +76,7 @@ public class EventStore {
 			  allEvents.add(event);
 		  }
         }
+        System.out.println("Got all events");
 	}
 
 	public Set<URL> getCalendarURLs() {		
