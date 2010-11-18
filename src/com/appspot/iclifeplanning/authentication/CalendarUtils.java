@@ -44,7 +44,7 @@ public class CalendarUtils {
 	public static final  String DEFAULT_FULL_FEED_REQUEST_URL 
 		= "http://www.google.com/calendar/feeds/default";
 	
-	private static CalendarService client = new CalendarService("ic-lifeplanning-v1");
+	public static CalendarService client = new CalendarService("ic-lifeplanning-v1");
 
 	/**Constructor for singleton pattern*/
 	private CalendarUtils() {}
