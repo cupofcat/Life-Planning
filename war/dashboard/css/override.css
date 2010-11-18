@@ -44,3 +44,8 @@ div#optimize_button a, div#optimize_button a:visited {
 div#optimize_button a:hover, div#optimize_button a:active {
 	color: #000;
 }
+
+div#calendar_suggestions #title {
+	font-family: Futura;
+	text-transform: uppercase;
+}
