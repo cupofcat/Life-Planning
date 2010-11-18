@@ -3,9 +3,13 @@ package com.appspot.iclifeplanning;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+<<<<<<< HEAD
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
+=======
+import java.util.Collection;
+>>>>>>> Added the Suggestion servlet with an implementation of the doGet() method
 import java.util.List;
 
 import javax.servlet.http.HttpServlet;
@@ -13,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.appspot.analyser.Analyzer;
+<<<<<<< HEAD
 import com.appspot.analyser.BaseCalendarSlot;
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
@@ -21,6 +26,12 @@ import com.appspot.analyser.Proposal;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.TokenStore;
+=======
+import com.appspot.analyser.DeleteSuggestion;
+import com.appspot.analyser.IEvent;
+import com.appspot.analyser.Suggestion;
+import com.appspot.datastore.SphereName;
+>>>>>>> Added the Suggestion servlet with an implementation of the doGet() method
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.appspot.iclifeplanning.events.Event;
 import com.appspot.iclifeplanning.events.EventStore;
@@ -40,14 +51,18 @@ public class SuggestionServlet extends HttpServlet {
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
+<<<<<<< HEAD
 		String token = TokenStore.getToken(CalendarUtils.getCurrentUserId());
 		CalendarUtils.client.setAuthSubToken(token);
+=======
+>>>>>>> Added the Suggestion servlet with an implementation of the doGet() method
 		EventStore eventStore = EventStore.getInstance();
 		eventStore.initizalize();
 		Collection<Event> events = eventStore.getEvents();
 		// ------------------- Dummy data
 		// Analyzer analyser = new Analyzer();
 		List<Suggestion> suggestions = new ArrayList();// analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
+<<<<<<< HEAD
 
 		IEvent event1 = (IEvent)events.toArray()[0];
 		IEvent event2 = (IEvent)events.toArray()[1];
@@ -57,6 +72,9 @@ public class SuggestionServlet extends HttpServlet {
 		sug = new DeleteSuggestion(event2);
 		suggestions.add(sug);
 		sug = new DeleteSuggestion(event3);
+=======
+		Suggestion sug = new DeleteSuggestion((IEvent)events.toArray()[0]);
+>>>>>>> Added the Suggestion servlet with an implementation of the doGet() method
 		suggestions.add(sug);
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
