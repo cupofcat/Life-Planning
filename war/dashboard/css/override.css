@@ -45,11 +45,15 @@ div#optimize_button a:hover, div#optimize_button a:active {
 	color: #000;
 }
 
-div#calendar_suggestions #title {
+div#calendar_suggestions .title {
 	font-family: Futura;
-	text-transform: uppercase;
+	font-size: 20px;
+	float: lef t;
 }
 
-div#calendar_suggestions #time {
-	
+div#calendar_suggestions .times {
+	font-family: Futura;
+	font-size: 16px;
+	float: lef t;
+	color: $ddd;
 }

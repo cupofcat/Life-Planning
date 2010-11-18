@@ -51,7 +51,7 @@
     <link rel="stylesheet" href="css/screensmall.css" type="text/css" media="screen">
   
     <script type="text/javascript" src="js/mootools.js"></script>
-    <!--<script type="text/javascript" src="js/moocheck.js"></script>-->
+    <script type="text/javascript" src="js/moocheck.js"></script>
     
     <script src="../js/jquery-1.2.6.min.js" type="text/javascript"></script>
     
@@ -121,6 +121,30 @@
         <%= calendarsDiv %>
       <div id="calendar_suggestions">
         <div class='demo'>
+          <form action='' method='post' class='centre'> 
+                    	<ul> 
+                      	<li class='tip' title=''> 
+                      		<label class='f_checkbox'><input type='checkbox' name='s1' checked='checked'>
+                      		  <div class="title">Title</div>
+                      		  <div class="times"> (2010-12-13 - 2011-12-12)</times>
+                      		    HEALTHBALBLAFOO
+                      		</label> 
+                      		<label class='f_checkbox'><input type='checkbox' name='s2' checked='checked'>
+                      		  <div class="title">Title</div>
+                      		  <div class="times"> (2010-12-13 - 2011-12-12)</times>
+                      		    HEALTHBALBLAFOO
+                      		</label>
+                      		<label class='f_checkbox'><input type='checkbox' name='s3' checked='checked'>
+                          		  <div class="title">Title</div>
+                          		  <div class="times">2010-12-13 - 2011-12-12</times>
+                          		    HEALTHBALBLAFOO
+                          		</label>
+                      	</li> 
+                      	<li class='centre' style='margin-top:4px'> 
+                      		<input type='reset' value='Reset'> <input type='submit' name='submit' value='Submit Form'> 
+                      	</li> 
+                    </ul> 
+                    </form>
         </div>
       </div>
       </div>
