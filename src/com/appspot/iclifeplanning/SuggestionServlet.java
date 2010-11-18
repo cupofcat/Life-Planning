@@ -31,7 +31,11 @@ import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
+<<<<<<< HEAD
 >>>>>>> Added the Suggestion servlet with an implementation of the doGet() method
+=======
+import com.appspot.datastore.TokenStore;
+>>>>>>> Dirty repair + dummy suggestions
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.appspot.iclifeplanning.events.Event;
 import com.appspot.iclifeplanning.events.EventStore;
@@ -52,10 +56,15 @@ public class SuggestionServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 <<<<<<< HEAD
+<<<<<<< HEAD
 		String token = TokenStore.getToken(CalendarUtils.getCurrentUserId());
 		CalendarUtils.client.setAuthSubToken(token);
 =======
 >>>>>>> Added the Suggestion servlet with an implementation of the doGet() method
+=======
+		String token = TokenStore.getToken(CalendarUtils.getCurrentUserId());
+		CalendarUtils.client.setAuthSubToken(token);
+>>>>>>> Dirty repair + dummy suggestions
 		EventStore eventStore = EventStore.getInstance();
 		eventStore.initizalize();
 		Collection<Event> events = eventStore.getEvents();
