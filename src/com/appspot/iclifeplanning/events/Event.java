@@ -108,15 +108,13 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		return 0;
 	}
 
-	@Override
-	public Pair<Double> getDurationInterval() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void makePersistent() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Pair<Double, Double> getDurationInterval() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
