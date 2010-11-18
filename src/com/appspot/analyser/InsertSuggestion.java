@@ -17,7 +17,6 @@ public class InsertSuggestion extends Suggestion {
 		super(e);
 	}
 
-	@Override
 	public void makePersistent() {
 		//wstawic nowy event w danym czasie
 	}
@@ -35,6 +34,11 @@ public class InsertSuggestion extends Suggestion {
 			Calendar startDate, Calendar endDate) {
 		super(title, description, startDate, endDate);
 		// TODO Auto-generated constructor stub
+	}
+
+	@Override
+	public String getType() {
+		return "New event";
 	}
 
 }
