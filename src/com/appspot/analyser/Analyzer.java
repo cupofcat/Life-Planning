@@ -28,6 +28,7 @@ public class Analyzer {
 		currentRatios = new double[times.length];
 	}
 	
+	THIS IS ALGORITHM VERSION
 	
 	public List<Suggestion> getSuggestions(Collection<? extends IEvent> events, String userID) throws IOException{
 		PersistenceManager pm = PMF.get().getPersistenceManager();
