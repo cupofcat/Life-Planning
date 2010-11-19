@@ -44,7 +44,7 @@ public class CalendarUtils {
 	public static final  String DEFAULT_FULL_FEED_REQUEST_URL 
 		= "http://www.google.com/calendar/feeds/default";
 	
-	private static CalendarService client = new CalendarService("ic-lifeplanning-v1");
+	public static CalendarService client = new CalendarService("ic-lifeplanning-v1");
 
 	/**Constructor for singleton pattern*/
 	private CalendarUtils() {}
@@ -85,16 +85,16 @@ public class CalendarUtils {
 		}
 	}
 
-	public String getLogOutURL(HttpServletRequest request) {
+	public static String getLogOutURL(HttpServletRequest request) {
 		return userService.createLogoutURL(request.getRequestURI());
 	}
 
-	public String getCurrentUserId() {
+	public static String getCurrentUserId() {
 		return userService.getCurrentUser().getUserId();
 	}
 
-	public Set<URL> getCalendarURLs() throws IOException, TokenException {		
-		Set<URL> urls = new HashSet<URL>();
+	public Set<String> getCalendarURLs() throws IOException, TokenException {		
+		Set<String> urls = new HashSet<String>();
 
         URL calendarFeedUrl = null;
 		try {
@@ -119,19 +119,16 @@ public class CalendarUtils {
 
 		CalendarEntry calendarEntry;
 		Link eventFeedLink;
-		URL eventFeedUrl = null;
+		String eventFeedUrl = null;
 
         for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
           calendarEntry = calendarResultFeed.getEntries().get(i);
 	  	  eventFeedLink
 	  	  	= calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
 		  
-	  	  try {
-			eventFeedUrl = new URL(eventFeedLink.getHref());
-		  } catch (MalformedURLException e) {
-			assert false;
-		  }
-		  
+		  eventFeedUrl = eventFeedLink.getHref();
+		  eventFeedUrl = eventFeedUrl.substring(37, eventFeedUrl.length() - 13);
+
 		  urls.add(eventFeedUrl);
         }
 

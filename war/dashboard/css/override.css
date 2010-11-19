@@ -8,11 +8,11 @@ div#header-long {
 }
 
 div#menu {
-	width: 420px;
+	width: 430px;
 }
 
 #lavaLampMenu {
-	width: 390px;
+	width: 400px;
 }
 
 iframe.calendar {
@@ -43,4 +43,25 @@ div#optimize_button a, div#optimize_button a:visited {
 
 div#optimize_button a:hover, div#optimize_button a:active {
 	color: #000;
+}
+
+div#calendar_suggestions .title {
+	font-family: Futura;
+	font-size: 20px;
+	float: lef t;
+}
+
+div#calendar_suggestions .times {
+	font-family: Futura;
+	font-size: 16px;
+	float: lef t;
+	color: $ddd;
+}
+
+div#calendar_suggestions .spheres {
+	font-family: Futura;
+	font-size: 10px;
+	margin-bottom: 10px;
+	float: right;
+	color: $ddd;
 }
