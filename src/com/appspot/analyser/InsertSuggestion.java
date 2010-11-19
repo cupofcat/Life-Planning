@@ -35,10 +35,9 @@ public class InsertSuggestion extends Suggestion {
 		super(title, description, startDate, endDate);
 		// TODO Auto-generated constructor stub
 	}
-
-	@Override
-	public String getType() {
-		return "New event";
-	}
+	
+ 	public String getType() {
+ 		return "New Event";
+ 	}
 
 }

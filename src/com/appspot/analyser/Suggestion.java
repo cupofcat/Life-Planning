@@ -10,6 +10,7 @@ import com.google.appengine.api.users.User;
 public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 	private boolean isRecurring;
 	private boolean canReschedule;
+	private double rating;
 	private Map<SphereName, Double> spheres;
 	private Pair<Double, Double> durationInterval;
 	
@@ -27,7 +28,13 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 				e.getDurationInterval().getFirst(), e.getDurationInterval().getSecond(),
 				e.isRecurring(), e.canReschedule(), e.getSpheres());
 	}
-
+	
+	public Suggestion(IEvent e, double rating){
+		this(e.getTitle(), e.getDescription(), e.getStartDate(), e.getEndDate(), 
+				e.getDurationInterval().getFirst(), e.getDurationInterval().getSecond(),
+				e.isRecurring(), e.canReschedule(), e.getSpheres(), rating);
+	}
+	
 	public Suggestion(String title, String description, Calendar startDate,
 			Calendar endDate, double minDuration, double maxDuration,
 			boolean isRecurring, boolean canReschedule, Map<SphereName, Double> s) {
@@ -36,6 +43,17 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 		setRecurring(isRecurring);
 		setReschedule(canReschedule);
 		setSpheres(s);
+	}
+	
+	public Suggestion(String title, String description, Calendar startDate,
+			Calendar endDate, double minDuration, double maxDuration,
+			boolean isRecurring, boolean canReschedule, Map<SphereName, Double> s, double rating) {
+		this(title, description, startDate, endDate);
+		durationInterval = new Pair<Double, Double>(minDuration, maxDuration);
+		setRecurring(isRecurring);
+		setReschedule(canReschedule);
+		setSpheres(s);
+		setRating(rating);
 	}
 
 	public boolean isRecurring() {
@@ -69,7 +87,14 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 	public void setDeurationInterval(double min, double max){
 		durationInterval = new Pair<Double, Double>(min, max);
 	}
-
+	
 	public abstract String getType();
 	
+	public double getRating() {
+		return rating;
+	}
+	
+	public void setRating(double rating) {
+		this.rating = rating;
+	}
 }

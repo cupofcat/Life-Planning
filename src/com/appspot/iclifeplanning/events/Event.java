@@ -109,12 +109,10 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public void makePersistent() {
-		// TODO Auto-generated method stub
 		
 	}
 
 	public Pair<Double, Double> getDurationInterval() {
-		// TODO Auto-generated method stub
 		double first = 1;
 		double second = 2;
 		return new Pair(first, second);

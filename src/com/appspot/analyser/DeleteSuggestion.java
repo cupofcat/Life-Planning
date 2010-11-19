@@ -23,23 +23,20 @@ public class DeleteSuggestion extends Suggestion {
 			Map<SphereName, Double> s) {
 		super(title, description, startDate, endDate, minDuration, maxDuration,
 				isRecurring, canReschedule, s);
-		// TODO Auto-generated constructor stub
 	}
 
 	public DeleteSuggestion(String title, String description,
 			Calendar startDate, Calendar endDate) {
 		super(title, description, startDate, endDate);
-		// TODO Auto-generated constructor stub
 	}
 
+ 	public String getType() {
+ 		return "Remove";
+ 	}
+ 	
 	public void makePersistent() {
-		// wywali¢ event całkowicie
+		// wywalic event calkowicie
 
-	}
-
-	@Override
-	public String getType() {
-		return "Remove";
 	}
 
 }

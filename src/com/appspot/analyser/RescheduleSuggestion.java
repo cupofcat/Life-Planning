@@ -8,7 +8,7 @@ import com.google.appengine.api.users.User;
 
 public class RescheduleSuggestion extends Suggestion {
 
-	private Pair<Calendar, Calendar> oldDates;
+	private Pair<Calendar, Calendar> newDates;
 	
 
 	
@@ -29,23 +29,22 @@ public class RescheduleSuggestion extends Suggestion {
 		super(title, description, startDate, endDate);
 	}
 
-	public RescheduleSuggestion(IEvent e, Calendar oldStart, Calendar oldEnd){
-		super(e);
-		setOldDates(oldStart, oldEnd);
+	public RescheduleSuggestion(IEvent e, Calendar newStart, Calendar newEnd, double rating){
+		super(e, rating);
+		setNewDates(newStart, newEnd);
 	}
 	
-	public void setOldDates(Calendar oldStart, Calendar oldEnd){
-		oldDates = new Pair<Calendar, Calendar>(oldStart, oldEnd);
+	public void setNewDates(Calendar newStart, Calendar newEnd){
+		newDates = new Pair<Calendar, Calendar>(newStart, newEnd);
 	}
+		
+ 	public String getType() {
+ 		return "Reschedule";
+ 	}
 
 	public void makePersistent() {
 		//wyjebac stary i wstawic nowy
 		// lub alter running time
-	}
-
-	@Override
-	public String getType() {
-		return "Rescedule";
 	}
 
 }
