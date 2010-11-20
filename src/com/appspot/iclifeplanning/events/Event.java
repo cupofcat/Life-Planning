@@ -101,12 +101,12 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double minDuration() {
-		double minDuration = (endTime.getValue() - startTime.getValue()) / 1000 / 60;
+		double minDuration = 0; //(endTime.getValue() - startTime.getValue()) / 1000 / 60;
 		return minDuration;
 	}
 
 	public double maxDuration() {
-		double maxDuration = (endTime.getValue() - startTime.getValue()) / 1000 / 60;
+		double maxDuration = 0; //(endTime.getValue() - startTime.getValue()) / 1000 / 60;
 		return maxDuration;
 	}
 

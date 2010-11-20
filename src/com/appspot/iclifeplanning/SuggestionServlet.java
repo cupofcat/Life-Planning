@@ -3,28 +3,17 @@ package com.appspot.iclifeplanning;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
-=======
-import java.util.Collection;
->>>>>>> Added the Suggestion servlet with an implementation of the doGet() method
-=======
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.GregorianCalendar;
->>>>>>> Adding more dummy events.
 import java.util.List;
-
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import com.appspot.analyser.Analyzer;
-<<<<<<< HEAD
-<<<<<<< HEAD
 import com.appspot.analyser.BaseCalendarSlot;
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
@@ -33,21 +22,14 @@ import com.appspot.analyser.Proposal;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.TokenStore;
-=======
-=======
 import com.appspot.analyser.BaseCalendarSlot;
->>>>>>> Adding more dummy events.
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Pair;
 import com.appspot.analyser.Proposal;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
-<<<<<<< HEAD
->>>>>>> Added the Suggestion servlet with an implementation of the doGet() method
-=======
 import com.appspot.datastore.TokenStore;
->>>>>>> Dirty repair + dummy suggestions
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.appspot.iclifeplanning.events.Event;
 import com.appspot.iclifeplanning.events.EventStore;
