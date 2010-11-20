@@ -1,5 +1,6 @@
 package com.appspot.iclifeplanning.events;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,7 +16,6 @@ import com.google.gdata.data.TextConstruct;
 import com.google.gdata.data.calendar.CalendarEventEntry;
 
 // TODO (amadurska): Ensure keywords come from both title & description
-// TODO (amadurska): Keywords should be really replaced by spheres.
 public class Event extends BaseCalendarSlot implements IEvent {
 	private CalendarEventEntry calendarEventEntry;
 	private DateTime startTime;
@@ -23,7 +23,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	private TextConstruct description;
 	private Set<String> keywords = new HashSet<String>();
 	private Set<Event> childEvents;
-	private String calendarTitle;
+	private URL calendarURL;
 	private String id;
 	private boolean canReschedule;
 	private boolean isRecurring;
@@ -101,11 +101,13 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double minDuration() {
-		return 0;
+		double minDuration = (endTime.getValue() - startTime.getValue()) / 1000 / 60;
+		return minDuration;
 	}
 
 	public double maxDuration() {
-		return 0;
+		double maxDuration = (endTime.getValue() - startTime.getValue()) / 1000 / 60;
+		return maxDuration;
 	}
 
 	public void makePersistent() {
@@ -114,9 +116,10 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public Pair<Double, Double> getDurationInterval() {
-		// TODO Auto-generated method stub
-		double first = 1;
-		double second = 2;
-		return new Pair(first, second);
+		return new Pair(minDuration(), maxDuration());
+	}
+
+	public void setCalendarURL(URL eventFeedUrl) {
+		this.calendarURL = eventFeedUrl;	
 	}
 }

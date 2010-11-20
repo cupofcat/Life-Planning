@@ -59,7 +59,6 @@ public class EventStore {
           calendarEntry = calendarResultFeed.getEntries().get(i);
 	  	  eventFeedLink = calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
 		  eventFeedUrl = new URL(eventFeedLink.getHref());
-		  urls.add(eventFeedUrl);
 		  query = new CalendarQuery(eventFeedUrl);
 		  query.setStringCustomParameter("singleevents", "true");
 
@@ -72,15 +71,11 @@ public class EventStore {
 		  allCalendarEvents = eventResultFeed.getEntries();
 		  for (int j = 0; j < allCalendarEvents.size(); j++) {
 			  event = new Event(allCalendarEvents.get(j));
-			  event.setTitle(calendarEntry.getTitle());
+			  event.setCalendarURL(eventFeedUrl);
 			  allEvents.add(event);
 		  }
         }
         System.out.println("Got all events");
-	}
-
-	public Set<URL> getCalendarURLs() {		
-		return urls;
 	}
 
 	public Set<Event> getEvents() {
