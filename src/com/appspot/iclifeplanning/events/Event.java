@@ -1,5 +1,6 @@
 package com.appspot.iclifeplanning.events;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -15,7 +16,6 @@ import com.google.gdata.data.TextConstruct;
 import com.google.gdata.data.calendar.CalendarEventEntry;
 
 // TODO (amadurska): Ensure keywords come from both title & description
-// TODO (amadurska): Keywords should be really replaced by spheres.
 public class Event extends BaseCalendarSlot implements IEvent {
 	private CalendarEventEntry calendarEventEntry;
 	private DateTime startTime;
@@ -23,7 +23,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	private TextConstruct description;
 	private Set<String> keywords = new HashSet<String>();
 	private Set<Event> childEvents;
-	private String calendarTitle;
+	private URL calendarURL;
 	private String id;
 	private boolean canReschedule;
 	private boolean isRecurring;
@@ -36,7 +36,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		id = calendarEventEntry.getId();
 		canReschedule = calendarEventEntry.getCanEdit();
 		isRecurring = calendarEventEntry.getRecurrence() != null;
-		parseKeywords(description);
+		parseKeywords(title);
 		log.severe("Sphere: " + getSpheres());
 	}
 
@@ -48,8 +48,8 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		this.id = id;
 	}
 
-	private void parseKeywords(TextConstruct description) {
-		String[] words = description.getPlainText().split("[\\s]+");
+	private void parseKeywords(String title) {
+		String[] words = title.split("[\\s]+");
 		
 		for(int i = 0; i < words.length; i++) {
 			if (isKeyword(words[i])) {
@@ -79,7 +79,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 //zobaczyc czy dziala
 	public Map<SphereName, Double> getSpheres() {
-		Map<String, Double> tmp = UClasifier.analyse(description);
+		Map<String, Double> tmp = UClasifier.analyse(title);
 		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
 		for(String key : tmp.keySet()){		
 			for(SphereName name : SphereName.values()){
@@ -101,22 +101,25 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double minDuration() {
-		return 0;
+		double minDuration = (endTime.getValue() - startTime.getValue()) / 1000 / 60;
+		return minDuration;
 	}
 
 	public double maxDuration() {
-		return 0;
+		double maxDuration = (endTime.getValue() - startTime.getValue()) / 1000 / 60;
+		return maxDuration;
 	}
 
-	@Override
-	public Pair<Double> getDurationInterval() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	@Override
 	public void makePersistent() {
 		// TODO Auto-generated method stub
 		
+	}
+
+	public Pair<Double, Double> getDurationInterval() {
+		return new Pair(minDuration(), maxDuration());
+	}
+
+	public void setCalendarURL(URL eventFeedUrl) {
+		this.calendarURL = eventFeedUrl;	
 	}
 }

@@ -8,6 +8,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import com.appspot.iclifeplanning.authentication.AuthService;
+import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.google.gdata.client.calendar.CalendarQuery;
 import com.google.gdata.data.Link;
 import com.google.gdata.data.calendar.CalendarEntry;
@@ -40,8 +41,9 @@ public class EventStore {
 
 		// Connect to Google Calendar and gather data
 		try {
-			calendarResultFeed = AuthService.client.getFeed(calendarFeedUrl, CalendarFeed.class);
+			calendarResultFeed = CalendarUtils.client.getFeed(calendarFeedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
+			System.out.println("BOOOO");
 			return;
 		}
 
@@ -57,12 +59,11 @@ public class EventStore {
           calendarEntry = calendarResultFeed.getEntries().get(i);
 	  	  eventFeedLink = calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
 		  eventFeedUrl = new URL(eventFeedLink.getHref());
-		  urls.add(eventFeedUrl);
 		  query = new CalendarQuery(eventFeedUrl);
 		  query.setStringCustomParameter("singleevents", "true");
 
   		  try {
-			  eventResultFeed = AuthService.client.getFeed(query, CalendarEventFeed.class);
+			  eventResultFeed = CalendarUtils.client.getFeed(query, CalendarEventFeed.class);
 		  } catch (ServiceException e) {
 			  return;
 		  }
@@ -70,14 +71,11 @@ public class EventStore {
 		  allCalendarEvents = eventResultFeed.getEntries();
 		  for (int j = 0; j < allCalendarEvents.size(); j++) {
 			  event = new Event(allCalendarEvents.get(j));
-			  event.setTitle(calendarEntry.getTitle());
+			  event.setCalendarURL(eventFeedUrl);
 			  allEvents.add(event);
 		  }
         }
-	}
-
-	public Set<URL> getCalendarURLs() {		
-		return urls;
+        System.out.println("Got all events");
 	}
 
 	public Set<Event> getEvents() {
