@@ -76,13 +76,6 @@ public class EventStore {
 		  }
         }
         System.out.println("Got all events");
-<<<<<<< HEAD
-=======
-	}
-
-	public Set<URL> getCalendarURLs() {		
-		return urls;
->>>>>>> Dirty repair + dummy suggestions
 	}
 
 	public Set<Event> getEvents() {
