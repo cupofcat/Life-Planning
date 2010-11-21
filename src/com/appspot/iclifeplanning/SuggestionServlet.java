@@ -3,30 +3,15 @@ package com.appspot.iclifeplanning;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.GregorianCalendar;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import com.appspot.analyser.Analyzer;
-import com.appspot.analyser.BaseCalendarSlot;
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
-import com.appspot.analyser.Pair;
-import com.appspot.analyser.Proposal;
-import com.appspot.analyser.Suggestion;
-import com.appspot.datastore.SphereName;
-import com.appspot.datastore.TokenStore;
-import com.appspot.analyser.BaseCalendarSlot;
-import com.appspot.analyser.DeleteSuggestion;
-import com.appspot.analyser.IEvent;
-import com.appspot.analyser.Pair;
-import com.appspot.analyser.Proposal;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.TokenStore;
@@ -46,23 +31,27 @@ import com.google.appengine.repackaged.org.json.JSONObject;
  */
 @SuppressWarnings("serial")
 public class SuggestionServlet extends HttpServlet {
+	// This should NOT be stored like this. Reimplement to use memcache at some point.
+	private static Map<String, List<Suggestion>> suggestionMap = new HashMap<String, List<Suggestion>>();
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 
+		System.out.println("Map size: " + suggestionMap.size());
 		String token = TokenStore.getToken(CalendarUtils.getCurrentUserId());
 		CalendarUtils.client.setAuthSubToken(token);
 
 		EventStore eventStore = EventStore.getInstance();
 		eventStore.initizalize();
-		Collection<Event> events = eventStore.getEvents();
+		List<Event> events = eventStore.getEvents();
 		// ------------------- Dummy data
 		// Analyzer analyser = new Analyzer();
-		List<Suggestion> suggestions = new ArrayList();// analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
+		List<Suggestion> suggestions = new ArrayList<Suggestion>();// analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
+		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 
-		IEvent event1 = (IEvent)events.toArray()[0];
-		IEvent event2 = (IEvent)events.toArray()[1];
-		IEvent event3 = (IEvent)events.toArray()[2];
+		IEvent event1 = (IEvent)events.get(0);
+		IEvent event2 = (IEvent)events.get(1);
+		IEvent event3 = (IEvent)events.get(2);
 
 		Suggestion sug = new DeleteSuggestion(event1);
 		suggestions.add(sug);
@@ -72,14 +61,16 @@ public class SuggestionServlet extends HttpServlet {
 		suggestions.add(sug);
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
-		for (Suggestion s : suggestions) {
-			suggestionArray.put(suggestionToJSONOBject(s));
+		Suggestion s;
+		for (int i = 0; i < suggestions.size(); i++) {
+			s = suggestions.get(i);
+			suggestionArray.put(suggestionToJSONOBject(s, i));
 		}
 		
 		response.getWriter().print(suggestionArray);
 	}
 
-	private JSONObject suggestionToJSONOBject(Suggestion s) {
+	private JSONObject suggestionToJSONOBject(Suggestion s, int i) {
 		JSONObject suggestionObject = new JSONObject();
 		try {
 			suggestionObject.put("title", s.getTitle());
@@ -91,7 +82,9 @@ public class SuggestionServlet extends HttpServlet {
 
 			suggestionObject.put("endDateTime", date.format(s.getEndDate().getTime()));
 			suggestionObject.put("type", s.getType());
-			
+			suggestionObject.put("id", i);
+			suggestionObject.put("userID", CalendarUtils.getCurrentUserId());
+
 			List<String> spheres = new ArrayList<String>();
 			for (SphereName sphere : s.getSpheres().keySet()) {
 				if (s.getSpheres().get(sphere) > 0) {
@@ -103,5 +96,10 @@ public class SuggestionServlet extends HttpServlet {
 			e.printStackTrace();
 		}
 		return suggestionObject;
+	}
+
+	public void doPost(HttpServletRequest request, HttpServletResponse response)
+		throws IOException {
+		System.out.println(suggestionMap.size());
 	}
 }
