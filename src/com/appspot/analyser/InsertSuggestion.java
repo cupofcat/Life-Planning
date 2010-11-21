@@ -17,7 +17,6 @@ public class InsertSuggestion extends Suggestion {
 		super(e);
 	}
 
-	@Override
 	public void makePersistent() {
 		//wstawic nowy event w danym czasie
 	}

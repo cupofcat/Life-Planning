@@ -12,7 +12,6 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.appspot.datastore.Analyzer;
 import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereChoice;
 import com.appspot.datastore.SphereInfo;
@@ -34,7 +33,7 @@ public class NotificationServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-		
+		/*
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		// Does this work?
 	    Set<Email> emails = (Set<Email>) pm.getManagedObjects(Email.class);
@@ -59,6 +58,8 @@ public class NotificationServlet extends HttpServlet {
 		      ms.sendEmail(emailAddress, MessageType.TOKEN_ERROR);
 		      // TODO(amadurska): Send e-mail to re-enable our application
 		    }
-		}
+		}*/
+		MailService ms = new MailService();
+		ms.sendEmail("amadurska@gmail.com", MessageType.TOKEN_ERROR);
 	}
 }

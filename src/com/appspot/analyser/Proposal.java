@@ -64,7 +64,6 @@ public class Proposal extends BaseCalendarSlot implements IEvent {
 		this.isRecurring = isRecurring;
 	}
 
-	@Override
 	public boolean canReschedule() {
 		return canReschedule;
 	}
@@ -73,7 +72,6 @@ public class Proposal extends BaseCalendarSlot implements IEvent {
 		canReschedule = schedule;
 	}
 
-	@Override
 	public Pair<Double, Double> getDurationInterval() {
 		return this.durationInterval;
 	}
@@ -82,7 +80,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent {
 		durationInterval = new Pair<Double, Double>(min, max);
 	}
 
-	@Override
+
 	public Map<SphereName, Double> getSpheres() {
 		return this.spheres;
 	}
@@ -91,7 +89,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent {
 		spheres = s;
 	}
 
-	@Override
+
 	public boolean isRecurring() {
 		return this.isRecurring;
 	}
@@ -132,7 +130,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent {
 		this.durationInterval = durationInterval;
 	}
 	
-	@Override
+
 	public void makePersistent() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 	}

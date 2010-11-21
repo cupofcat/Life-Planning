@@ -32,7 +32,6 @@ public class DeleteSuggestion extends Suggestion {
 		// TODO Auto-generated constructor stub
 	}
 
-	@Override
 	public void makePersistent() {
 		// wywali¢ event całkowicie
 

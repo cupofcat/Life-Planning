@@ -17,7 +17,8 @@ public class MailService {
 		//Here, no Authenticator argument is used (it is null).
 	    //Authenticators are used to prompt the user for user
 	    //name and password.
-	    Session session = Session.getDefaultInstance(fMailServerConfig, null);
+		Properties props = new Properties();
+	    Session session = Session.getDefaultInstance(props, null);
 	    MimeMessage message;
 	    try {
 	      //the "from" address may be set in code, or set in the
@@ -25,47 +26,16 @@ public class MailService {
 	      //message.setFrom( new InternetAddress(aFromEmailAddr) );
 	    
 	      message = type.getMessage(session);
+	      message.addRecipient(Message.RecipientType.TO, new InternetAddress(email, ""));
+	      message.setFrom(new InternetAddress("iclifeplanning@gmail.com", "Life Planning"));
+	      message.setSubject("Updates from your Life Planning Utility!");
 	      Transport.send( message );
-	    }
-	    catch (MessagingException ex){
+	    } catch (MessagingException ex) {
 	      System.err.println("Cannot send email. " + ex);
+	    } catch (UnsupportedEncodingException e) {
+	    	
 	    }
 	}
-
-	private static Properties fMailServerConfig = new Properties();
-	
-	static {
-	  fetchConfig();
-	}
-	
-	/**
-	* Open a specific text file containing mail server
-	* parameters, and populate a corresponding Properties object.
-	*/
-	private static void fetchConfig() {
-	  InputStream input = null;
-	  try {
-	    //If possible, one should try to avoid hard-coding a path in this
-	    //manner; in a web application, one should place such a file in
-	    //WEB-INF, and access it using ServletContext.getResourceAsStream.
-	    //Another alternative is Class.getResourceAsStream.
-	    //This file contains the javax.mail config properties mentioned above.
-		  //TODO(amadurska) Do exactly what's written above
-	  input = new FileInputStream( "C:\\Temp\\MyMailServer.txt" );
-	  fMailServerConfig.load( input );
-	  } catch ( IOException ex ){
-	    System.err.println("Cannot open and load mail server properties file.");
-	  }
-	  finally {
-	    try {
-	      if ( input != null ) input.close();
-	    }
-	    catch ( IOException ex ){
-	      System.err.println( "Cannot close mail server properties file." );
-	     }
-	  }
-	}
-
 	
 	/*  
 	    # Configuration file for javax.mail 
@@ -91,12 +61,22 @@ public class MailService {
 	*/
 	
 	public enum MessageType {
-		NOTIFICATION, TOKEN_ERROR;
+		NOTIFICATION {
 
-		public MimeMessage getMessage(Session session) throws MessagingException {
-		    MimeMessage message = new MimeMessage(session);
-		    message.setText("Some generic title");
-			return message;
-		}
+			public MimeMessage getMessage(Session session) throws MessagingException {
+			    MimeMessage message = new MimeMessage(session);
+			    message.setText("Hi! This is your regular update e-mail!");
+				return message;
+			}
+		}, TOKEN_ERROR {
+
+			public MimeMessage getMessage(Session session) throws MessagingException {
+				MimeMessage message = new MimeMessage(session);
+			    message.setText("Hi! You need to reset the right for our application!");
+				return message;
+			}
+		};
+
+		public abstract MimeMessage getMessage(Session session) throws MessagingException;
 	}
 }
