@@ -29,8 +29,8 @@ public class RescheduleSuggestion extends Suggestion {
 		super(title, description, startDate, endDate);
 	}
 
-	public RescheduleSuggestion(IEvent e, Calendar newStart, Calendar newEnd, double rating){
-		super(e, rating);
+	public RescheduleSuggestion(IEvent e, Calendar newStart, Calendar newEnd){
+		super(e);
 		setNewDates(newStart, newEnd);
 	}
 	

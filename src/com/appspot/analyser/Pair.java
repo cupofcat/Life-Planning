@@ -1,6 +1,6 @@
 package com.appspot.analyser;
 
-public class Pair<K extends Comparable<K>, V extends Comparable<V>> {
+public class Pair<K, V> {
 	private K first;
 	private V second;
 		

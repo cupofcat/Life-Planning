@@ -34,6 +34,10 @@ public class SphereInfo {
 		return this.isWithinConfidenceInterval(currentRatio);
 	}
 	
+	public Double getTotalSphereTime(){
+		return sphereTotalTime;
+	}
+	
 //	public double getDurationToConfidence(double sphereInfluence, double userBusyTime) {
 //		if (currentRatio > targetRatio*(1+Analyzer.CONFIDENCE)) 
 //			return getDuration(sphereInfluence, userBusyTime, 1+Analyzer.CONFIDENCE);
@@ -52,11 +56,8 @@ public class SphereInfo {
 	public double getRatioAccuracy(double additionalTime, double userBusyTime) {
 		double newRatio = getNewRatio(additionalTime, userBusyTime);
 		double result = newRatio-targetRatio;
-		if (!isWithinConfidenceInterval() && isWithinConfidenceInterval(newRatio)) {
-			result *= 0.001;
-		}
-		else if (isWithinConfidenceInterval() && !isWithinConfidenceInterval(newRatio)) {
-			result *= 100.0;
+		if (!isWithinConfidenceInterval(newRatio)) {
+			result *= 100000.0;
 		}
 		return Math.abs(result);
 	}

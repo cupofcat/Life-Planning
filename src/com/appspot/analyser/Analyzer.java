@@ -26,25 +26,18 @@ public class Analyzer {
 	public Analyzer() {
 	}
 
+	//calculate our coefficient of accuracy
 	private double getCurrentRatioStatus(Map<SphereName, SphereInfo> infos, Map<SphereName, Double> influences, double eventExtraTime) {
 		double res = 0;
 		for (SphereName sphere : infos.keySet()) {
 			double extraSphereTime = influences.get(sphere) * eventExtraTime;
-			res += infos.get(sphere).getRatioAccuracy(extraSphereTime, userBusyTime + eventExtraTime);
+			double acc = infos.get(sphere).getRatioAccuracy(extraSphereTime, userBusyTime + eventExtraTime);
+			res += acc;
 		}
 		return res;
 	}
 
-	private boolean getSpheresStatus(Map<SphereName, SphereInfo> infos, Map<SphereName, Double> influences, double eventExtraTime) {
-		/* Doesn't tell which sphere fails test */
-		for (SphereName sphere : infos.keySet()) {
-			double extraSphereTime = influences.get(sphere) * eventExtraTime;
-			if (!infos.get(sphere).isWithinConfidenceInterval(extraSphereTime))
-				return false;
-		}
-		return true;
-	}
-
+	//Are all spheres within confidence interval
 	private boolean getSpheresStatus(Map<SphereName, SphereInfo> infos) {
 		for (SphereName sphere : infos.keySet()) {
 			if (!infos.get(sphere).isWithinConfidenceInterval())
@@ -53,39 +46,38 @@ public class Analyzer {
 		return true;
 	}
 
-	private Pair<Double, Double> getRatioStatus(double timeStep, Map<SphereName, SphereInfo> infos, Map<SphereName, Double> influences ){
+	private Pair<Double, Double> getRatioStatus(double timeStep, Map<SphereName, SphereInfo> sphereResults, Map<SphereName, Double> influences ){
 		double currentExtraTime = 0;
-		double currentStatus = getCurrentRatioStatus(infos,	influences, 0.0);
+		double currentStatus = getCurrentRatioStatus(sphereResults,	influences, 0.0);
 		double prevStatus = currentStatus;
 		for(int i = 1; i <= Analyzer.TRIES; i++){
 			currentExtraTime = i * timeStep;
-			currentStatus = getCurrentRatioStatus(infos, influences, currentExtraTime);
-			if(prevStatus < currentStatus)
+			currentStatus = getCurrentRatioStatus(sphereResults, influences, currentExtraTime);
+			if(prevStatus <= currentStatus)
 				return new Pair<Double, Double>(prevStatus , currentExtraTime - timeStep);
 			prevStatus = currentStatus;
 		}
 		return new Pair<Double, Double>(prevStatus, currentExtraTime);
 	}
 
-	public List<Suggestion> getSuggestions(Collection<? extends IEvent> events,
-			String userID) throws IOException {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Map<SphereName, List<Suggestion>> result = new HashMap<SphereName, List<Suggestion>>();
-		Map<SphereName, Double> spherePreferences = new HashMap<SphereName, Double>();
-		Collection<SphereChoice> res = (Collection<SphereChoice>) pm.newQuery("select from " + SphereChoice.class.getName()
-				+ " where userID='" + userID).execute();
-		for (SphereChoice choice : res)
-			spherePreferences.put(choice.getSphereName(), choice.getValue());
-		Map<SphereName, SphereInfo> sphereResults = checkGoals(events,
-				spherePreferences);
-
+	public List<Suggestion> getSuggestions(List<? extends IEvent> events, String userID, Map<SphereName, Double> spherePreferences, boolean optimizeFull) throws IOException {
+		//		------------------- Sphere preferences from database ------------------------------------
+		//		PersistenceManager pm = PMF.get().getPersistenceManager();
+		//		Map<SphereName, List<Suggestion>> result = new HashMap<SphereName, List<Suggestion>>();
+		//		Map<SphereName, Double> spherePreferences = new HashMap<SphereName, Double>();
+		//		Collection<SphereChoice> res = (Collection<SphereChoice>) pm.newQuery("select from " + SphereChoice.class.getName()
+		//				+ " where userID='" + userID).execute();
+		//		for (SphereChoice choice : res)
+		//			spherePreferences.put(choice.getSphereName(), choice.getValue());
+		Map<SphereName, SphereInfo> sphereResults = checkGoals(events,spherePreferences);
 		if (getSpheresStatus(sphereResults))
 			return null;
-
+		Pair<Double, Pair<IEvent, Double>> min = new Pair<Double, Pair<IEvent, Double>>(Double.MAX_VALUE, null);
+		Calendar end = new GregorianCalendar();
 		List<Suggestion> suggestions = new LinkedList<Suggestion>();		
 		for (IEvent event : events) {
 			Map<SphereName, Double> sphereInfluences = event.getSpheres();
-			long additionalTime = 0;
+			Double additionalTime = 0.0;
 			Double eventDuration = event.getDuration();
 			Pair<Double, Double> eventDurationInterval = event.getDurationInterval();
 			double maxLengthening = eventDurationInterval.getSecond()- eventDuration;
@@ -93,27 +85,45 @@ public class Analyzer {
 			/* Find (brute force) best (sphere-wise) duration for the event */
 			Pair<Double,Double> lenRes = getRatioStatus(maxLengthening/Analyzer.TRIES, sphereResults, sphereInfluences);
 			Pair<Double,Double> shortRes = getRatioStatus((-maxShortening)/Analyzer.TRIES, sphereResults, sphereInfluences);
-			Calendar end = new GregorianCalendar();
 			// this "rates" the suggestions, aim to have it ~0
 			double spheresCoefficient;
 			if(lenRes.getFirst() < shortRes.getFirst()) {
 				//dodac id do IEventu
-				//sphereCoefficient nie ma z BaseCalendarSlot (bo free time nie powinien go miec, tylko w Suggestion + z dupy konstruktory
 				spheresCoefficient = lenRes.getFirst();
-				additionalTime = (long) (lenRes.getSecond()*60000);
+				additionalTime = lenRes.getSecond();
 			}
 			else {
 				spheresCoefficient = shortRes.getFirst();
-				additionalTime = (long) (shortRes.getSecond()*60000);
+				additionalTime = shortRes.getSecond();
 			}
-			end.setTimeInMillis(event.getEndDate().getTimeInMillis() + additionalTime);
-			//				double suggestionRating = rateSuggestion(sphere, additionalTime, spheresCoefficient);
-			suggestions.add(new RescheduleSuggestion(event, event.getStartDate(), event.getEndDate(), spheresCoefficient));
-			/* Check if needs any further scheduling modification */
-			if (getSpheresStatus(sphereResults, sphereInfluences, additionalTime))
+			if(spheresCoefficient < min.getFirst()){
+				min.setFirst(spheresCoefficient);
+				min.setSecond(new Pair<IEvent, Double>(event, additionalTime));
+			}
+			// End przesuwamy tylko teraz, a co jesli sie zazębia? Moze przesunąć do tyłu o różnicę i dopiero dodać?
+			// Może się moga zazębiać? Jak coś to patrzymy na nastepny event i czy jest conflict i potem rozwiązujemy
+			/* Check if needs any further scheduling modification - decreasing steps (maybe for our best option only?) */
+			//check all the rest of events and pick minimum
+			if (!optimizeFull && spheresCoefficient <= 0.1){
+				end.setTimeInMillis(event.getEndDate().getTimeInMillis() + (long) (additionalTime*60000));
+				suggestions.add(new RescheduleSuggestion(event, event.getStartDate(), end));
 				return suggestions;
+			}
+		}
+		if(min.getFirst() <= 0.1){
+			IEvent event = min.getSecond().getFirst();
+			Double additionalTime = min.getSecond().getSecond();
+			end.setTimeInMillis(event.getEndDate().getTimeInMillis() + (long) (additionalTime*60000));
+			suggestions.add(new RescheduleSuggestion(event, event.getStartDate(), end));
 		}
 		return suggestions;
+	}
+
+	private void printMap(Map<?, SphereInfo > map){
+		for(Object key : map.keySet()){
+			SphereInfo info = map.get(key);
+			System.out.println(key + " : currentRatio=" + info.getCurrentRatio() + "  sphereTotal=" + info.getTotalSphereTime());
+		}
 	}
 
 	public double rateSuggestion(SphereInfo sphere, double additionalTime, double sphereCoefficient) {
@@ -134,9 +144,7 @@ public class Analyzer {
 			Map<SphereName, Double> sphereResults = event.getSpheres();
 			Set<SphereName> keys = sphereResults.keySet();
 			for (SphereName key : keys) {
-				double time = Math.round((Double
-						.valueOf(sphereResults.get(key)) / 100)
-						* durationInMins);
+				double time = Math.round(sphereResults.get(key)* durationInMins);
 				times.put(key, times.get(key) + time);
 			}
 			sum += durationInMins;
