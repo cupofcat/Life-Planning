@@ -34,7 +34,7 @@ public class Analyzer {
 		}
 		return res;
 	}
-	
+
 	private boolean getSpheresStatus(Map<SphereName, SphereInfo> infos, Map<SphereName, Double> influences, double eventExtraTime) {
 		/* Doesn't tell which sphere fails test */
 		for (SphereName sphere : infos.keySet()) {
@@ -44,7 +44,7 @@ public class Analyzer {
 		}
 		return true;
 	}
-	
+
 	private boolean getSpheresStatus(Map<SphereName, SphereInfo> infos) {
 		for (SphereName sphere : infos.keySet()) {
 			if (!infos.get(sphere).isWithinConfidenceInterval())
@@ -78,40 +78,41 @@ public class Analyzer {
 			spherePreferences.put(choice.getSphereName(), choice.getValue());
 		Map<SphereName, SphereInfo> sphereResults = checkGoals(events,
 				spherePreferences);
-		
+
 		if (getSpheresStatus(sphereResults))
 			return null;
-		
+
 		List<Suggestion> suggestions = new LinkedList<Suggestion>();		
-			for (IEvent event : events) {
-				Map<SphereName, Double> sphereInfluences = event.getSpheres();
-				long additionalTime = 0;
-				Double eventDuration = event.getDuration();
-				Pair<Double, Double> eventDurationInterval = event.getDurationInterval();
-				double maxLengthening = eventDurationInterval.getSecond()- eventDuration;
-				double maxShortening = eventDuration - eventDurationInterval.getFirst();
-				/* Find (brute force) best (sphere-wise) duration for the event */
-				Pair<Double,Double> lenRes = getRatioStatus(maxLengthening/Analyzer.TRIES, sphereResults, sphereInfluences);
-				Pair<Double,Double> shortRes = getRatioStatus((-maxShortening)/Analyzer.TRIES, sphereResults, sphereInfluences);
-				Calendar end = new GregorianCalendar();
-				double spheresCoefficient;
-				if(lenRes.getFirst() < shortRes.getFirst()) {
-					//dodac id do IEventu
-					//sphereCoefficient nie ma z BaseCalendarSlot (bo free time nie powinien go miec, tylko w Suggestion + z dupy konstruktory
-					spheresCoefficient = lenRes.getFirst();
-					additionalTime = (long) (lenRes.getSecond()*60000);
-				}
-				else {
-					spheresCoefficient = shortRes.getFirst();
-					additionalTime = (long) (shortRes.getSecond()*60000);
-				}
-				end.setTimeInMillis(event.getEndDate().getTimeInMillis() + additionalTime);
-//				double suggestionRating = rateSuggestion(sphere, additionalTime, spheresCoefficient);
-				suggestions.add(new RescheduleSuggestion(event, event.getStartDate(), event.getEndDate(), spheresCoefficient));
-				/* Check if needs any further scheduling modification */
-				if (getSpheresStatus(sphereResults, sphereInfluences, additionalTime))
-					return suggestions;
+		for (IEvent event : events) {
+			Map<SphereName, Double> sphereInfluences = event.getSpheres();
+			long additionalTime = 0;
+			Double eventDuration = event.getDuration();
+			Pair<Double, Double> eventDurationInterval = event.getDurationInterval();
+			double maxLengthening = eventDurationInterval.getSecond()- eventDuration;
+			double maxShortening = eventDuration - eventDurationInterval.getFirst();
+			/* Find (brute force) best (sphere-wise) duration for the event */
+			Pair<Double,Double> lenRes = getRatioStatus(maxLengthening/Analyzer.TRIES, sphereResults, sphereInfluences);
+			Pair<Double,Double> shortRes = getRatioStatus((-maxShortening)/Analyzer.TRIES, sphereResults, sphereInfluences);
+			Calendar end = new GregorianCalendar();
+			// this "rates" the suggestions, aim to have it ~0
+			double spheresCoefficient;
+			if(lenRes.getFirst() < shortRes.getFirst()) {
+				//dodac id do IEventu
+				//sphereCoefficient nie ma z BaseCalendarSlot (bo free time nie powinien go miec, tylko w Suggestion + z dupy konstruktory
+				spheresCoefficient = lenRes.getFirst();
+				additionalTime = (long) (lenRes.getSecond()*60000);
 			}
+			else {
+				spheresCoefficient = shortRes.getFirst();
+				additionalTime = (long) (shortRes.getSecond()*60000);
+			}
+			end.setTimeInMillis(event.getEndDate().getTimeInMillis() + additionalTime);
+			//				double suggestionRating = rateSuggestion(sphere, additionalTime, spheresCoefficient);
+			suggestions.add(new RescheduleSuggestion(event, event.getStartDate(), event.getEndDate(), spheresCoefficient));
+			/* Check if needs any further scheduling modification */
+			if (getSpheresStatus(sphereResults, sphereInfluences, additionalTime))
+				return suggestions;
+		}
 		return suggestions;
 	}
 
@@ -119,7 +120,7 @@ public class Analyzer {
 		double newRatio = sphere.getNewRatio(additionalTime, userBusyTime);
 		return sphereCoefficient*sphere.getRatioAccuracy(additionalTime, newRatio);
 	}
-	
+
 	public Map<SphereName, SphereInfo> checkGoals(
 			Collection<? extends IEvent> events, Map<SphereName, Double> choices)
 			throws IOException {
