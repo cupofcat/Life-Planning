@@ -55,11 +55,11 @@ public class SphereInfo {
 	
 	public double getRatioAccuracy(double additionalTime, double userBusyTime) {
 		double newRatio = getNewRatio(additionalTime, userBusyTime);
-		double result = newRatio-targetRatio;
+		double result = Math.abs(newRatio-targetRatio);
 		if (!isWithinConfidenceInterval(newRatio)) {
 			result *= 100000.0;
 		}
-		return Math.abs(result);
+		return result;
 	}
 	
 	private double getRatioDifference() {
@@ -67,7 +67,9 @@ public class SphereInfo {
 	}
 	
 	public boolean isWithinConfidenceInterval(double ratio){
-		return (Math.abs(ratio - targetRatio) )/targetRatio < Analyzer.CONFIDENCE;
+		double x = (Math.abs(ratio - targetRatio) )/targetRatio;
+		int y = 8;
+		return x < Analyzer.CONFIDENCE;
 	}
 	
 //	private double getDuration(double sphereInfluence, double userBusyTime, double multiplier) {

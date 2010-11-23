@@ -43,20 +43,25 @@ public class LifePlanningServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-		Suggestion s = new RescheduleSuggestion("Event1", null, new GregorianCalendar(2000, 3, 3, 15, 0, 0),new GregorianCalendar(2000, 3, 3, 16, 0, 0) );
+		Suggestion beginning = new RescheduleSuggestion("Begin", null, new GregorianCalendar(2000, 3, 3, 0, 0, 0),new GregorianCalendar(2000, 3, 3, 0, 0, 0) );
+		Suggestion end = new RescheduleSuggestion("End", null, new GregorianCalendar(2000, 3, 3, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
+		Suggestion s = new RescheduleSuggestion("Event1", null, new GregorianCalendar(2000, 3, 3, 13, 0, 0),new GregorianCalendar(2000, 3, 3, 14, 40, 0) );
 		s.setSpheres(generateSpheres(new double[]{0.7, 0.3}));
 		s.setDeurationInterval(30, 70);
-		Suggestion s2 = new RescheduleSuggestion("Event2", null, new GregorianCalendar(2000, 3, 3, 13, 0, 0),new GregorianCalendar(2000, 3, 3, 14, 0, 0) );
+		Suggestion s2 = new RescheduleSuggestion("Event2", null, new GregorianCalendar(2000, 3, 3, 15, 00, 0),new GregorianCalendar(2000, 3, 3, 15, 30, 0) );
 		s2.setSpheres(generateSpheres(new double[]{1.0}));
-		s2.setDeurationInterval(25, 80);
-		Suggestion s3 = new RescheduleSuggestion("Event3", null, new GregorianCalendar(2000, 3, 3, 18, 0, 0),new GregorianCalendar(2000, 3, 3, 18, 30, 0) );
+		s2.setDeurationInterval(0, 80);
+		Suggestion s3 = new RescheduleSuggestion("Event3", null, new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 16, 35, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
 		s3.setDeurationInterval(20, 80);
 		List<Suggestion> list = new LinkedList<Suggestion>();
 		list.add(s);
+		//list.add(end);
+		//list.add(beginning);
+		//list.add(s3);
 		list.add(s2);
-		list.add(s3);
-		new Analyzer().getSuggestions(list, "", generateSpheres(new double[]{0.6,0.4}), true);
+
+		new Analyzer().getSuggestions(list, "", generateSpheres(new double[]{0.7,0.3}), true);
 	}
 	
 	private Map<SphereName, Double> generateSpheres(double[] values){
