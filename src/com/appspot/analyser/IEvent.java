@@ -3,15 +3,13 @@ package com.appspot.analyser;
 import java.util.Map;
 
 import com.appspot.datastore.SphereName;
+import com.google.gdata.data.calendar.CalendarEventEntry;
 
 public interface IEvent extends ICalendarSlot {
-	boolean isRecurring();
-
-	boolean canReschedule();
-
-	Map<SphereName, Double> getSpheres();
-
-	Pair<Double, Double> getDurationInterval();
-
-	void makePersistent();
+	public boolean isRecurring();
+	public boolean canReschedule();
+	public Map<SphereName, Double> getSpheres();
+	public Pair<Double, Double> getDurationInterval();
+	public void makePersistent();
+	public CalendarEventEntry getCalendarEvent();
 }

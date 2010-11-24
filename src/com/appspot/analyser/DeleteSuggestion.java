@@ -1,12 +1,17 @@
 package com.appspot.analyser;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Map;
 
 import com.appspot.datastore.SphereName;
-import com.google.appengine.api.users.User;
+import com.appspot.iclifeplanning.authentication.CalendarUtils;
+import com.google.gdata.data.calendar.CalendarEventEntry;
+import com.google.gdata.util.ServiceException;
 
 public class DeleteSuggestion extends Suggestion {
+	private CalendarEventEntry event;
 
 	public DeleteSuggestion(BaseCalendarSlot slot) {
 		super(slot);
@@ -14,6 +19,7 @@ public class DeleteSuggestion extends Suggestion {
 
 	public DeleteSuggestion(IEvent e) {
 		super(e);
+		event = e.getCalendarEvent();
 	}
 
 
@@ -35,8 +41,18 @@ public class DeleteSuggestion extends Suggestion {
  	}
  	
 	public void makePersistent() {
-		// wywalic event calkowicie
+		try {
+			URL deleteUrl = new URL(event.getEditLink().getHref());
+			CalendarUtils.client.delete(deleteUrl);
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ServiceException e) {
+			e.printStackTrace();
+		}
+	}
 
+	public CalendarEventEntry getCalendarEvent() {
+		return null;
 	}
 
 }

@@ -1,11 +1,9 @@
 package com.appspot.iclifeplanning.events;
 
-import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Logger;
 
 import com.appspot.analyser.BaseCalendarSlot;
 import com.appspot.analyser.IEvent;
@@ -17,15 +15,14 @@ import com.google.gdata.data.calendar.CalendarEventEntry;
 public class Event extends BaseCalendarSlot implements IEvent {
 	private Set<String> keywords = new HashSet<String>();
 	private Set<Event> childEvents;
-	private URL calendarURL;
+	private CalendarEventEntry calendarEventEntry;
 	private String id;
 	private boolean canReschedule;
 	private boolean isRecurring;
-	private static final Logger log = Logger.getLogger("EventStore");
 
 	public Event(CalendarEventEntry calendarEventEntry) {
 		super(calendarEventEntry);
-		//calendarEventEntry.get
+		this.calendarEventEntry = calendarEventEntry;
 		childEvents = null;
 		id = calendarEventEntry.getId();
 		canReschedule = calendarEventEntry.getCanEdit();
@@ -111,7 +108,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		return new Pair(minDuration(), maxDuration());
 	}
 
-	public void setCalendarURL(URL eventFeedUrl) {
-		this.calendarURL = eventFeedUrl;	
+	public CalendarEventEntry getCalendarEvent() {
+		return calendarEventEntry;
 	}
 }
