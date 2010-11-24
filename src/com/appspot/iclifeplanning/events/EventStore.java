@@ -2,6 +2,8 @@ package com.appspot.iclifeplanning.events;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,7 +11,10 @@ import java.util.logging.Logger;
 
 import com.appspot.iclifeplanning.authentication.AuthService;
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
+import com.google.appengine.api.datastore.Query;
+import com.google.gdata.client.Query.CustomParameter;
 import com.google.gdata.client.calendar.CalendarQuery;
+import com.google.gdata.data.DateTime;
 import com.google.gdata.data.Link;
 import com.google.gdata.data.calendar.CalendarEntry;
 import com.google.gdata.data.calendar.CalendarEventEntry;
@@ -20,8 +25,7 @@ import com.google.gdata.util.ServiceException;
 public class EventStore {
 
 	private static EventStore eventStore = null;
-	private Set<Event> allEvents = new HashSet<Event>();
-	private Set<URL> urls = new HashSet<URL>();
+	private List<Event> allEvents = new ArrayList<Event>();
 	private static final Logger log = Logger.getLogger("EventStore");
 	
 	private EventStore() {}
@@ -34,7 +38,7 @@ public class EventStore {
 	
 	public void initizalize() throws IOException {
 
-		allEvents = new HashSet<Event>();
+		allEvents = new ArrayList<Event>();
 
         URL calendarFeedUrl = new URL(AuthService.CALENDAR_FULL_FEED_REQUEST_URL);
 		CalendarFeed calendarResultFeed = null;
@@ -43,7 +47,6 @@ public class EventStore {
 		try {
 			calendarResultFeed = CalendarUtils.client.getFeed(calendarFeedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
-			System.out.println("BOOOO");
 			return;
 		}
 
@@ -59,9 +62,19 @@ public class EventStore {
           calendarEntry = calendarResultFeed.getEntries().get(i);
 	  	  eventFeedLink = calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
 		  eventFeedUrl = new URL(eventFeedLink.getHref());
-		  urls.add(eventFeedUrl);
 		  query = new CalendarQuery(eventFeedUrl);
-		  query.setStringCustomParameter("singleevents", "true");
+		  query.addCustomParameter(new CustomParameter("singleevents", "true"));
+		  query.addCustomParameter(new CustomParameter("orderby", "starttime"));
+		  query.addCustomParameter(new CustomParameter("sortorde", "ascending"));
+		  
+		  // temporary default values. Should really be set by user through UI
+		  long now = System.currentTimeMillis();
+		  System.out.println(now);
+		  long future = now + (long)30*24*60*60*1000;//2592000000l; // month in miliseconds
+		  System.out.println(future);
+
+		  query.setMinimumStartTime(new DateTime(now));
+		  query.setMaximumStartTime(new DateTime(future));
 
   		  try {
 			  eventResultFeed = CalendarUtils.client.getFeed(query, CalendarEventFeed.class);
@@ -72,18 +85,15 @@ public class EventStore {
 		  allCalendarEvents = eventResultFeed.getEntries();
 		  for (int j = 0; j < allCalendarEvents.size(); j++) {
 			  event = new Event(allCalendarEvents.get(j));
-			  event.setTitle(calendarEntry.getTitle());
+			  System.out.println(event.getTitle());
+			  System.out.println("Time: " + event.getStartDate().getTimeInMillis());
+			  event.setCalendarURL(eventFeedUrl);
 			  allEvents.add(event);
 		  }
         }
-        System.out.println("Got all events");
 	}
 
-	public Set<URL> getCalendarURLs() {		
-		return urls;
-	}
-
-	public Set<Event> getEvents() {
+	public List<Event> getEvents() {
 		return allEvents;	
 	}
 }

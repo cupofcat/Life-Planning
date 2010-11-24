@@ -20,7 +20,7 @@
     //This is expected in most cases
   }
 
-  String noTokenDiv = "";
+  String noTokenDiv = "<div id=\"calendar_div_toggle\"><a href=\"#\">Show calendar</a></div>";
   String calendars = "";
 
   try {
@@ -29,9 +29,9 @@
       calendars += "&amp;src=" + url;
     }
   } catch (TokenException e) {
-    noTokenDiv = "<div style=\"text-align: center; font-size: 20px; font-face: Futura; text-transform: capitalize; \">No token, go to <a href=\"" +
+    noTokenDiv = "<div id=\"no_token\"><a href=\"" +
     CalendarUtils.getCalendarUtils().getCalendarAccessUrl(request.getRequestURL().toString()) +
-    "\">link</a>!</div><script>jQuery(\"#calendar_div\").hide();</script>";
+    "\">Calendar not authorised! Please, follow this link.</a></div>";
   } catch (IOException e) {
     
   }
@@ -45,7 +45,6 @@
     <link rel="stylesheet" href="../css/lavalamp3.css" type="text/css" media="screen">
     <link rel="stylesheet" href="../css/coda-slider.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="css/override.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="css/drawer.css" type="text/css" media="screen">
     <link rel="stylesheet" href="css/screensmall.css" type="text/css" media="screen">
   
     <script type="text/javascript" src="js/mootools.js"></script>
@@ -55,11 +54,12 @@
     
     <script type="text/javascript" src="../js/jquery.easing.1.3.js"></script>
     <script type="text/javascript" src="../js/jquery.lavalamp-1.3.4b2.js"></script>
-    <!--<script type="text/javascript" src="js/drawer.js"></script>-->
 
     <script type="text/javascript">
       jQuery.noConflict();
+      
       jQuery(document).ready(function($) {
+        //Build suggestions
         $("#optimize_button a").click(function(e){
           e.preventDefault();
           $.getJSON("../suggestions", function(sugs){
@@ -80,6 +80,22 @@
             $.getScript("js/moocheck.js");
           });
         });
+
+        //Hide and slide calendar_div
+        $("#calendar_div").hide();
+        $("#calendar_div_toggle a").click(function(e){
+          e.preventDefault();
+          if ($("#calendar_div").is(":hidden")) {
+            $("#calendar_div_toggle a").html("Hide calendar");
+            $("#calendar_div").slideDown(200);
+          }
+          else {
+            $("#calendar_div_toggle a").html("Show calendar");
+            $("#calendar_div").slideUp(200);
+          }
+        });
+
+        //Lavalamp
         jQuery("#lavaLampMenu").lavaLamp({fx: "swing", speed: 200});
       });
     </script>
@@ -104,17 +120,13 @@
         </div>
       </div>
       <div id="body">
-        <!--<ul id="drw_tabs">
-        	<li><a href="#calendar_div" rel="drw">Calendar</a></li>
-        </ul>
-        <div id="drw"></div>-->
+        <%= noTokenDiv %>
         <div id="calendar_div" class="sample">
         	<iframe class="calendar" src="https://www.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;height=500&amp;wkst=2&amp;bgcolor=%23ffffff<%= calendars %>" style=" border-width:0 "></iframe>
           <div id="optimize_button">
             <a href="#">Optimise my life!</a>
           </div>
         </div>
-        <%= noTokenDiv %>
         <br /><br />
       <div id="calendar_suggestions">
         <div class='demo'>

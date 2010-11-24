@@ -1,5 +1,6 @@
 package com.appspot.iclifeplanning.events;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -10,20 +11,13 @@ import com.appspot.analyser.BaseCalendarSlot;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Pair;
 import com.appspot.datastore.SphereName;
-import com.google.gdata.data.DateTime;
-import com.google.gdata.data.TextConstruct;
 import com.google.gdata.data.calendar.CalendarEventEntry;
 
 // TODO (amadurska): Ensure keywords come from both title & description
-// TODO (amadurska): Keywords should be really replaced by spheres.
 public class Event extends BaseCalendarSlot implements IEvent {
-	private CalendarEventEntry calendarEventEntry;
-	private DateTime startTime;
-	private DateTime endTime;
-	private TextConstruct description;
 	private Set<String> keywords = new HashSet<String>();
 	private Set<Event> childEvents;
-	private String calendarTitle;
+	private URL calendarURL;
 	private String id;
 	private boolean canReschedule;
 	private boolean isRecurring;
@@ -31,13 +25,11 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	public Event(CalendarEventEntry calendarEventEntry) {
 		super(calendarEventEntry);
-		this.calendarEventEntry = calendarEventEntry;
 		childEvents = null;
 		id = calendarEventEntry.getId();
 		canReschedule = calendarEventEntry.getCanEdit();
 		isRecurring = calendarEventEntry.getRecurrence() != null;
 		parseKeywords(title);
-		log.severe("Sphere: " + getSpheres());
 	}
 
 	public String getId() {
@@ -101,11 +93,13 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double minDuration() {
-		return 0;
+		double minDuration = (endDate.getTimeInMillis() - startDate.getTimeInMillis()) / 1000 / 60;
+		return minDuration;
 	}
 
 	public double maxDuration() {
-		return 0;
+		double maxDuration = (endDate.getTimeInMillis() - startDate.getTimeInMillis()) / 1000 / 60;
+		return maxDuration;
 	}
 
 	public void makePersistent() {
@@ -113,8 +107,10 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public Pair<Double, Double> getDurationInterval() {
-		double first = 1;
-		double second = 2;
-		return new Pair(first, second);
+		return new Pair(minDuration(), maxDuration());
+	}
+
+	public void setCalendarURL(URL eventFeedUrl) {
+		this.calendarURL = eventFeedUrl;	
 	}
 }
