@@ -27,7 +27,7 @@ public class UClasifier {
 		Map<String, Double> result = new HashMap<String, Double>();
 		double percentage;
 		for (Class cls : cz) {
-			percentage = (cls.getP() * 100);
+			percentage = (cls.getP());
 			result.put(cls.getClassName(), percentage);
 		}
 		return result;
