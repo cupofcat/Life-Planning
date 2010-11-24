@@ -4,12 +4,20 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 
+import com.appspot.datastore.PMF;
+import com.appspot.datastore.SphereChoice;
+import com.appspot.datastore.SphereName;
+import com.appspot.datastore.Token;
 import com.appspot.datastore.TokenStore;
+import com.appspot.iclifeplanning.notifications.Email;
+import com.appspot.iclifeplanning.notifications.EmailStore;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -133,5 +141,32 @@ public class CalendarUtils {
         }
 
 		return urls;
+	}
+
+	public void checkIfNewUser() {
+		UserService userService = UserServiceFactory.getUserService();
+		User user = userService.getCurrentUser();
+		String id = user.getUserId();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Collection<String> userIDs 
+		  = (Collection<String>) pm.newQuery("SELECT id FROM " + Email.class.getName()).execute();
+		
+		if (!userIDs.contains(id)) {
+			EmailStore.addEmail(id, user.getEmail());
+			addSpheres(id);
+		}
+	}
+
+	public void addSpheres(String id) {
+		SphereChoice choice;
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		for (SphereName sphere : SphereName.values()) {
+			choice = new SphereChoice(id, sphere, sphere.defaultValue());
+		    try {
+		      pm.makePersistent(choice);
+		    } finally {
+		      pm.close();
+		    }
+		}
 	}
 }
