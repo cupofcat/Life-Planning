@@ -18,6 +18,7 @@ import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereChoice;
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
+import com.appspot.iclifeplanning.events.Event;
 
 public class Analyzer {
 
@@ -28,6 +29,24 @@ public class Analyzer {
 	public Analyzer() {
 	}
 
+
+	public List<Suggestion> getSuggestions(List<Event> events,
+			String currentUserId, boolean b) throws IOException {
+				return this.getSuggestions(events, currentUserId,generateSpheres(new double[]{0.7, 0.3}) ,  b);
+				}
+
+	private Map<SphereName, Double> generateSpheres(double[] values){
+		SphereName[] names = SphereName.values();
+		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
+		for(int i = 0; i < names.length; i++){
+			if(i < values.length)
+				res.put(names[i], values[i]);
+			else
+				res.put(names[i], 0.0 );
+		}
+		return res;
+	}
+	
 	public List<Suggestion> getSuggestions(List<? extends IEvent> events, String userID, Map<SphereName, Double> spherePreferences,
 			boolean optimizeFull) throws IOException {
 		// ------------------- Sphere preferences from database

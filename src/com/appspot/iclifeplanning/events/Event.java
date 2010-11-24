@@ -25,6 +25,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	public Event(CalendarEventEntry calendarEventEntry) {
 		super(calendarEventEntry);
+		//calendarEventEntry.get
 		childEvents = null;
 		id = calendarEventEntry.getId();
 		canReschedule = calendarEventEntry.getCanEdit();

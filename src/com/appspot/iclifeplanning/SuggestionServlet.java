@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.appspot.analyser.Analyzer;
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Suggestion;
@@ -45,20 +47,22 @@ public class SuggestionServlet extends HttpServlet {
 		eventStore.initizalize();
 		List<Event> events = eventStore.getEvents();
 		// ------------------- Dummy data
-		// Analyzer analyser = new Analyzer();
-		List<Suggestion> suggestions = new ArrayList<Suggestion>();// analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
+		Analyzer analyser = new Analyzer();
+		List<Suggestion> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
+		
 		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 
+		/*
 		IEvent event1 = (IEvent)events.get(0);
 		IEvent event2 = (IEvent)events.get(1);
-		IEvent event3 = (IEvent)events.get(2);
+		//IEvent event3 = (IEvent)events.get(2);
 
 		Suggestion sug = new DeleteSuggestion(event1);
 		suggestions.add(sug);
 		sug = new DeleteSuggestion(event2);
 		suggestions.add(sug);
-		sug = new DeleteSuggestion(event3);
-		suggestions.add(sug);
+		//sug = new DeleteSuggestion(event3);
+		suggestions.add(sug);*/
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
 		Suggestion s;
