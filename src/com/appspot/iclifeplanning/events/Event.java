@@ -11,16 +11,10 @@ import com.appspot.analyser.BaseCalendarSlot;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Pair;
 import com.appspot.datastore.SphereName;
-import com.google.gdata.data.DateTime;
-import com.google.gdata.data.TextConstruct;
 import com.google.gdata.data.calendar.CalendarEventEntry;
 
 // TODO (amadurska): Ensure keywords come from both title & description
 public class Event extends BaseCalendarSlot implements IEvent {
-	private CalendarEventEntry calendarEventEntry;
-	private DateTime startTime;
-	private DateTime endTime;
-	private TextConstruct description;
 	private Set<String> keywords = new HashSet<String>();
 	private Set<Event> childEvents;
 	private URL calendarURL;
@@ -31,13 +25,11 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	public Event(CalendarEventEntry calendarEventEntry) {
 		super(calendarEventEntry);
-		this.calendarEventEntry = calendarEventEntry;
 		childEvents = null;
 		id = calendarEventEntry.getId();
 		canReschedule = calendarEventEntry.getCanEdit();
 		isRecurring = calendarEventEntry.getRecurrence() != null;
 		parseKeywords(title);
-		log.severe("Sphere: " + getSpheres());
 	}
 
 	public String getId() {
@@ -101,12 +93,12 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double minDuration() {
-		double minDuration = 0; //(endTime.getValue() - startTime.getValue()) / 1000 / 60;
+		double minDuration = (endDate.getTimeInMillis() - startDate.getTimeInMillis()) / 1000 / 60;
 		return minDuration;
 	}
 
 	public double maxDuration() {
-		double maxDuration = 0; //(endTime.getValue() - startTime.getValue()) / 1000 / 60;
+		double maxDuration = (endDate.getTimeInMillis() - startDate.getTimeInMillis()) / 1000 / 60;
 		return maxDuration;
 	}
 
