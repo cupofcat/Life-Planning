@@ -1,10 +1,19 @@
 package com.appspot.analyser;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Map;
 
 import com.appspot.datastore.SphereName;
+import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.google.appengine.api.users.User;
+import com.google.gdata.data.DateTime;
+import com.google.gdata.data.PlainTextConstruct;
+import com.google.gdata.data.calendar.CalendarEventEntry;
+import com.google.gdata.data.extensions.When;
+import com.google.gdata.util.ServiceException;
 
 public class InsertSuggestion extends Suggestion {
 
@@ -15,10 +24,6 @@ public class InsertSuggestion extends Suggestion {
 
 	public InsertSuggestion(IEvent e) {
 		super(e);
-	}
-
-	public void makePersistent() {
-		//wstawic nowy event w danym czasie
 	}
 
 	public InsertSuggestion(String title, String description,
@@ -40,4 +45,33 @@ public class InsertSuggestion extends Suggestion {
  		return "New Event";
  	}
 
+ 	public void makePersistent() {
+		CalendarEventEntry newEntry = new CalendarEventEntry();
+
+		newEntry.setTitle(new PlainTextConstruct(title));
+		newEntry.setContent(new PlainTextConstruct(description));
+
+		DateTime startTime = new DateTime(startDate.getTimeInMillis());
+		DateTime endTime = new DateTime(endDate.getTimeInMillis());
+		When eventTimes = new When();
+		eventTimes.setStartTime(startTime);
+		eventTimes.setEndTime(endTime);
+		newEntry.addTime(eventTimes);
+
+ 		URL postUrl = null;
+		try {
+			postUrl = new URL(CalendarUtils.DEFAULT_FULL_FEED_REQUEST_URL);
+			CalendarUtils.client.insert(postUrl, newEntry);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ServiceException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public CalendarEventEntry getCalendarEvent() {
+		return null;
+	}
 }

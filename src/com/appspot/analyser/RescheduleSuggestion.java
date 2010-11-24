@@ -1,16 +1,22 @@
 package com.appspot.analyser;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Map;
 
 import com.appspot.datastore.SphereName;
-import com.google.appengine.api.users.User;
+import com.appspot.iclifeplanning.authentication.CalendarUtils;
+import com.google.gdata.data.DateTime;
+import com.google.gdata.data.PlainTextConstruct;
+import com.google.gdata.data.calendar.CalendarEventEntry;
+import com.google.gdata.util.ServiceException;
 
 public class RescheduleSuggestion extends Suggestion {
 
 	private Pair<Calendar, Calendar> newDates;
-	
-
+	private CalendarEventEntry event;
 	
 	public RescheduleSuggestion(BaseCalendarSlot slot) {
 		super(slot);
@@ -32,6 +38,7 @@ public class RescheduleSuggestion extends Suggestion {
 	public RescheduleSuggestion(IEvent e, Calendar newStart, Calendar newEnd){
 		super(e);
 		setNewDates(newStart, newEnd);
+		event = e.getCalendarEvent();
 	}
 	
 	public void setNewDates(Calendar newStart, Calendar newEnd){
@@ -43,8 +50,24 @@ public class RescheduleSuggestion extends Suggestion {
  	}
 
 	public void makePersistent() {
-		//wyjebac stary i wstawic nowy
-		// lub alter running time
+		event.setTitle(new PlainTextConstruct("Rescheduling!"));
+		event.getTimes().get(0).setStartTime(new DateTime(newDates.getFirst().getTimeInMillis()));
+		event.getTimes().get(0).setEndTime(new DateTime(newDates.getSecond().getTimeInMillis()));
+		URL editUrl;
+		try {
+			editUrl = new URL(event.getEditLink().getHref());
+			CalendarUtils.client.update(editUrl, event);
+		} catch (MalformedURLException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (ServiceException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public CalendarEventEntry getCalendarEvent() {
+		return null;
 	}
 
 }
