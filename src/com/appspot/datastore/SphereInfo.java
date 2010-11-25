@@ -21,6 +21,10 @@ public class SphereInfo {
 		return currentRatio;
 	}
 	
+	public double getSphereTotalTime(){
+		return sphereTotalTime;
+	}
+	
 	public boolean isWithinConfidenceInterval(){
 		return isWithinConfidenceInterval(getCurrentRatio());
 	}

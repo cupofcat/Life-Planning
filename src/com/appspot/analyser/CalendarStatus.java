@@ -1,30 +1,38 @@
 package com.appspot.analyser;
 
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import com.appspot.datastore.*;
 
-public class CalendarStatus {
+import com.appspot.datastore.SphereInfo;
+import com.appspot.datastore.SphereName;
+
+public class CalendarStatus implements Comparable<CalendarStatus> {
 	private IEvent event;
 	private double additionalEventTime;
 	private double coefficient;
 	private double userBusyTime;
 	private Map<SphereName, SphereInfo> sphereResults;
 	
-	public CalendarStatus(double userBusyTime, Map<SphereName, SphereInfo> sphereResults){
+	public CalendarStatus(double userBusyTime, Map<SphereName, SphereInfo> currentSphereResults){
 		event = null;
 		this.userBusyTime = userBusyTime;
-		this.sphereResults = sphereResults;
+		sphereResults = new HashMap<SphereName, SphereInfo>();
+		copySphereResults(currentSphereResults);
 		setCurrentCoefficient();
 	}
 	
-	public CalendarStatus(IEvent event, double userBusyTime, Map<SphereName, SphereInfo> sphereResults) {
-		this(userBusyTime, sphereResults);
-		this.event = event;
+	private void copySphereResults(Map<SphereName, SphereInfo> currentSphereResults) {
+		for(SphereName name : currentSphereResults.keySet()){
+			SphereInfo currentInfo = currentSphereResults.get(name);
+			sphereResults.put(name, new SphereInfo(currentInfo.getCurrentRatio(), currentInfo.getTargetRatio(), currentInfo.getSphereTotalTime()));
+		}
 	}
 	
 	public CalendarStatus(IEvent event, CalendarStatus other){
-		this(other.getUserBusyTime(), other.getSphereResults());
+		this.userBusyTime = other.getUserBusyTime();
+		sphereResults = new HashMap<SphereName, SphereInfo>();
+		copySphereResults(other.getSphereResults());
+		coefficient = other.getCoefficient();
 		this.event = event;
 	}
 
@@ -68,7 +76,7 @@ public class CalendarStatus {
 //				return false;
 //		}
 //		return true;
-		return coefficient < 0.1;
+		return coefficient < Analyzer.CONFIDENCE;
 	}
 	
 	public void analyse(){
@@ -124,4 +132,12 @@ public class CalendarStatus {
 		return new Pair<Double, Double>(prevStatus, currentExtraTime);
 	}
 
+	public int compareTo(CalendarStatus next) {
+		if (coefficient < next.getCoefficient())
+			return -1;
+		else if (coefficient > next.getCoefficient()) 
+			return 1;
+		else 
+			return 0;
+	}
 }

@@ -36,7 +36,7 @@ public class LifePlanningServlet extends HttpServlet {
 		Suggestion end = new RescheduleSuggestion("End", null, new GregorianCalendar(2000, 3, 3, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
 		Suggestion s = new RescheduleSuggestion("Event1", null, new GregorianCalendar(2000, 3, 3, 13, 0, 0),new GregorianCalendar(2000, 3, 3, 14, 40, 0) );
 		s.setSpheres(generateSpheres(new double[]{0.6, 0.4}));
-		s.setDeurationInterval(30, 0);
+		s.setDeurationInterval(30, 120);
 		Suggestion s2 = new RescheduleSuggestion("Event2", null, new GregorianCalendar(2000, 3, 3, 15, 00, 0),new GregorianCalendar(2000, 3, 3, 15, 30, 0) );
 		s2.setSpheres(generateSpheres(new double[]{1.0}));
 		s2.setDeurationInterval(0, 80);
@@ -44,12 +44,12 @@ public class LifePlanningServlet extends HttpServlet {
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
 		s3.setDeurationInterval(0, 20);
 		List<Suggestion> list = new LinkedList<Suggestion>();
-		list.add(s2);
+		list.add(s);
 		//list.add(end);
 		//list.add(beginning);
-		//list.add(s3);
-		list.add(s);
-
+		list.add(s2);
+		list.add(s3);
+		
 		new Analyzer().getSuggestions(list, "", generateSpheres(new double[]{0.6,0.4}), true);
 //		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.5,0.3});
 //		UserProfile p = new UserProfile("msb08", "Macj", "obr", "obr@op.pl",m, true );

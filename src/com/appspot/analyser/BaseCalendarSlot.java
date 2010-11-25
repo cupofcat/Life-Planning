@@ -98,4 +98,8 @@ public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
 	public int compareTo(ICalendarSlot slot){
 		return startDate.compareTo(slot.getStartDate());
 	}
+	
+	public boolean equals(Object o){
+		return ((ICalendarSlot) o).compareTo(this) == 0;
+	}
 }
