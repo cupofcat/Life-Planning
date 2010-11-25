@@ -4,25 +4,25 @@ public enum SphereName {
 	HEALTH{
 
 		@Override
-		public int defaultValue() {
-			return 30;
+		public Double defaultValue() {
+			return 0.2;
 		}
 	}, WORK {
 		@Override
-		public int defaultValue() {
-			return 20;
+		public Double defaultValue() {
+			return 0.4;
 		}
 	}, FAMILY {
 		@Override
-		public int defaultValue() {
-			return 40;
+		public Double defaultValue() {
+			return 0.25;
 		}
 	}, RECREATION {
 		@Override
-		public int defaultValue() {
-			return 10;
+		public Double defaultValue() {
+			return 0.15;
 		}
 	};
 	
-	public abstract int defaultValue();
+	public abstract Double defaultValue();
 }

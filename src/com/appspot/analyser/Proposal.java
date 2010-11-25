@@ -15,7 +15,7 @@ import com.google.appengine.api.users.User;
 
 
 @PersistenceCapable
-public class Proposal extends BaseCalendarSlot implements IEvent {
+public class Proposal extends BaseCalendarSlot implements IEvent  {
 	
     @NotPersistent
 	private boolean isRecurring;

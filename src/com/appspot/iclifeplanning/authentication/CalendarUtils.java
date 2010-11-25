@@ -5,17 +5,19 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServletRequest;
 
 import com.appspot.datastore.PMF;
-import com.appspot.datastore.SphereChoice;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.Token;
 import com.appspot.datastore.TokenStore;
+import com.appspot.datastore.UserProfile;
 import com.appspot.iclifeplanning.notifications.Email;
 import com.appspot.iclifeplanning.notifications.EmailStore;
 import com.google.appengine.api.users.User;
@@ -32,55 +34,52 @@ import com.google.gdata.util.ServiceException;
 /**
  * Class responsible for managing the authentication within the application.
  * Uses Google account/password for token-based authentication. Majority of
- * issues are managed by Google services, mainly  by the UserService class.
+ * issues are managed by Google services, mainly by the UserService class.
  * 
  * @author Agnieszka Magda Madurska (amm208@doc.ic.ac.uk)
- *
+ * 
  */
 public class CalendarUtils {
 
-	/** AuthService instance for singleton-based design*/
+	/** AuthService instance for singleton-based design */
 	private static CalendarUtils calendarUtilsInstance = null;
 
-	/**Service used to monitor the currently the users of the application*/
+	/** Service used to monitor the currently the users of the application */
 	private static UserService userService = UserServiceFactory.getUserService();
 
-	/**Feed-url giving access to all calendars accesible by a give user*/
-	public static final  String CALENDAR_FULL_FEED_REQUEST_URL 
-	    = "http://www.google.com/calendar/feeds/default/allcalendars/full";
+	/** Feed-url giving access to all calendars accesible by a give user */
+	public static final String CALENDAR_FULL_FEED_REQUEST_URL = "http://www.google.com/calendar/feeds/default/allcalendars/full";
 
-	public static final  String DEFAULT_FULL_FEED_REQUEST_URL 
-		= "http://www.google.com/calendar/feeds/default";
-	
+	public static final String DEFAULT_FULL_FEED_REQUEST_URL = "http://www.google.com/calendar/feeds/default";
+
 	public static CalendarService client = new CalendarService("ic-lifeplanning-v1");
 
-	/**Constructor for singleton pattern*/
-	private CalendarUtils() {}
-	
+	/** Constructor for singleton pattern */
+	private CalendarUtils() {
+	}
+
 	public static CalendarUtils getCalendarUtils() {
 		if (calendarUtilsInstance == null) {
 			calendarUtilsInstance = new CalendarUtils();
 		}
 		return calendarUtilsInstance;
 	}
-	
-	public String getCalendarAccessUrl(String nextUrl)
-	    throws IOException{
-	      
-	      String requestUrl = AuthSubUtil.getRequestUrl(nextUrl,
-	          DEFAULT_FULL_FEED_REQUEST_URL, false, true);
-	      
-	      return requestUrl;
+
+	public String getCalendarAccessUrl(String nextUrl) throws IOException {
+
+		String requestUrl = AuthSubUtil.getRequestUrl(nextUrl, DEFAULT_FULL_FEED_REQUEST_URL, false, true);
+
+		return requestUrl;
 	}
 
 	/** Stores token for the currently logged-in user in the datastore */
-	public void setTokenFromReply(String reply){
+	public void setTokenFromReply(String reply) {
 		String authToken = AuthSubUtil.getTokenFromReply(reply);
 		try {
 			authToken = AuthSubUtil.exchangeForSessionToken(authToken, null);
 			client.setAuthSubToken(authToken);
-            User user = userService.getCurrentUser();
-            TokenStore.addToken(user.getUserId(), authToken);
+			User user = userService.getCurrentUser();
+			TokenStore.addToken(user.getUserId(), authToken);
 		} catch (AuthenticationException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -101,10 +100,10 @@ public class CalendarUtils {
 		return userService.getCurrentUser().getUserId();
 	}
 
-	public Set<String> getCalendarURLs() throws IOException, TokenException {		
+	public Set<String> getCalendarURLs() throws IOException, TokenException {
 		Set<String> urls = new HashSet<String>();
 
-        URL calendarFeedUrl = null;
+		URL calendarFeedUrl = null;
 		try {
 			calendarFeedUrl = new URL(AuthService.CALENDAR_FULL_FEED_REQUEST_URL);
 		} catch (MalformedURLException e1) {
@@ -119,26 +118,25 @@ public class CalendarUtils {
 			calendarResultFeed = client.getFeed(calendarFeedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
 			TokenStore.deleteTokend(userService.getCurrentUser().getUserId());
-			//e.printStackTrace();
-			throw new TokenException(); 
+			// e.printStackTrace();
+			throw new TokenException();
 		} catch (MalformedURLException e1) {
 			assert false;
-		} 
+		}
 
 		CalendarEntry calendarEntry;
 		Link eventFeedLink;
 		String eventFeedUrl = null;
 
-        for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
-          calendarEntry = calendarResultFeed.getEntries().get(i);
-	  	  eventFeedLink
-	  	  	= calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
-		  
-		  eventFeedUrl = eventFeedLink.getHref();
-		  eventFeedUrl = eventFeedUrl.substring(37, eventFeedUrl.length() - 13);
+		for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
+			calendarEntry = calendarResultFeed.getEntries().get(i);
+			eventFeedLink = calendarEntry.getLink("http://schemas.google.com/gCal/2005#eventFeed", null);
 
-		  urls.add(eventFeedUrl);
-        }
+			eventFeedUrl = eventFeedLink.getHref();
+			eventFeedUrl = eventFeedUrl.substring(37, eventFeedUrl.length() - 13);
+
+			urls.add(eventFeedUrl);
+		}
 
 		return urls;
 	}
@@ -148,25 +146,29 @@ public class CalendarUtils {
 		User user = userService.getCurrentUser();
 		String id = user.getUserId();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Collection<String> userIDs 
-		  = (Collection<String>) pm.newQuery("SELECT id FROM " + Email.class.getName()).execute();
-		
+		Collection<String> userIDs = (Collection<String>) pm.newQuery("SELECT id FROM " + Email.class.getName()).execute();
+
 		if (!userIDs.contains(id)) {
 			EmailStore.addEmail(id, user.getEmail());
-			addSpheres(id);
+			// addSpheres(id);
 		}
 	}
 
 	public void addSpheres(String id) {
-		SphereChoice choice;
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		for (SphereName sphere : SphereName.values()) {
-			choice = new SphereChoice(id, sphere, sphere.defaultValue());
-		    try {
-		      pm.makePersistent(choice);
-		    } finally {
-		      pm.close();
-		    }
+		Collection<UserProfile> users = (Collection<UserProfile>) pm.newQuery("SELECT FROM " + UserProfile.class.getName() + " WHERE userID=" + id)
+				.execute();
+		HashMap<SphereName, Double> spherePreferences = new HashMap<SphereName, Double>();
+		for (SphereName sphere : SphereName.values())
+			spherePreferences.put(sphere, sphere.defaultValue());
+		for (UserProfile user : users) {
+			try {
+				user.setSpherePreferences(spherePreferences);
+				user.makePersistent();
+			} finally {
+				pm.close();
+			}
 		}
+
 	}
 }

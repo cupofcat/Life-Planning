@@ -5,6 +5,7 @@ import java.util.GregorianCalendar;
 
 import javax.jdo.annotations.*;
 
+import com.appspot.datastore.BaseDataObject;
 import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.users.User;
 import com.google.gdata.data.TextConstruct;
@@ -12,7 +13,7 @@ import com.google.gdata.data.calendar.CalendarEventEntry;
 
 @PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
-public class BaseCalendarSlot implements ICalendarSlot {
+public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
 	
 	@PrimaryKey
     @Persistent

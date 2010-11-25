@@ -9,21 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.appspot.analyser.Analyzer;
-import com.appspot.analyser.BaseCalendarSlot;
-import com.appspot.analyser.Employee;
-import com.appspot.analyser.IEvent;
-import com.appspot.analyser.Proposal;
-import com.appspot.analyser.RescheduleSuggestion;
-import com.appspot.analyser.Suggestion;
+import com.appspot.analyser.*;
 import com.appspot.datastore.*;
 import com.appspot.iclifeplanning.authentication.AuthService;
 import com.appspot.iclifeplanning.events.Event;
-import com.appspot.iclifeplanning.events.EventInterface;
-import com.appspot.iclifeplanning.events.EventStore;
-import com.google.appengine.api.users.User;
-import com.google.gdata.data.PlainTextConstruct;
-import com.google.gdata.data.TextConstruct;
 import com.google.gdata.data.calendar.CalendarEntry;
 import com.google.gdata.data.calendar.CalendarFeed;
 import com.google.gdata.util.ServiceException;
@@ -46,27 +35,37 @@ public class LifePlanningServlet extends HttpServlet {
 		Suggestion beginning = new RescheduleSuggestion("Begin", null, new GregorianCalendar(2000, 3, 3, 0, 0, 0),new GregorianCalendar(2000, 3, 3, 0, 0, 0) );
 		Suggestion end = new RescheduleSuggestion("End", null, new GregorianCalendar(2000, 3, 3, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
 		Suggestion s = new RescheduleSuggestion("Event1", null, new GregorianCalendar(2000, 3, 3, 13, 0, 0),new GregorianCalendar(2000, 3, 3, 14, 40, 0) );
-		s.setSpheres(generateSpheres(new double[]{0.7, 0.3}));
-		s.setDeurationInterval(30, 70);
+		s.setSpheres(generateSpheres(new double[]{0.6, 0.4}));
+		s.setDeurationInterval(30, 0);
 		Suggestion s2 = new RescheduleSuggestion("Event2", null, new GregorianCalendar(2000, 3, 3, 15, 00, 0),new GregorianCalendar(2000, 3, 3, 15, 30, 0) );
 		s2.setSpheres(generateSpheres(new double[]{1.0}));
 		s2.setDeurationInterval(0, 80);
 		Suggestion s3 = new RescheduleSuggestion("Event3", null, new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 16, 35, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
-		s3.setDeurationInterval(20, 80);
+		s3.setDeurationInterval(0, 20);
 		List<Suggestion> list = new LinkedList<Suggestion>();
-		list.add(s);
+		list.add(s2);
 		//list.add(end);
 		//list.add(beginning);
 		//list.add(s3);
-		list.add(s2);
+		list.add(s);
 
-		new Analyzer().getSuggestions(list, "", generateSpheres(new double[]{0.7,0.3}), true);
+		new Analyzer().getSuggestions(list, "", generateSpheres(new double[]{0.6,0.4}), true);
+//		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.5,0.3});
+//		UserProfile p = new UserProfile("msb08", "Macj", "obr", "obr@op.pl",m, true );
+//		p.makePersistent();
+		PersistenceManager pm = PMF.get().getPersistenceManager();
+		Collection<UserProfile> users = (Collection<UserProfile>) pm.newQuery("SELECT FROM " + UserProfile.class.getName()).execute();
+		for(UserProfile user : users)
+			System.out.println(user.getSpherePreferences().get(SphereName.HEALTH));
+		Proposal p2 = new Proposal("dsa", "dfsa", null, null);
+		p2.setDurationInterval(new Pair<Double, Double>(12.0, 45.0));
+		p2.makePersistent();
 	}
 	
-	private Map<SphereName, Double> generateSpheres(double[] values){
+	private HashMap<SphereName, Double> generateSpheres(double[] values){
 		SphereName[] names = SphereName.values();
-		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
+		HashMap<SphereName, Double> res = new HashMap<SphereName, Double>();
 		for(int i = 0; i < names.length; i++){
 			if(i < values.length)
 				res.put(names[i], values[i]);
