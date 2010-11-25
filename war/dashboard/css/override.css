@@ -102,6 +102,8 @@ div#calendar_suggestions > ul > li {
 	background: red;
 	border: 1px solid #111;
 	cursor: pointer;
+	min-height: 68px;
+	margin-bottom: 5px;
 }
 
 div#calendar_suggestions > ul > li > div.in_li {
@@ -125,6 +127,10 @@ div#calendar_suggestions > ul > li.checked {
 	background: #222 url(chk_on.png) no-repeat 10px center;
 }
 
+div#calendar_suggestions > ul > li.unchecked div {
+	color: #333;
+}
+
 div#calendar_suggestions > ul > li.unchecked {
 	background: #1c1c1c url(chk_off.png) no-repeat 10px center;
 }
@@ -135,15 +141,15 @@ div#calendar_suggestions > ul > li div.title {
 }
 
 div#calendar_suggestions > ul > li div.description {
+	margin-top: 10px;
 }
 
 div#calendar_suggestions > ul > li div.datetimes {
 	font-size: 13px;
-	color: #999;
 }
 
-div#calendar_suggestions > ul > li div.type {
-
+div#calendar_suggestions > ul > li.checked div.datetimes {
+	color: #999;
 }
 
 div#calendar_suggestions > ul > li div.id, div#calendar_suggestions > ul > li div.userId {
@@ -153,6 +159,10 @@ div#calendar_suggestions > ul > li div.id, div#calendar_suggestions > ul > li di
 div#calendar_suggestions ul.spheres {
 	list-style-type: none;
 	font-size: 12px;
+}
+
+div#calendar_suggestions > ul > li.unchecked ul.spheres {
+	display: none;
 }
 
 div#calendar_suggestions ul.spheres > li{

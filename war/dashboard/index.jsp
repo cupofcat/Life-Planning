@@ -62,20 +62,20 @@
           e.preventDefault();
           if ($("#calendar_div").is(":hidden")) {
             $("#calendar_div_toggle a").html("Hide calendar");
-            $("#calendar_div").slideDown(200);
+            $("#calendar_div").slideDown(500);
           }
           else {
             $("#calendar_div_toggle a").html("Show calendar");
-            $("#calendar_div").slideUp(200);
+            $("#calendar_div").slideUp(500);
           }
         });
         
         //Build suggestions
         $("#optimize_button a").click(function(e){
           e.preventDefault();
+          $("#calendar_div_toggle a").click();
           $("#calendar_suggestions").html('<img src="css/ajax-loader.gif" />');
           $.getJSON("../suggestions", function(sugs){
-            $("#calendar_div_toggle a").click();
             $container = $("#calendar_suggestions");
             $con_html = '<ul>';
             $.each(sugs, function(i, s){
@@ -83,7 +83,7 @@
               $con_html += '<div class="left">';
               $con_html += '<div class=\"title\">' + s.title + '</div>';
               $con_html += '<div class=\"datetimes\">' + s.startDateTime + ' - ' + s.endDateTime + '</div>';
-              $con_html += '<div class=\"description\">' + s.description + '</div>';
+              $con_html += '<div class=\"description\">' + s.description + "Lorem ipsum dolor sit amet, consectetur adipisicing elit." + '</div>';
               //$con_html += '<div class=\"type\">' + s.type + '</div>';
               $con_html += '<div class=\"id\">' + s.id + '</div>';
               $con_html += '<div class=\"userId\">' + s.userID + '</div>';
@@ -108,7 +108,9 @@
               $con_html += "</ul></div></div></li>";
             })
             $con_html += "</ul>";
+            $container.hide();
             $container.html($con_html);
+            $container.slideDown(500);
 
             $('#calendar_suggestions > ul > li').addClass('checked').click(function(e){
               if ($(this).hasClass('checked')) {
