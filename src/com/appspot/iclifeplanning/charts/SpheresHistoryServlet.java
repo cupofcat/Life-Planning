@@ -262,7 +262,7 @@ public class SpheresHistoryServlet extends HttpServlet
 		dummy1.put("pointStart", "1136073600000"); //Date.UTC(2006, 0, 01),
 		dummy1.put("data", data1);
 		
-		List datas = new ArrayList(3);
+		List<Map<String, Object>> datas = new ArrayList<Map<String, Object>>(3);
 		datas.add(dummy0);
 		datas.add(dummy1);
 		
@@ -274,5 +274,4 @@ public class SpheresHistoryServlet extends HttpServlet
 		
 		response_.getWriter().print(reply);
 	}
-
 }

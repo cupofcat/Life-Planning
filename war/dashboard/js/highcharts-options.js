@@ -2,17 +2,20 @@ Highcharts.setOptions({
    colors: ["#DDDF0D", "#7798BF", "#55BF3B", "#DF5353", "#aaeeee", "#ff0066", "#eeaaee",
 	  "#55BF3B", "#DF5353", "#7798BF", "#aaeeee"],
    chart: {
-	  backgroundColor: {
+	  /*backgroundColor: {
 		 linearGradient: [0, 0, 0, 400],
 		 stops: [
-			[0, 'rgb(96, 96, 96)'],
-			[1, 'rgb(16, 16, 16)']
+			[0, 'rgba(255, 96, 96, 0)'],
+			[1, 'rgba(255, 255, 16, 0)']
 		 ]
-	  },
+		 //opacity: 0,
+	  },*/
+	  //background: transparent,
+	  backgroundColor: 'rgba(0, 0, 0, 0)',
 	  borderWidth: 0,
 	  borderRadius: 15,
 	  plotBackgroundColor: null,
-	  plotShadow: false,
+	  plotShadow: true,
 	  plotBorderWidth: 0
    },
    title: {

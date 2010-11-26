@@ -26,7 +26,10 @@ public class PlanAchievementServlet extends HttpServlet
 	{
 		// TODO: replace with a call for data
 		
-		Integer[] data0a = {null, null, null, null, null, 6 , 11, 32, 110, 235, 369, 640, 
+		// enables getting data for any sphere specified as a parameter in the getJSON method in JS
+		// String sphere = request_.getParameter("sphere");
+				
+		Integer[] data2a = {null, null, null, null, null, 6 , 11, 32, 110, 235, 369, 640, 
 				1005, 1436, 2063, 3057, 4618, 6444, 9822, 15468, 20434, 24126, 
 				27387, 29459, 31056, 31982, 32040, 31233, 29224, 27342, 26662, 
 				26956, 27912, 28999, 28965, 27826, 25579, 25722, 24826, 24605, 
@@ -42,42 +45,73 @@ public class PlanAchievementServlet extends HttpServlet
 			35000, 33000, 31000, 29000, 27000, 25000, 24000, 23000, 22000, 
 			21000, 20000, 19000, 18000, 18000, 17000, 16000};
 		
-		String sphere = request_.getParameter("sphere");
 		
-		int[] planned = null;
+		int[] planned1 = null;
+		int[] planned2 = null;
 		int plan = 20000;
+		int plan2 = 15000;
 		
-		Map<String, Object> dummy1 = new HashMap<String, Object>();
-		dummy1.put("name", "Planned");
-		Map<String, Object> dummy0 = new HashMap<String, Object>();
-		dummy0.put("name", "Achieved");
 		
-		// enables getting data for any sphere specified as a parameter in the getJSON method in JS
-		if("Russia".equals(sphere))
+		/*
+		 * Sphere 1
+		 */
+		Map<String, Object> plannedMap1 = new HashMap<String, Object>();
+		plannedMap1.put("name", "Planned1");
+		planned1 = new int[data1a.length];
+		for(int i=0; i<planned1.length; i++)
 		{
-			planned = new int[data1a.length];
-			dummy0.put("data", data1a);
+			planned1[i] = plan;
 		}
-		else
+		plannedMap1.put("data", planned1);
+		
+		Map<String, Object> achievedMap1 = new HashMap<String, Object>();
+		achievedMap1.put("name", "Achieved1");
+		achievedMap1.put("data", data1a);
+		
+		List<Map<String, Object>> sphere1 = new ArrayList<Map<String, Object>>(3);
+		sphere1.add(plannedMap1);
+		sphere1.add(achievedMap1);
+		
+		Map<String, Object> sphere1Map = new HashMap<String, Object>();
+		sphere1Map.put("sphere", "sport");
+		sphere1Map.put("series", sphere1);
+		
+		/*
+		 * Sphere 2
+		 */
+		Map<String, Object> plannedMap2 = new HashMap<String, Object>();
+		plannedMap2.put("name", "Planned2");
+		planned2 = new int[data2a.length];
+		for(int i=0; i<planned2.length; i++)
 		{
-			planned = new int[data0a.length];
-			dummy0.put("data", data0a);
+			planned2[i] = plan2;
 		}
+		plannedMap2.put("data", planned2);
 		
-		for(int i=0; i<planned.length; i++)
-		{
-			planned[i] = plan;
-		}
-		dummy1.put("data", planned);
+		Map<String, Object> achievedMap2 = new HashMap<String, Object>();
+		achievedMap2.put("name", "Achieved2");
+		achievedMap2.put("data", data2a);
 		
-		List datas = new ArrayList(3);
-		datas.add(dummy1);
-		datas.add(dummy0);
+		List<Map<String, Object>> sphere2 = new ArrayList<Map<String, Object>>(3);
+		sphere2.add(plannedMap2);
+		sphere2.add(achievedMap2);
 		
+		Map<String, Object> sphere2Map = new HashMap<String, Object>();
+		sphere2Map.put("sphere", "family");
+		sphere2Map.put("series", sphere2);
+		
+		/*
+		 * All spheres
+		 */
+		List<Map<String, Object>> allSpheres = new ArrayList<Map<String, Object>>(5);
+		allSpheres.add(sphere1Map);
+		allSpheres.add(sphere2Map);
+		
+		// map of everything that is sent to the browser
 		Map<String, Object> allData = new TreeMap<String, Object>();
-		allData.put("series", datas);
+		allData.put("spheres", allSpheres);
 		
-		// converts a map to two-dimensional array
+		// converts a java map to JSON map
 		JSONObject reply = DataToJSONConverter.convertMapToMap(allData);
 		
 		response_.getWriter().print(reply);
