@@ -90,20 +90,7 @@
               $con_html += '</div>';
               $con_html += '<div class="right"><ul class=\"spheres\">';
               $.each(s.spheres, function(j, sphere){
-                $con_html += '<li>';
-                if (sphere == "HEALTH") {
-                  $con_html += '<img src="css/heart-icon.png" />';
-                }
-                if (sphere == "FAMILY") {
-                  $con_html += '<img src="css/family-icon.png" />';
-                }
-                if (sphere == "WORK") {
-                  //$con_html += '<img src="css/work-icon.png" />';
-                }
-                if (sphere == "RECREATION") {
-                  //$con_html += '<img src="css/recreation-icon.png" />';
-                }
-                $con_html += '</li>';
+                $con_html += '<li><span class="' + sphere.toLowerCase() + '">' + sphere + '</span></li>';
               })
               $con_html += "</ul></div></div></li>";
             })
