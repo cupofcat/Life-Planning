@@ -133,7 +133,6 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 	}
 
-	@Override
 	public CalendarEventEntry getCalendarEvent() {
 		// TODO Auto-generated method stub
 		return null;
