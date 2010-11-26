@@ -20,7 +20,7 @@ public class Analyzer {
 
 	public static final double CONFIDENCE = 0.1;
 	static final int TRIES = 10;
-	private int maxDepth = 5;
+	private int maxDepth = 3;
 	private int maxSuggestions = 3;
 
 	public Analyzer() {
@@ -30,7 +30,70 @@ public class Analyzer {
 		return convertToSuggestions(this.getSuggestions(events, currentUserId, generateSpheres(new double[] { 0.7, 0.3 }), b));
 	}
 
-	private LinkedList<List<Suggestion>> convertToSuggestions(LinkedList<List<CalendarStatus>> statuses) {
+	public List<List<CalendarStatus>> getSuggestions(List<? extends IEvent> externalEvents, String userID, Map<SphereName, Double> spherePreferences,
+			boolean optimizeFull) throws IOException {
+		// wyciagnac spherePreferences i optimize z bazy danych
+		if (externalEvents.size() == 0)
+			return null;
+		removeStaticEvents(externalEvents);
+		List<IEvent> events = (List<IEvent>) externalEvents;
+		LinkedList<List<CalendarStatus>> result = new LinkedList<List<CalendarStatus>>();
+		CalendarStatus start = checkGoals(events, spherePreferences);
+		if (isCloseEnough(start, optimizeFull))
+			return null;
+		List<CalendarStatus> statuses = getSortedStatuses(events, start);
+		for (int i = 0; i < maxSuggestions || i < statuses.size(); i++) {
+			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
+			CalendarStatus nextMin = statuses.get(i);
+			// best event can't improve the status
+			if (nextMin.compareTo(start) >= 0)
+				break;
+			list.add(nextMin);
+			events.remove(nextMin.getEvent());
+			List<CalendarStatus> rest = getSuggestions(events, nextMin, optimizeFull, maxDepth);
+			if (rest != null)
+				list.addAll(rest);
+			result.add(list);
+			events.add(nextMin.getEvent());
+		}
+		return result;
+	}
+
+	private List<CalendarStatus> getSuggestions(List<IEvent> events, CalendarStatus currentStatus, boolean optimizeFull, int depth)
+			throws IOException {
+		if (isCloseEnough(currentStatus, optimizeFull) || events.size() == 0 || depth <= 0)
+			return null;
+		List<CalendarStatus> statuses = getSortedStatuses(events, currentStatus);
+		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
+		CalendarStatus minimum = statuses.get(0);
+		if (minimum.compareTo(currentStatus) >= 0)
+			return null;
+		list.add(minimum);
+		events.remove(minimum.getEvent());
+		List<CalendarStatus> rest = getSuggestions(events, minimum, optimizeFull, depth - 1);
+		if (rest != null)
+			list.addAll(rest);
+		events.add(minimum.getEvent());
+		return list;
+	}
+
+	private boolean isCloseEnough(CalendarStatus currentStatus, boolean optimizeFull) {
+		return currentStatus.getCoefficient() < Math.pow(Analyzer.CONFIDENCE, 2) || (!optimizeFull && currentStatus.isWithinConfidenceInterval());
+	}
+
+	private List<CalendarStatus> getSortedStatuses(List<? extends IEvent> events, CalendarStatus currentStatus) {
+		List<CalendarStatus> result = new LinkedList<CalendarStatus>();
+		CalendarStatus newStatus;
+		for (IEvent event : events) {
+			newStatus = new CalendarStatus(event, currentStatus);
+			newStatus.analyse();
+			result.add(newStatus);
+		}
+		Collections.sort(result);
+		return result;
+	}
+
+	private LinkedList<List<Suggestion>> convertToSuggestions(List<List<CalendarStatus>> statuses) {
 		LinkedList<List<Suggestion>> listSuggestions = new LinkedList<List<Suggestion>>();
 		Iterator<List<CalendarStatus>> it = statuses.iterator();
 		while (it.hasNext()) {
@@ -42,8 +105,7 @@ public class Analyzer {
 				Double additionalTime = status.getAdditionalEventTime();
 				if (event.getDuration() + additionalTime == 0) {
 					suggestions.add(new DeleteSuggestion(event));
-				}
-				else {
+				} else {
 					Calendar end = new GregorianCalendar();
 					end.setTimeInMillis(event.getEndDate().getTimeInMillis() + (long) (additionalTime * 60000));
 					suggestions.add(new RescheduleSuggestion(event, event.getStartDate(), end));
@@ -53,7 +115,16 @@ public class Analyzer {
 		}
 		return listSuggestions;
 	}
-	
+
+	private void removeStaticEvents(List<? extends IEvent> events) {
+		Iterator<? extends IEvent> it = events.iterator();
+		while(it.hasNext()){
+			IEvent current = it.next();
+			if(!current.canReschedule())
+				it.remove();
+		}
+	}
+
 	private Map<SphereName, Double> generateSpheres(double[] values) {
 		SphereName[] names = SphereName.values();
 		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
@@ -65,61 +136,6 @@ public class Analyzer {
 		}
 		return res;
 	}
-	
-
-	public LinkedList<List<CalendarStatus>> getSuggestions(List<? extends IEvent> externalEvents, String userID, Map<SphereName, Double> spherePreferences,
-			boolean optimizeFull) throws IOException {
-		//wyciagnac spherePreferences i optimize z bazy danych
-		if(externalEvents == null || externalEvents.size() == 0)
-			return null;
-		List<IEvent> events = (List<IEvent>) externalEvents;
-		LinkedList<List<CalendarStatus>> result = new LinkedList<List<CalendarStatus>>();
-		CalendarStatus start = checkGoals(events, spherePreferences);
-		if (!optimizeFull && start.isWithinConfidenceInterval())
-			return null;
-		List<CalendarStatus> statuses = getSortedStatuses(events, start);
-		for(int i = 0; i < maxSuggestions; i++){
-			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
-			CalendarStatus nextMin = statuses.get(i);
-			list.add(nextMin);
-			events.remove(nextMin.getEvent());
-			List<CalendarStatus> rest = getSuggestions(events, nextMin, optimizeFull, maxDepth);
-			if(rest != null)
-				list.addAll(getSuggestions(events, nextMin, optimizeFull, maxDepth));
-			result.add(list);
-			events.add(nextMin.getEvent());
-		}
-		return result;
-	}
-
-	private List<CalendarStatus> getSuggestions(List<IEvent> events,CalendarStatus currentStatus, boolean optimizeFull, int depth) throws IOException {
-		if(( !optimizeFull && currentStatus.isWithinConfidenceInterval() ) || events.size() == 0)
-			return null;
-		List<CalendarStatus> statuses = getSortedStatuses(events, currentStatus);
-		CalendarStatus minimum = statuses.get(0);
-		if(minimum.compareTo(currentStatus) >= 0 || depth <= 0)
-			return null;
-		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
-		list.add(minimum);
-		events.remove(minimum.getEvent());
-		list.addAll(getSuggestions(events, minimum, optimizeFull, depth-1));
-		events.add(minimum.getEvent());
-		return list;
-	}
-	
-	
-	private List<CalendarStatus> getSortedStatuses(List<? extends IEvent> events, CalendarStatus currentStatus) {
-		List<CalendarStatus> result = new LinkedList<CalendarStatus>();
-		CalendarStatus newStatus;
-		for (IEvent event : events){
-			newStatus = new CalendarStatus(event, currentStatus);
-			newStatus.analyse();
-			result.add(newStatus);
-		}
-		Collections.sort(result);
-		return result;
-	}
-
 
 	private List<BaseCalendarSlot> getFreeSlots(List<? extends ICalendarSlot> events) {
 		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
@@ -173,7 +189,7 @@ public class Analyzer {
 
 	private String printDate(Calendar cal) {
 		return cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH) + "/" + cal.get(Calendar.YEAR) + "  " + cal.get(Calendar.HOUR_OF_DAY)
-		+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+				+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
 	}
 
 	private void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {

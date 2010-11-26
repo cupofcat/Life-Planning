@@ -70,12 +70,6 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	}
 	
 	public boolean isWithinConfidenceInterval(){
-//		Collection<SphereInfo> infos = sphereResults.values();
-//		for(SphereInfo info : infos){
-//			if(!info.isWithinConfidenceInterval())
-//				return false;
-//		}
-//		return true;
 		return coefficient < Analyzer.CONFIDENCE;
 	}
 	
@@ -85,7 +79,6 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		Pair<Double, Double> eventDurationInterval = event.getDurationInterval();
 		double maxLengthening = eventDurationInterval.getSecond() - eventDuration;
 		double maxShortening = eventDuration - eventDurationInterval.getFirst();
-		/* Find (brute force) best (sphere-wise) duration for the event */
 		Pair<Double, Double> lenRes = getRatioStatus(maxLengthening / Analyzer.TRIES, sphereResults, sphereInfluences);
 		Pair<Double, Double> shortRes = getRatioStatus((-maxShortening) / Analyzer.TRIES, sphereResults, sphereInfluences);
 		if (lenRes.getFirst() < shortRes.getFirst()) {
@@ -131,6 +124,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		}
 		return new Pair<Double, Double>(prevStatus, currentExtraTime);
 	}
+	// lubie 
 
 	public int compareTo(CalendarStatus next) {
 		if (coefficient < next.getCoefficient())

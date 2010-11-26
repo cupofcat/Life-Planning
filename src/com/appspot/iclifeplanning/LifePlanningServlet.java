@@ -34,15 +34,18 @@ public class LifePlanningServlet extends HttpServlet {
 			throws IOException {
 		Suggestion beginning = new RescheduleSuggestion("Begin", null, new GregorianCalendar(2000, 3, 3, 0, 0, 0),new GregorianCalendar(2000, 3, 3, 0, 0, 0) );
 		Suggestion end = new RescheduleSuggestion("End", null, new GregorianCalendar(2000, 3, 3, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
-		Suggestion s = new RescheduleSuggestion("Event1", null, new GregorianCalendar(2000, 3, 3, 13, 0, 0),new GregorianCalendar(2000, 3, 3, 14, 40, 0) );
+		Suggestion s = new RescheduleSuggestion("Meeting Praca", null, new GregorianCalendar(2000, 3, 3, 13, 0, 0),new GregorianCalendar(2000, 3, 3, 14, 40, 0) );
 		s.setSpheres(generateSpheres(new double[]{0.6, 0.4}));
 		s.setDeurationInterval(30, 120);
-		Suggestion s2 = new RescheduleSuggestion("Event2", null, new GregorianCalendar(2000, 3, 3, 15, 00, 0),new GregorianCalendar(2000, 3, 3, 15, 30, 0) );
+		s.setReschedule(false);
+		Suggestion s2 = new RescheduleSuggestion("Zdrowie", null, new GregorianCalendar(2000, 3, 3, 15, 00, 0),new GregorianCalendar(2000, 3, 3, 15, 30, 0) );
 		s2.setSpheres(generateSpheres(new double[]{1.0}));
 		s2.setDeurationInterval(0, 80);
-		Suggestion s3 = new RescheduleSuggestion("Event3", null, new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 16, 35, 0) );
+		s2.setReschedule(true);
+		Suggestion s3 = new RescheduleSuggestion("Praca", null, new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 16, 35, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
 		s3.setDeurationInterval(0, 20);
+		s3.setReschedule(false);
 		List<Suggestion> list = new LinkedList<Suggestion>();
 		list.add(s);
 		//list.add(end);
