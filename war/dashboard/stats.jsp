@@ -29,14 +29,13 @@
     <script type="text/javascript" src="js/mootools.js"></script>
     <script type="text/javascript" src="js/moocheck.js"></script>
     
-    <script src="../js/jquery-1.2.6.min.js" type="text/javascript"></script>
+    <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
     
     <script type="text/javascript" src="../js/jquery.easing.1.3.js"></script>
     <script type="text/javascript" src="../js/jquery.lavalamp-1.3.4b2.js"></script>
     <script type="text/javascript" src="js/drawer.js"></script>
 	
 	<!--  Highcharts libraries: -->
-	<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 	<script type="text/javascript" src="js/highcharts.js"></script>
 	<script type="text/javascript" src="js/modules/exporting.js"></script>
 
@@ -54,38 +53,44 @@
 	<script type="text/javascript" src="js/chosen-priorities.js"></script>
 	<script type="text/javascript" src="js/spheres-history.js"></script>
 	<script type="text/javascript">
-	var sphereOfInterest = {"sphere": "Russia"};
+		// to be deleted later on if no arguments are needed to be passed to the server while getJSON.
+		// currently not used
+		var sphereOfInterest = {"sphere": "Russia"};
 	</script>
 	<script type="text/javascript" src="js/plan-achievement.js"></script>
 	
-  </head>
-  <body>
-    <div id="main">
-      <div id="header-long">
-        <div id="strip"></div>
-        <div id="header">
-          <div id="header-top">
-            <div id="logo"><div id="bg"></div><h1><%= request.getUserPrincipal().getName() %></h1></div>
-            <div id="menu">
-              <ul class="lamp" id="lavaLampMenu">
-                  <li><a href="index.jsp">Dashboard</a></li>
-                  <li><a href="">Settings</a></li>
-                  <li><a href="">Stats</a></li>
-                  <li><a href="<%= userService.createLogoutURL("/") %>">Logout</a></li>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="body">
-	  <br /><br />
-       <div id="priorities-chart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
-	   <div id="historicChart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
-	   <div id="plan-achievement" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
-	   
-      </div>
-      <div id="footer">
-      </div>
-    </div>
+	</head>
+	<body>
+		<div id="main">
+			<div id="header-long">
+				<div id="strip"></div>
+				<div id="header">
+					<div id="header-top">
+						<div id="logo"><div id="bg"></div><h1><%= request.getUserPrincipal().getName() %></h1></div>
+						<div id="menu">
+							<ul class="lamp" id="lavaLampMenu">
+								<li><a href="index.jsp">Dashboard</a></li>
+								<li><a href="">Settings</a></li>
+								<li><a href="">Stats</a></li>
+								<li><a href="<%= userService.createLogoutURL("/") %>">Logout</a></li>
+							</ul>
+						</div>
+					</div>
+				</div>
+			</div>
+     
+			<div id="body">
+				<br /><br />
+				
+				<div id="priorities-chart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
+				<div id="historicChart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
+				<!-- Buttons for holding spheres are kept in here -->
+				<div id="sphereButtonsHolder"></div><br />
+				<div id="plan-achievement" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
+			   
+			</div>
+			<div id="footer">
+			</div>
+		</div>
   </body> 
 </html>
