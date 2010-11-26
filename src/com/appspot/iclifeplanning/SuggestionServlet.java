@@ -50,7 +50,7 @@ public class SuggestionServlet extends HttpServlet {
 		Analyzer analyser = new Analyzer();
 
 		List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
-		
+
 		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 
 		/*
