@@ -34,7 +34,7 @@ import com.google.appengine.repackaged.org.json.JSONObject;
 @SuppressWarnings("serial")
 public class SuggestionServlet extends HttpServlet {
 	// This should NOT be stored like this. Reimplement to use memcache at some point.
-	private static Map<String, List<Suggestion>> suggestionMap = new HashMap<String, List<Suggestion>>();
+	private static Map<String, List<List<Suggestion>>> suggestionMap = new HashMap<String, List<List<Suggestion>>>();
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
@@ -48,7 +48,7 @@ public class SuggestionServlet extends HttpServlet {
 		List<Event> events = eventStore.getEvents();
 		// ------------------- Dummy data
 		Analyzer analyser = new Analyzer();
-		List<Suggestion> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
+		List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
 		
 		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 
@@ -67,7 +67,8 @@ public class SuggestionServlet extends HttpServlet {
 		JSONArray suggestionArray = new JSONArray();
 		Suggestion s;
 		for (int i = 0; i < suggestions.size(); i++) {
-			s = suggestions.get(i);
+			// TEMPORARY
+			s = suggestions.get(0).get(i);
 			suggestionArray.put(suggestionToJSONOBject(s, i));
 		}
 		
