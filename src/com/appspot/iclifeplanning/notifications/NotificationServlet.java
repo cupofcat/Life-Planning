@@ -30,6 +30,7 @@ import com.google.appengine.api.users.User;
  */
 @SuppressWarnings("serial")
 public class NotificationServlet extends HttpServlet {
+	private static long timer = 0;
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {

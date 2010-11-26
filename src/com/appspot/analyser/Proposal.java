@@ -12,6 +12,7 @@ import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
 
 import com.google.appengine.api.users.User;
+import com.google.gdata.data.calendar.CalendarEventEntry;
 
 
 @PersistenceCapable
@@ -130,6 +131,11 @@ public class Proposal extends BaseCalendarSlot implements IEvent {
 	
 	public void makePersistent() {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
+	}
+
+	public CalendarEventEntry getCalendarEvent() {
+		// TODO Auto-generated method stub
+		return null;
 	}
 	
 }
