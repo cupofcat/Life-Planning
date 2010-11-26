@@ -66,7 +66,7 @@ public class SuggestionServlet extends HttpServlet {
 		suggestions.add(sug);/**/
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
-		/** TODO(amadurska): rebuild
+		/** TODO(amadurska): rebuild for new JSON format
 		Suggestion s;
 		for (int i = 0; i < suggestions.size(); i++) {
 			// TEMPORARY

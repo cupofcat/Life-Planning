@@ -40,7 +40,7 @@ public class DeleteSuggestion extends Suggestion {
  		return "Remove";
  	}
  	
-	public void makePersistent(int alternative) {
+ 	protected void makePersistentInternal() {
 		try {
 			URL deleteUrl = new URL(event.getEditLink().getHref());
 			CalendarUtils.client.delete(deleteUrl);

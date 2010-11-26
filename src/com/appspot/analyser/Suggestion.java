@@ -1,10 +1,13 @@
 package com.appspot.analyser;
 
+import java.io.IOException;
+import java.net.URL;
 import java.util.Calendar;
 import java.util.Map;
 
 import com.appspot.datastore.SphereName;
-import com.google.appengine.api.users.User;
+import com.appspot.iclifeplanning.authentication.CalendarUtils;
+import com.google.gdata.util.ServiceException;
 
 
 public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
@@ -70,6 +73,16 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 	public void setDeurationInterval(double min, double max){
 		durationInterval = new Pair<Double, Double>(min, max);
 	}
-	
+
+	public void makePersistent(int alternative) {
+		if (alternative == 0) {
+			makePersistentInternal();
+		} else {
+			//alternativeSuggestions.get(alternative-1).makePersistent(0);
+		}
+	}
+
 	public abstract String getType();
+
+	protected abstract void makePersistentInternal();
 }

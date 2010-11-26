@@ -8,7 +8,6 @@ import java.util.Map;
 
 import com.appspot.datastore.SphereName;
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
-import com.google.appengine.api.users.User;
 import com.google.gdata.data.DateTime;
 import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.calendar.CalendarEventEntry;
@@ -45,7 +44,7 @@ public class InsertSuggestion extends Suggestion {
  		return "New Event";
  	}
 
- 	public void makePersistent(int alternative) {
+ 	protected void makePersistentInternal() {
 		CalendarEventEntry newEntry = new CalendarEventEntry();
 
 		newEntry.setTitle(new PlainTextConstruct(title));
