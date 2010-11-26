@@ -90,7 +90,7 @@
               $con_html += '</div>';
               $con_html += '<div class="right"><ul class=\"spheres\">';
               $.each(s.spheres, function(j, sphere){
-                $con_html += '<li><span class="' + sphere.toLowerCase() + '">' + sphere + '</span></li>';
+                $con_html += '<li class="' + sphere.toLowerCase() + '"><span>' + sphere + '</span></li>';
               })
               $con_html += "</ul></div></div></li>";
             })
