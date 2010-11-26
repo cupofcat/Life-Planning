@@ -45,7 +45,7 @@ public class InsertSuggestion extends Suggestion {
  		return "New Event";
  	}
 
- 	public void makePersistent() {
+ 	public void makePersistent(int alternative) {
 		CalendarEventEntry newEntry = new CalendarEventEntry();
 
 		newEntry.setTitle(new PlainTextConstruct(title));

@@ -49,7 +49,7 @@ public class RescheduleSuggestion extends Suggestion {
  		return "Reschedule";
  	}
 
-	public void makePersistent() {
+	public void makePersistent(int alternative) {
 		event.setTitle(new PlainTextConstruct("Rescheduling!"));
 		event.getTimes().get(0).setStartTime(new DateTime(newDates.getFirst().getTimeInMillis()));
 		event.getTimes().get(0).setEndTime(new DateTime(newDates.getSecond().getTimeInMillis()));

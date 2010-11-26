@@ -50,7 +50,6 @@ public class SuggestionServlet extends HttpServlet {
 		Analyzer analyser = new Analyzer();
 
 		List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
-
 		
 		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 
@@ -67,12 +66,13 @@ public class SuggestionServlet extends HttpServlet {
 		suggestions.add(sug);/**/
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
+		/** TODO(amadurska): rebuild
 		Suggestion s;
 		for (int i = 0; i < suggestions.size(); i++) {
 			// TEMPORARY
 			s = suggestions.get(0).get(i);
 			suggestionArray.put(suggestionToJSONOBject(s, i));
-		}
+		}**/
 		
 		response.getWriter().print(suggestionArray);
 	}
@@ -107,6 +107,34 @@ public class SuggestionServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws IOException {
-		System.out.println(suggestionMap.size());
+
+		JSONObject suggestionsJSON = null;
+
+		try {
+			suggestionsJSON = new JSONObject(request.getReader().toString());
+			String userID = suggestionsJSON.getString("userID");
+			int list = suggestionsJSON.getInt("listNumber");
+			JSONArray acceptedSuggestions = suggestionsJSON.getJSONArray("suggestions");
+			int lenght = acceptedSuggestions.length();
+			JSONObject suggestionJSON;
+			int suggestion;
+			int alternative;
+			String key;
+			
+			List<List<Suggestion>> suggestions = suggestionMap.get(userID);
+
+			for(int i = 0; i < lenght; i++) {
+				suggestionJSON = acceptedSuggestions.getJSONObject(i);
+				key = suggestionJSON.keys().toString();
+				suggestion = Integer.parseInt(key);
+				alternative = suggestionJSON.getInt(key);
+				suggestions.get(list).get(suggestion).makePersistent(alternative);
+			}
+			
+			
+		} catch (JSONException e) {
+			System.out.println("Badly formatted JSON!");
+			e.printStackTrace();
+		}
 	}
 }
