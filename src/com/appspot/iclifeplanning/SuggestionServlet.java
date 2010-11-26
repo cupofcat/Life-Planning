@@ -48,6 +48,7 @@ public class SuggestionServlet extends HttpServlet {
 		List<Event> events = eventStore.getEvents();
 		// ------------------- Dummy data
 		Analyzer analyser = new Analyzer();
+
 		List<List<Suggestion>> suggestions = null;//analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
 		
 		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
@@ -61,8 +62,8 @@ public class SuggestionServlet extends HttpServlet {
 		suggestions.add(sug);
 		sug = new DeleteSuggestion(event2);
 		suggestions.add(sug);
-		//sug = new DeleteSuggestion(event3);
-		suggestions.add(sug);*/
+		/*sug = new DeleteSuggestion(event3);
+		suggestions.add(sug);/**/
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
 		/** TODO(amadurska): rebuild
