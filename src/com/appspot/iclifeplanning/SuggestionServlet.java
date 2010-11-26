@@ -34,7 +34,7 @@ import com.google.appengine.repackaged.org.json.JSONObject;
 @SuppressWarnings("serial")
 public class SuggestionServlet extends HttpServlet {
 	// This should NOT be stored like this. Reimplement to use memcache at some point.
-	private static Map<String, List<Suggestion>> suggestionMap = new HashMap<String, List<Suggestion>>();
+	private static Map<String, List<List<Suggestion>>> suggestionMap = new HashMap<String, List<List<Suggestion>>>();
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
@@ -48,7 +48,7 @@ public class SuggestionServlet extends HttpServlet {
 		List<Event> events = eventStore.getEvents();
 		// ------------------- Dummy data
 		Analyzer analyser = new Analyzer();
-		List<Suggestion> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
+		List<List<Suggestion>> suggestions = null;//analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
 		
 		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 
@@ -65,11 +65,12 @@ public class SuggestionServlet extends HttpServlet {
 		suggestions.add(sug);*/
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
+		/** TODO(amadurska): rebuild
 		Suggestion s;
 		for (int i = 0; i < suggestions.size(); i++) {
 			s = suggestions.get(i);
 			suggestionArray.put(suggestionToJSONOBject(s, i));
-		}
+		}**/
 		
 		response.getWriter().print(suggestionArray);
 	}
@@ -104,6 +105,34 @@ public class SuggestionServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws IOException {
-		System.out.println(suggestionMap.size());
+
+		JSONObject suggestionsJSON = null;
+
+		try {
+			suggestionsJSON = new JSONObject(request.getReader().toString());
+			String userID = suggestionsJSON.getString("userID");
+			int list = suggestionsJSON.getInt("listNumber");
+			JSONArray acceptedSuggestions = suggestionsJSON.getJSONArray("suggestions");
+			int lenght = acceptedSuggestions.length();
+			JSONObject suggestionJSON;
+			int suggestion;
+			int alternative;
+			String key;
+			
+			List<List<Suggestion>> suggestions = suggestionMap.get(userID);
+
+			for(int i = 0; i < lenght; i++) {
+				suggestionJSON = acceptedSuggestions.getJSONObject(i);
+				key = suggestionJSON.keys().toString();
+				suggestion = Integer.parseInt(key);
+				alternative = suggestionJSON.getInt(key);
+				suggestions.get(list).get(suggestion).makePersistent(alternative);
+			}
+			
+			
+		} catch (JSONException e) {
+			System.out.println("Badly formatted JSON!");
+			e.printStackTrace();
+		}
 	}
 }

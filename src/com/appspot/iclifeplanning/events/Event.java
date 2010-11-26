@@ -100,7 +100,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		return maxDuration;
 	}
 
-	public void makePersistent() {
+	public void makePersistent(int alternative) {
 		
 	}
 

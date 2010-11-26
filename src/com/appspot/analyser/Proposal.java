@@ -129,7 +129,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent {
 		this.durationInterval = durationInterval;
 	}
 	
-	public void makePersistent() {
+	public void makePersistent(int alternative) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 	}
 
