@@ -87,7 +87,6 @@ public class EventStore {
 			  event = new Event(allCalendarEvents.get(j));
 			  System.out.println(event.getTitle());
 			  System.out.println("Time: " + event.getStartDate().getTimeInMillis());
-			  event.setCalendarURL(eventFeedUrl);
 			  allEvents.add(event);
 		  }
         }

@@ -45,10 +45,7 @@
     <link rel="stylesheet" href="../css/lavalamp3.css" type="text/css" media="screen">
     <link rel="stylesheet" href="../css/coda-slider.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="css/override.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="css/screensmall.css" type="text/css" media="screen">
-  
-    <script type="text/javascript" src="js/mootools.js"></script>
-    <script type="text/javascript" src="js/moocheck.js"></script>
+    <link rel="stylesheet" href="css/suggestions.css" type="text/css" media="screen">
     
     <script src="../js/jquery-1.2.6.min.js" type="text/javascript"></script>
     
@@ -59,28 +56,6 @@
       jQuery.noConflict();
       
       jQuery(document).ready(function($) {
-        //Build suggestions
-        $("#optimize_button a").click(function(e){
-          e.preventDefault();
-          $.getJSON("../suggestions", function(sugs){
-            $formContainer = $("#calendar_suggestions .demo");
-            $frm = "<form action='' method='post' class='centre'><ul>";
-            $.each(sugs, function(i, s){
-              $frm += "<label class='f_checkbox'><input type='checkbox' name='s" + i + "' checked='checked'>";
-              $frm += "<div class=\"title\">" + s.title + "</div>";
-              $frm += "<div class=\"times\">"+ s.startDateTime + " - " + s.endDateTime + "</div>";
-              $frm += "<div class=\"spheres\">"
-              $.each(s.spheres, function(j, sph){
-                $frm += sph + " ";
-              })
-              $frm += "</div></label>";
-            })
-            $frm += "<br /><br /><input type=\"submit\"></ul></form>";
-            $formContainer.html($frm);
-            $.getScript("js/moocheck.js");
-          });
-        });
-
         //Hide and slide calendar_div
         $("#calendar_div").hide();
         $("#calendar_div_toggle a").click(function(e){
@@ -93,6 +68,70 @@
             $("#calendar_div_toggle a").html("Show calendar");
             $("#calendar_div").slideUp(200);
           }
+        });
+        
+        //Build suggestions
+        $("#optimize_button a").click(function(e){
+          e.preventDefault();
+          $("#calendar_suggestions").html('<img src="css/ajax-loader.gif" />');
+          $.getJSON("../suggestions", function(sugs){
+            $("#calendar_div_toggle a").click();
+            $container = $("#calendar_suggestions");
+            $con_html = '<ul>';
+            $.each(sugs, function(i, s){
+              $con_html += '<li class="' + s.type + '"><div class="in_li">';
+              $con_html += '<div class="left">';
+              $con_html += '<div class=\"title\">' + s.title + '</div>';
+              $con_html += '<div class=\"datetimes\">' + s.startDateTime + ' - ' + s.endDateTime + '</div>';
+              $con_html += '<div class=\"description\">' + s.description + '</div>';
+              //$con_html += '<div class=\"type\">' + s.type + '</div>';
+              $con_html += '<div class=\"id\">' + s.id + '</div>';
+              $con_html += '<div class=\"userId\">' + s.userID + '</div>';
+              $con_html += '</div>';
+              $con_html += '<div class="right"><ul class=\"spheres\">';
+              $.each(s.spheres, function(j, sphere){
+                $con_html += '<li>';
+                if (sphere == "HEALTH") {
+                  $con_html += '<img src="css/heart-icon.png" />';
+                }
+                if (sphere == "FAMILY") {
+                  $con_html += '<img src="css/family-icon.png" />';
+                }
+                if (sphere == "WORK") {
+                  //$con_html += '<img src="css/work-icon.png" />';
+                }
+                if (sphere == "RECREATION") {
+                  //$con_html += '<img src="css/recreation-icon.png" />';
+                }
+                $con_html += '</li>';
+              })
+              $con_html += "</ul></div></div></li>";
+            })
+            $con_html += "</ul>";
+            $container.html($con_html);
+
+            $('#calendar_suggestions > ul > li').addClass('checked').click(function(e){
+              if ($(this).hasClass('checked')) {
+                $(this).removeClass('checked');
+                $(this).addClass('unchecked');
+              } else {
+                $(this).removeClass('unchecked');
+                $(this).addClass('checked');
+              }
+            });
+
+            $('<button id="send_suggestions">Apply suggestions</button>').click(function(){
+              $user_id = "";
+              $ids = [];
+              $('#calendar_suggestions ul').children(".checked").each(function(i, suggestion){
+                $user_id = $('div.userId', this).text();
+                $ids.push($('div.id', this).text());
+              });
+              $answer = '{"userID:"' + $user_id + ', "suggestions":[' + $ids + ']}';
+              alert($answer);
+              //$.post("../suggestions", $answer);
+            }).appendTo($container);
+          });
         });
 
         //Lavalamp
@@ -129,8 +168,6 @@
         </div>
         <br /><br />
       <div id="calendar_suggestions">
-        <div class='demo'>
-        </div>
       </div>
       <br /><br />
       </div>
