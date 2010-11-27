@@ -79,7 +79,6 @@
             $container = $("#calendar_suggestions");
             $container.html('');
             $.each(optimisation.lists, function(sugg_set_id, sugg_set) {
-              $container.append('<div class="id">' + optimisation.userID + '</div>');
               $sugg_set_div = $('<div class="sugg_set" id="sugg_set' + sugg_set_id + '"></div>').appendTo($container);
               $sugg_set_div.append('<div class="id">' + sugg_set_id + '</div>');
               $.each(sugg_set, function(alter_set_id, alter_set) {
@@ -87,7 +86,7 @@
                 $alter_set_id_div = $('<div class="id">' + alter_set_id + '</div>').appendTo($alter_set_div);
                 $.each(alter_set, function(alter_id, alter) {
                   $alter_div = $('<div class="alter ' + alter.type + '"></div>').appendTo($alter_set_div);
-                  $alter_div.addClass('checked').click(function() {
+                  $alter_div.addClass('selected').click(function() {
                     if ($(this).hasClass('selected')) {
                       $(this).removeClass('selected');
                       $(this).addClass('unselected');
@@ -108,12 +107,28 @@
                   }); //spheres
                 }); //alter_set
               }); //sugg_set
+              $apply_button = $('<button class="apply_suggs">Apply suggestions</button>').appendTo($sugg_set_div);
+              $apply_button.click(function() {
+                //optimisation.userID
+                //sugg_set_id
+                $choices = [];
+                $('div.alter_set', $sugg_set_div).each(function(alter_set_id, alter_set) {
+                  $choice = [];
+                  $('div.selected', alter_set).each(function(alter_id, alter) {
+                    $choice.push(alter_set_id);
+                    $choice.puhs(alter_id);
+                  });
+                  $choices.push($choice);
+                });
+                $answer = '{"userID":"' + optimisation.userID + '", "setID":"' + sugg_set_id + '", "suggestions":[' + $choices + ']}';
+                alert($answer);
+              }); //apply_button.click()
             }); //optimisation.lists
             
             $container.hide();
             $container.slideDown(500);
 
-            $('<button id="send_suggestions">Apply suggestions</button>').click(function(){
+            /*$('<button id="send_suggestions">Apply suggestions</button>').click(function(){
               $user_id = "";
               $ids = [];
               $('#calendar_suggestions ul').children(".checked").each(function(i, suggestion){
@@ -123,7 +138,7 @@
               $answer = '{"userID:"' + $user_id + ', "suggestions":[' + $ids + ']}';
               alert($answer);
               //$.post("../suggestions", $answer);
-            }).appendTo($container);
+            }).appendTo($container);*/
           });
         });
 
