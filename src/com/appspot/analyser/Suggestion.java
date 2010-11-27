@@ -2,7 +2,9 @@ package com.appspot.analyser;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.List;
 import java.util.Map;
 
 import com.appspot.datastore.SphereName;
@@ -15,6 +17,7 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 	private boolean canReschedule;
 	private Map<SphereName, Double> spheres;
 	private Pair<Double, Double> durationInterval;
+	private List<Suggestion> alternativeSuggestions = new ArrayList<Suggestion>();
 	
 	public Suggestion(String title, String description, Calendar startDate,
 			Calendar endDate){
@@ -78,11 +81,15 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 		if (alternative == 0) {
 			makePersistentInternal();
 		} else {
-			//alternativeSuggestions.get(alternative-1).makePersistent(0);
+			alternativeSuggestions.get(alternative-1).makePersistent(0);
 		}
 	}
 
 	public abstract String getType();
 
 	protected abstract void makePersistentInternal();
+
+	public List<Suggestion> getAlternativeSuggestions() {
+		return alternativeSuggestions;
+	}
 }

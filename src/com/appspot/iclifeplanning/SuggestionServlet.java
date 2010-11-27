@@ -3,6 +3,7 @@ package com.appspot.iclifeplanning;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,35 +50,59 @@ public class SuggestionServlet extends HttpServlet {
 		// ------------------- Dummy data
 		Analyzer analyser = new Analyzer();
 
-		List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
-
+		//List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
+		List<List<Suggestion>> suggestions = new ArrayList<List<Suggestion>>();
+		suggestions.add(new ArrayList<Suggestion>());
+		suggestions.add(new ArrayList<Suggestion>());
+		suggestions.add(new ArrayList<Suggestion>());
 		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 
-		/*
+		
 		IEvent event1 = (IEvent)events.get(0);
 		IEvent event2 = (IEvent)events.get(1);
-		//IEvent event3 = (IEvent)events.get(2);
+		IEvent event3 = (IEvent)events.get(2);
 
 		Suggestion sug = new DeleteSuggestion(event1);
-		suggestions.add(sug);
+		suggestions.get(0).add(sug);
 		sug = new DeleteSuggestion(event2);
-		suggestions.add(sug);
-		/*sug = new DeleteSuggestion(event3);
-		suggestions.add(sug);/**/
+		suggestions.get(1).add(sug);
+		sug = new DeleteSuggestion(event3);
+		suggestions.get(2).add(sug);
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
-		/** TODO(amadurska): rebuild for new JSON format
-		Suggestion s;
+		List<Suggestion> s;
 		for (int i = 0; i < suggestions.size(); i++) {
-			// TEMPORARY
-			s = suggestions.get(0).get(i);
-			suggestionArray.put(suggestionToJSONOBject(s, i));
-		}**/
-		
-		response.getWriter().print(suggestionArray);
+			s = suggestions.get(0);
+			suggestionArray.put(suggestionListToJSONArray(s, i));
+		}
+
+		JSONObject result = new JSONObject();
+		try {
+			result.put("userID", CalendarUtils.getCurrentUserId());
+			result.put("lists", suggestionArray);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		response.getWriter().print(result);
 	}
 
-	private JSONObject suggestionToJSONOBject(Suggestion s, int i) {
+	private JSONArray suggestionListToJSONArray(List<Suggestion> suggestionList, int listID) {
+		Suggestion suggestion;
+		JSONArray suggestionArray = new JSONArray();
+		List<Suggestion> alternativeSuggestions;
+		for (int i = 0; i < suggestionList.size(); i++) {
+			suggestion = suggestionList.get(0);
+			suggestionArray.put(suggestionToJSONOBject(suggestion, i, 0));
+			alternativeSuggestions = suggestion.getAlternativeSuggestions();
+			for (int j = 0; j < alternativeSuggestions.size(); j++) {
+				suggestionArray.put(suggestionToJSONOBject(suggestion, i, ++j));
+			}
+			
+		}
+		return suggestionArray;
+	}
+
+	private JSONObject suggestionToJSONOBject(Suggestion s, int id, int alternativeId) {
 		JSONObject suggestionObject = new JSONObject();
 		try {
 			suggestionObject.put("title", s.getTitle());
@@ -89,8 +114,7 @@ public class SuggestionServlet extends HttpServlet {
 
 			suggestionObject.put("endDateTime", date.format(s.getEndDate().getTime()));
 			suggestionObject.put("type", s.getType());
-			suggestionObject.put("id", i);
-			suggestionObject.put("userID", CalendarUtils.getCurrentUserId());
+			suggestionObject.put("id", id);
 
 			List<String> spheres = new ArrayList<String>();
 			for (SphereName sphere : s.getSpheres().keySet()) {
