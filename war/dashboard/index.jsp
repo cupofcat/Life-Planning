@@ -86,21 +86,25 @@
                 $alter_set_id_div = $('<div class="id">' + alter_set_id + '</div>').appendTo($alter_set_div);
                 $.each(alter_set, function(alter_id, alter) {
                   $alter_div = $('<div class="alter ' + alter.type + '"></div>').appendTo($alter_set_div);
-                  $alter_div.addClass('selected').click(function() {
-                    if ($(this).hasClass('selected')) {
+                  if (alter_id == 0) {
+                    $alter_div.addClass('selected');
+                  } else {
+                    $alter_div.addClass('unselected');
+                  }
+                  $alter_div.click(function() {
+                    $('.selected', $(this).parent()).each(function(i) {
                       $(this).removeClass('selected');
                       $(this).addClass('unselected');
-                    } else {
-                      $(this).removeClass('unselected');
-                      $(this).addClass('selected');
-                    }
+                    });
+                    $(this).removeClass('unselected');
+                    $(this).addClass('selected');
                   });
                   $alter_id_div = $('<div class="id">' + alter_id + '</div>').appendTo($alter_div);
                   $alter_div_left = $('<div class="left"></div>').appendTo($alter_div);
                   $alter_div_right = $('<div class="right"></div>').appendTo($alter_div);
                   $alter_div_left.append('<div class="title">' + alter.title + '</div>');
                   $alter_div_left.append('<div class="datetimes">' + alter.startDateTime + ' - ' + alter.endDateTime + '</div>');
-                  $alter_div_left.append('<div class="description">' + alter.description + 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.' + '</div>');
+                  $alter_div_left.append('<div class="description">' + alter.description + 'Lorem ipsum dolor sit amet, consectetur.' + '</div>');
                   $spheres_ul = $('<ul class="spheres"></ul>').appendTo($alter_div_right);
                   $.each(alter.spheres, function(sphere_id, sphere) {
                     $spheres_ul.append('<li class="' + sphere.toLowerCase() + '"><span>' + sphere + '</span></li>');
@@ -109,36 +113,24 @@
               }); //sugg_set
               $apply_button = $('<button class="apply_suggs">Apply suggestions</button>').appendTo($sugg_set_div);
               $apply_button.click(function() {
-                //optimisation.userID
-                //sugg_set_id
                 $choices = [];
-                $('div.alter_set', $sugg_set_div).each(function(alter_set_id, alter_set) {
-                  $choice = [];
-                  $('div.selected', alter_set).each(function(alter_id, alter) {
-                    $choice.push(alter_set_id);
-                    $choice.puhs(alter_id);
+                $('div.alter_set', $('div.sugg_set').get(sugg_set_id)).each(function(alter_set_id, alter_set) {
+                  $choice = '[';
+                  $('div.selected', this).each(function(alter_id, alter) {
+                    $choice += alter_set_id + ', ';
+                    $choice += $('.id', this).text();
                   });
+                  $choice += ']';
                   $choices.push($choice);
                 });
                 $answer = '{"userID":"' + optimisation.userID + '", "setID":"' + sugg_set_id + '", "suggestions":[' + $choices + ']}';
-                alert($answer);
+                $.post("../suggestions", $answer);
+                $container.html('');
               }); //apply_button.click()
             }); //optimisation.lists
             
             $container.hide();
             $container.slideDown(500);
-
-            /*$('<button id="send_suggestions">Apply suggestions</button>').click(function(){
-              $user_id = "";
-              $ids = [];
-              $('#calendar_suggestions ul').children(".checked").each(function(i, suggestion){
-                $user_id = $('div.userId', this).text();
-                $ids.push($('div.id', this).text());
-              });
-              $answer = '{"userID:"' + $user_id + ', "suggestions":[' + $ids + ']}';
-              alert($answer);
-              //$.post("../suggestions", $answer);
-            }).appendTo($container);*/
           });
         });
 
