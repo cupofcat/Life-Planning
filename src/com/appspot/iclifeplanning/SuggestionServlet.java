@@ -75,6 +75,7 @@ public class SuggestionServlet extends HttpServlet {
 		suggestions.get(0).add(new DeleteSuggestion(event3));
 		
 		sug = new DeleteSuggestion(event2);
+		alternatives = new ArrayList<Suggestion>();
 		alternatives.add(new DeleteSuggestion(event4));
 		alternatives.add(new DeleteSuggestion(event5));
 		sug.setAlternativeSuggetions(alternatives);
@@ -83,6 +84,7 @@ public class SuggestionServlet extends HttpServlet {
 		suggestions.get(1).add(new DeleteSuggestion(event4));
 		
 		sug = new DeleteSuggestion(event3);
+		alternatives = new ArrayList<Suggestion>();
 		alternatives.add(new DeleteSuggestion(event4));
 		alternatives.add(new DeleteSuggestion(event5));
 		sug.setAlternativeSuggetions(alternatives);
@@ -94,8 +96,8 @@ public class SuggestionServlet extends HttpServlet {
 		JSONArray suggestionArray = new JSONArray();
 		List<Suggestion> s;
 		for (int i = 0; i < suggestions.size(); i++) {
-			s = suggestions.get(0);
-			suggestionArray.put(suggestionListToJSONArray(s, i));
+			s = suggestions.get(i);
+			suggestionArray.put(suggestionListToJSONArray(s));
 		}
 
 		JSONObject result = new JSONObject();
@@ -108,11 +110,11 @@ public class SuggestionServlet extends HttpServlet {
 		response.getWriter().print(result);
 	}
 
-	private JSONArray suggestionListToJSONArray(List<Suggestion> suggestionList, int listID) {
+	private JSONArray suggestionListToJSONArray(List<Suggestion> suggestionList) {
 		Suggestion suggestion;
 		JSONArray suggestionArray = new JSONArray();
 		for (int i = 0; i < suggestionList.size(); i++) {
-			suggestion = suggestionList.get(0);
+			suggestion = suggestionList.get(i);
 			suggestionArray.put(suggestionToJSONArray(suggestion));			
 		}
 		return suggestionArray;
