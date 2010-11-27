@@ -75,39 +75,43 @@
           e.preventDefault();
           $("#calendar_div_toggle a").click();
           $("#calendar_suggestions").html('<img src="css/ajax-loader.gif" />');
-          $.getJSON("../suggestions", function(sugs){
+          $.getJSON("../suggestions", function(optimisation){
             $container = $("#calendar_suggestions");
-            $con_html = '<ul>';
-            $.each(sugs, function(i, s){
-              $con_html += '<li class="' + s.type + '"><div class="in_li">';
-              $con_html += '<div class="left">';
-              $con_html += '<div class=\"title\">' + s.title + '</div>';
-              $con_html += '<div class=\"datetimes\">' + s.startDateTime + ' - ' + s.endDateTime + '</div>';
-              $con_html += '<div class=\"description\">' + s.description + "Lorem ipsum dolor sit amet, consectetur adipisicing elit." + '</div>';
-              //$con_html += '<div class=\"type\">' + s.type + '</div>';
-              $con_html += '<div class=\"id\">' + s.id + '</div>';
-              $con_html += '<div class=\"userId\">' + s.userID + '</div>';
-              $con_html += '</div>';
-              $con_html += '<div class="right"><ul class=\"spheres\">';
-              $.each(s.spheres, function(j, sphere){
-                $con_html += '<li class="' + sphere.toLowerCase() + '"><span>' + sphere + '</span></li>';
-              })
-              $con_html += "</ul></div></div></li>";
-            })
-            $con_html += "</ul>";
+            $container.html('');
+            $.each(optimisation.lists, function(sugg_set_id, sugg_set) {
+              $container.append('<div class="id">' + optimisation.userID + '</div>');
+              $sugg_set_div = $('<div class="sugg_set" id="sugg_set' + sugg_set_id + '"></div>').appendTo($container);
+              $sugg_set_div.append('<div class="id">' + sugg_set_id + '</div>');
+              $.each(sugg_set, function(alter_set_id, alter_set) {
+                $alter_set_div = $('<div class="alter_set"></div>').appendTo($sugg_set_div);
+                $alter_set_id_div = $('<div class="id">' + alter_set_id + '</div>').appendTo($alter_set_div);
+                $.each(alter_set, function(alter_id, alter) {
+                  $alter_div = $('<div class="alter ' + alter.type + '"></div>').appendTo($alter_set_div);
+                  $alter_div.addClass('checked').click(function() {
+                    if ($(this).hasClass('selected')) {
+                      $(this).removeClass('selected');
+                      $(this).addClass('unselected');
+                    } else {
+                      $(this).removeClass('unselected');
+                      $(this).addClass('selected');
+                    }
+                  });
+                  $alter_id_div = $('<div class="id">' + alter_id + '</div>').appendTo($alter_div);
+                  $alter_div_left = $('<div class="left"></div>').appendTo($alter_div);
+                  $alter_div_right = $('<div class="right"></div>').appendTo($alter_div);
+                  $alter_div_left.append('<div class="title">' + alter.title + '</div>');
+                  $alter_div_left.append('<div class="datetimes">' + alter.startDateTime + ' - ' + alter.endDateTime + '</div>');
+                  $alter_div_left.append('<div class="description">' + alter.description + 'Lorem ipsum dolor sit amet, consectetur adipisicing elit.' + '</div>');
+                  $spheres_ul = $('<ul class="spheres"></ul>').appendTo($alter_div_right);
+                  $.each(alter.spheres, function(sphere_id, sphere) {
+                    $spheres_ul.append('<li class="' + sphere.toLowerCase() + '"><span>' + sphere + '</span></li>');
+                  }); //spheres
+                }); //alter_set
+              }); //sugg_set
+            }); //optimisation.lists
+            
             $container.hide();
-            $container.html($con_html);
             $container.slideDown(500);
-
-            $('#calendar_suggestions > ul > li').addClass('checked').click(function(e){
-              if ($(this).hasClass('checked')) {
-                $(this).removeClass('checked');
-                $(this).addClass('unchecked');
-              } else {
-                $(this).removeClass('unchecked');
-                $(this).addClass('checked');
-              }
-            });
 
             $('<button id="send_suggestions">Apply suggestions</button>').click(function(){
               $user_id = "";
