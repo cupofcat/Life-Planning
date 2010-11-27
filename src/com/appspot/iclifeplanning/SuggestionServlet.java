@@ -96,7 +96,7 @@ public class SuggestionServlet extends HttpServlet {
 		JSONArray suggestionArray = new JSONArray();
 		List<Suggestion> s;
 		for (int i = 0; i < suggestions.size(); i++) {
-			s = suggestions.get(0);
+			s = suggestions.get(i);
 			suggestionArray.put(suggestionListToJSONArray(s));
 		}
 
