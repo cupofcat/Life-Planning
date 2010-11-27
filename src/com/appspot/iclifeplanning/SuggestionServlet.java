@@ -61,13 +61,35 @@ public class SuggestionServlet extends HttpServlet {
 		IEvent event1 = (IEvent)events.get(0);
 		IEvent event2 = (IEvent)events.get(1);
 		IEvent event3 = (IEvent)events.get(2);
+		IEvent event4 = (IEvent)events.get(3);
+		IEvent event5 = (IEvent)events.get(4);
+		IEvent event6 = (IEvent)events.get(5);
 
 		Suggestion sug = new DeleteSuggestion(event1);
+		List<Suggestion> alternatives = new ArrayList<Suggestion>();
+		alternatives.add(new DeleteSuggestion(event4));
+		alternatives.add(new DeleteSuggestion(event5));
+		sug.setAlternativeSuggetions(alternatives);
 		suggestions.get(0).add(sug);
+
+		suggestions.get(0).add(new DeleteSuggestion(event3));
+		
 		sug = new DeleteSuggestion(event2);
+		alternatives.add(new DeleteSuggestion(event4));
+		alternatives.add(new DeleteSuggestion(event5));
+		sug.setAlternativeSuggetions(alternatives);
 		suggestions.get(1).add(sug);
+
+		suggestions.get(1).add(new DeleteSuggestion(event4));
+		
 		sug = new DeleteSuggestion(event3);
+		alternatives.add(new DeleteSuggestion(event4));
+		alternatives.add(new DeleteSuggestion(event5));
+		sug.setAlternativeSuggetions(alternatives);
 		suggestions.get(2).add(sug);
+
+		suggestions.get(2).add(new DeleteSuggestion(event5));
+		suggestions.get(2).add(new DeleteSuggestion(event6));
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
 		List<Suggestion> s;
