@@ -114,7 +114,6 @@ public class SuggestionServlet extends HttpServlet {
 
 			suggestionObject.put("endDateTime", date.format(s.getEndDate().getTime()));
 			suggestionObject.put("type", s.getType());
-			suggestionObject.put("id", id);
 
 			List<String> spheres = new ArrayList<String>();
 			for (SphereName sphere : s.getSpheres().keySet()) {
