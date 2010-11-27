@@ -92,4 +92,8 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 	public List<Suggestion> getAlternativeSuggestions() {
 		return alternativeSuggestions;
 	}
+
+	public void setAlternativeSuggetions(List<Suggestion> alternativeSuggestions) {
+		this.alternativeSuggestions = alternativeSuggestions;
+	}
 }

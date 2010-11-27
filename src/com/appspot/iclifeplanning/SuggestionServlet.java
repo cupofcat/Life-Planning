@@ -61,13 +61,35 @@ public class SuggestionServlet extends HttpServlet {
 		IEvent event1 = (IEvent)events.get(0);
 		IEvent event2 = (IEvent)events.get(1);
 		IEvent event3 = (IEvent)events.get(2);
+		IEvent event4 = (IEvent)events.get(3);
+		IEvent event5 = (IEvent)events.get(4);
+		IEvent event6 = (IEvent)events.get(5);
 
 		Suggestion sug = new DeleteSuggestion(event1);
+		List<Suggestion> alternatives = new ArrayList<Suggestion>();
+		alternatives.add(new DeleteSuggestion(event4));
+		alternatives.add(new DeleteSuggestion(event5));
+		sug.setAlternativeSuggetions(alternatives);
 		suggestions.get(0).add(sug);
+
+		suggestions.get(0).add(new DeleteSuggestion(event3));
+		
 		sug = new DeleteSuggestion(event2);
+		alternatives.add(new DeleteSuggestion(event4));
+		alternatives.add(new DeleteSuggestion(event5));
+		sug.setAlternativeSuggetions(alternatives);
 		suggestions.get(1).add(sug);
+
+		suggestions.get(1).add(new DeleteSuggestion(event4));
+		
 		sug = new DeleteSuggestion(event3);
+		alternatives.add(new DeleteSuggestion(event4));
+		alternatives.add(new DeleteSuggestion(event5));
+		sug.setAlternativeSuggetions(alternatives);
 		suggestions.get(2).add(sug);
+
+		suggestions.get(2).add(new DeleteSuggestion(event5));
+		suggestions.get(2).add(new DeleteSuggestion(event6));
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
 		List<Suggestion> s;
@@ -89,35 +111,41 @@ public class SuggestionServlet extends HttpServlet {
 	private JSONArray suggestionListToJSONArray(List<Suggestion> suggestionList, int listID) {
 		Suggestion suggestion;
 		JSONArray suggestionArray = new JSONArray();
-		List<Suggestion> alternativeSuggestions;
 		for (int i = 0; i < suggestionList.size(); i++) {
 			suggestion = suggestionList.get(0);
-			suggestionArray.put(suggestionToJSONOBject(suggestion, i, 0));
-			alternativeSuggestions = suggestion.getAlternativeSuggestions();
-			for (int j = 0; j < alternativeSuggestions.size(); j++) {
-				suggestionArray.put(suggestionToJSONOBject(suggestion, i, ++j));
-			}
-			
+			suggestionArray.put(suggestionToJSONArray(suggestion));			
 		}
 		return suggestionArray;
 	}
 
-	private JSONObject suggestionToJSONOBject(Suggestion s, int id, int alternativeId) {
+	private JSONArray suggestionToJSONArray(Suggestion suggestion) {
+		JSONArray suggestionArray = new JSONArray();
+		Suggestion alternativeSuggestion;
+		List<Suggestion> alternativeSuggestions = suggestion.getAlternativeSuggestions();
+		suggestionArray.put(suggestionToJSONObject(suggestion));
+		for (int j = 0; j < alternativeSuggestions.size(); j++) {
+			alternativeSuggestion = alternativeSuggestions.get(j);
+			suggestionArray.put(suggestionToJSONObject(alternativeSuggestion));
+		}
+		return suggestionArray;
+	}
+
+	private JSONObject suggestionToJSONObject(Suggestion suggestion) {
 		JSONObject suggestionObject = new JSONObject();
 		try {
-			suggestionObject.put("title", s.getTitle());
-			suggestionObject.put("description", s.getDescription());
+			suggestionObject.put("title", suggestion.getTitle());
+			suggestionObject.put("description", suggestion.getDescription());
 			suggestionObject.put("repeating", "");
 			
 			SimpleDateFormat date = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
-			suggestionObject.put("startDateTime", date.format(s.getStartDate().getTime()));
+			suggestionObject.put("startDateTime", date.format(suggestion.getStartDate().getTime()));
 
-			suggestionObject.put("endDateTime", date.format(s.getEndDate().getTime()));
-			suggestionObject.put("type", s.getType());
+			suggestionObject.put("endDateTime", date.format(suggestion.getEndDate().getTime()));
+			suggestionObject.put("type", suggestion.getType());
 
 			List<String> spheres = new ArrayList<String>();
-			for (SphereName sphere : s.getSpheres().keySet()) {
-				if (s.getSpheres().get(sphere) > 0) {
+			for (SphereName sphere : suggestion.getSpheres().keySet()) {
+				if (suggestion.getSpheres().get(sphere) > 0) {
 					spheres.add(sphere.name());
 				}
 			}
@@ -153,8 +181,6 @@ public class SuggestionServlet extends HttpServlet {
 				alternative = suggestionJSON.getInt(key);
 				suggestions.get(list).get(suggestion).makePersistent(alternative);
 			}
-			
-			
 		} catch (JSONException e) {
 			System.out.println("Badly formatted JSON!");
 			e.printStackTrace();
