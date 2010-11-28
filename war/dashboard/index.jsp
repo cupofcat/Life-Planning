@@ -13,6 +13,7 @@
 
 <%
   UserService userService = UserServiceFactory.getUserService();
+  CalendarUtils.setUpIfNewUser();
   //TODO: check if the token is there first:
   try {
     CalendarUtils.getCalendarUtils().setTokenFromReply(request.getQueryString());

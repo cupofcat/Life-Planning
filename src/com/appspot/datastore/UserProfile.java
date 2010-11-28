@@ -12,33 +12,30 @@ public class UserProfile extends BaseDataObject {
 	@PrimaryKey
 	private String userID;
 	@Persistent
-	private String name;
-	@Persistent
-	private String surname;
+	private String nickname;
 	@Persistent
 	private String email;
 	@Persistent(serialized="true")
 	private HashMap<SphereName, Double> spherePreferences;
 	@Persistent
 	private boolean fullyOptimized;
+	@Persistent
+	private long joinTime;
 	
-	public UserProfile(String userID, String name, String surname, String email, HashMap<SphereName, Double> spherePreferences, boolean fullyOptimized) {
+	public UserProfile(String userID, String nickname, String email, 
+			HashMap<SphereName, Double> spherePreferences, boolean fullyOptimized, long joinTime) {
 		super();
 		this.userID = userID;
-		this.name = name;
-		this.surname = surname;
+		this.nickname = nickname;
 		this.email = email;
 		this.spherePreferences = spherePreferences;
 		this.fullyOptimized = fullyOptimized;
+		this.joinTime = joinTime;
 	}
-	
-	
 
 	public void setSpherePreferences(HashMap<SphereName, Double> spherePreferences) {
 		this.spherePreferences = spherePreferences;
 	}
-
-
 
 	public String getEmail() {
 		return email;
@@ -62,17 +59,14 @@ public class UserProfile extends BaseDataObject {
 	}
 
 	public String getName() {
-		return name;
+		return nickname;
 	}
 
-	public String getSurname() {
-		return surname;
+	public long getJoinTime() {
+		return joinTime;
 	}
 
 	public Map<SphereName, Double> getSpherePreferences() {
 		return spherePreferences;
-	}
-	
-	
-	
+	}	
 }

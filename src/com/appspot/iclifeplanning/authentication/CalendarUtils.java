@@ -4,13 +4,16 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import javax.jdo.PersistenceManager;
+import javax.jdo.Query;
 import javax.servlet.http.HttpServletRequest;
 
 import com.appspot.datastore.PMF;
@@ -18,8 +21,7 @@ import com.appspot.datastore.SphereName;
 import com.appspot.datastore.Token;
 import com.appspot.datastore.TokenStore;
 import com.appspot.datastore.UserProfile;
-import com.appspot.iclifeplanning.notifications.Email;
-import com.appspot.iclifeplanning.notifications.EmailStore;
+import com.appspot.datastore.UserProfileStore;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -141,34 +143,31 @@ public class CalendarUtils {
 		return urls;
 	}
 
-	public void checkIfNewUser() {
+	public static void setUpIfNewUser() {
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
 		String id = user.getUserId();
 		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Collection<String> userIDs = (Collection<String>) pm.newQuery("SELECT id FROM " + Email.class.getName()).execute();
-
-		if (!userIDs.contains(id)) {
-			EmailStore.addEmail(id, user.getEmail());
-			// addSpheres(id);
+		Query query = pm.newQuery("SELECT userID FROM " + UserProfile.class.getName());
+		List<String> userIDs = (List<String>) query.execute();
+		
+		if (!contains(userIDs, id)) {
+			HashMap<SphereName, Double> spherePreferences = new HashMap<SphereName, Double>();
+			for (SphereName s : SphereName.values()) {
+				spherePreferences.put(s, s.defaultValue());
+			}
+			UserProfile newProfile 
+			    = new UserProfile(id, user.getNickname(), user.getEmail(), 
+			    		spherePreferences, true, Calendar.getInstance().getTimeInMillis());
+			UserProfileStore.addUserProfile(newProfile);
 		}
 	}
 
-	public void addSpheres(String id) {
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Collection<UserProfile> users = (Collection<UserProfile>) pm.newQuery("SELECT FROM " + UserProfile.class.getName() + " WHERE userID=" + id)
-				.execute();
-		HashMap<SphereName, Double> spherePreferences = new HashMap<SphereName, Double>();
-		for (SphereName sphere : SphereName.values())
-			spherePreferences.put(sphere, sphere.defaultValue());
-		for (UserProfile user : users) {
-			try {
-				user.setSpherePreferences(spherePreferences);
-				user.makePersistent();
-			} finally {
-				pm.close();
-			}
+	private static boolean contains(List<String> userIDs, String id) {
+		for (int i = 0; i < userIDs.size(); i++) {
+			if (userIDs.get(i).equals(id))
+				return true;
 		}
-
+		return false;
 	}
 }

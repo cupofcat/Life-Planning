@@ -164,23 +164,22 @@ public class SuggestionServlet extends HttpServlet {
 		JSONObject suggestionsJSON = null;
 
 		try {
-			suggestionsJSON = new JSONObject(request.getReader().toString());
+			//System.out.println(request.getReader().readLine());
+			suggestionsJSON = new JSONObject(request.getReader().readLine());
 			String userID = suggestionsJSON.getString("userID");
-			int list = suggestionsJSON.getInt("listNumber");
+			int list = suggestionsJSON.getInt("setID");
 			JSONArray acceptedSuggestions = suggestionsJSON.getJSONArray("suggestions");
 			int lenght = acceptedSuggestions.length();
-			JSONObject suggestionJSON;
+			JSONArray suggestionJSON;
 			int suggestion;
 			int alternative;
-			String key;
-			
+
 			List<List<Suggestion>> suggestions = suggestionMap.get(userID);
 
 			for(int i = 0; i < lenght; i++) {
-				suggestionJSON = acceptedSuggestions.getJSONObject(i);
-				key = suggestionJSON.keys().toString();
-				suggestion = Integer.parseInt(key);
-				alternative = suggestionJSON.getInt(key);
+				suggestionJSON = acceptedSuggestions.getJSONArray(i);
+				suggestion = (Integer) suggestionJSON.get(0);
+				alternative = (Integer) suggestionJSON.get(1);
 				suggestions.get(list).get(suggestion).makePersistent(alternative);
 			}
 		} catch (JSONException e) {

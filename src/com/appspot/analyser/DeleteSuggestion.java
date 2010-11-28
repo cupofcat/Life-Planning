@@ -7,6 +7,7 @@ import java.util.Map;
 
 import com.appspot.datastore.SphereName;
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
+import com.google.gdata.client.calendar.CalendarService;
 import com.google.gdata.data.calendar.CalendarEventEntry;
 import com.google.gdata.util.ServiceException;
 
@@ -42,8 +43,10 @@ public class DeleteSuggestion extends Suggestion {
  	
  	protected void makePersistentInternal() {
 		try {
+			CalendarService clientCopy = CalendarUtils.client;
+			clientCopy.getRequestFactory().setHeader("If-Match", "*");
 			URL deleteUrl = new URL(event.getEditLink().getHref());
-			CalendarUtils.client.delete(deleteUrl);
+			clientCopy.delete(deleteUrl);
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (ServiceException e) {
