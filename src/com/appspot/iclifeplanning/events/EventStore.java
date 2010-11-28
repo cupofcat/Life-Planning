@@ -37,8 +37,19 @@ public class EventStore {
 	}
 	
 	public void initizalize() throws IOException {
+	    long now = System.currentTimeMillis();
+	    System.out.println(now);
+	    long future = now + (long)30*24*60*60*1000;
+	    System.out.println(future);
+		allEvents = getEventsFromTimeRange(now, future);
+	}
 
-		allEvents = new ArrayList<Event>();
+	public List<Event> getEvents() {
+		return allEvents;	
+	}
+
+	public List<Event> getEventsFromTimeRange(long startTime, long endTime) throws IOException{
+		List<Event> events = new ArrayList<Event>();
 
         URL calendarFeedUrl = new URL(AuthService.CALENDAR_FULL_FEED_REQUEST_URL);
 		CalendarFeed calendarResultFeed = null;
@@ -47,7 +58,7 @@ public class EventStore {
 		try {
 			calendarResultFeed = CalendarUtils.client.getFeed(calendarFeedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
-			return;
+			return null;
 		}
 
 		CalendarEntry calendarEntry;
@@ -66,33 +77,22 @@ public class EventStore {
 		  query.addCustomParameter(new CustomParameter("singleevents", "true"));
 		  query.addCustomParameter(new CustomParameter("orderby", "starttime"));
 		  query.addCustomParameter(new CustomParameter("sortorde", "ascending"));
-		  
-		  // temporary default values. Should really be set by user through UI
-		  long now = System.currentTimeMillis();
-		  System.out.println(now);
-		  long future = now + (long)30*24*60*60*1000;//2592000000l; // month in miliseconds
-		  System.out.println(future);
 
-		  query.setMinimumStartTime(new DateTime(now));
-		  query.setMaximumStartTime(new DateTime(future));
+		  query.setMinimumStartTime(new DateTime(startTime));
+		  query.setMaximumStartTime(new DateTime(endTime));
 
   		  try {
 			  eventResultFeed = CalendarUtils.client.getFeed(query, CalendarEventFeed.class);
 		  } catch (ServiceException e) {
-			  return;
+			  return null;
 		  }
 
 		  allCalendarEvents = eventResultFeed.getEntries();
 		  for (int j = 0; j < allCalendarEvents.size(); j++) {
 			  event = new Event(allCalendarEvents.get(j));
-			  System.out.println(event.getTitle());
-			  System.out.println("Time: " + event.getStartDate().getTimeInMillis());
-			  allEvents.add(event);
+			  events.add(event);
 		  }
         }
-	}
-
-	public List<Event> getEvents() {
-		return allEvents;	
+		return events;
 	}
 }

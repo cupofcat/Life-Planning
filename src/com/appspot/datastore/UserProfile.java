@@ -66,7 +66,7 @@ public class UserProfile extends BaseDataObject {
 		return joinTime;
 	}
 
-	public Map<SphereName, Double> getSpherePreferences() {
+	public HashMap<SphereName, Double> getSpherePreferences() {
 		return spherePreferences;
 	}	
 }
