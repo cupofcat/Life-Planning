@@ -33,38 +33,44 @@ public class LifePlanningServlet extends HttpServlet {
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 		Suggestion beginning = new RescheduleSuggestion("Begin", null, new GregorianCalendar(2000, 3, 3, 0, 0, 0),new GregorianCalendar(2000, 3, 3, 0, 0, 0) );
+		beginning.setDeurationInterval(0, 0);
 		Suggestion end = new RescheduleSuggestion("End", null, new GregorianCalendar(2000, 3, 3, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
+		end.setDeurationInterval(0, 0);
 		Suggestion s = new RescheduleSuggestion("Meeting Praca", null, new GregorianCalendar(2000, 3, 3, 13, 0, 0),new GregorianCalendar(2000, 3, 3, 14, 40, 0) );
 		s.setSpheres(generateSpheres(new double[]{0.6, 0.4}));
 		s.setDeurationInterval(30, 120);
-		s.setReschedule(false);
-		Suggestion s2 = new RescheduleSuggestion("Zdrowie", null, new GregorianCalendar(2000, 3, 3, 15, 00, 0),new GregorianCalendar(2000, 3, 3, 15, 30, 0) );
+		s.setReschedule(true);
+		Suggestion s2 = new RescheduleSuggestion("Zdrowie", null, new GregorianCalendar(2000, 3, 3, 15, 00, 0),new GregorianCalendar(2000, 3, 3, 16, 30, 0) );
 		s2.setSpheres(generateSpheres(new double[]{1.0}));
-		s2.setDeurationInterval(0, 80);
+		s2.setDeurationInterval(0, 120);
 		s2.setReschedule(true);
 		Suggestion s3 = new RescheduleSuggestion("Praca", null, new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 16, 35, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
 		s3.setDeurationInterval(0, 20);
-		s3.setReschedule(false);
+		s3.setReschedule(true);
 		List<Suggestion> list = new LinkedList<Suggestion>();
 		list.add(s);
-		//list.add(end);
-		//list.add(beginning);
+		list.add(end);
+		list.add(beginning);
 		list.add(s2);
 		list.add(s3);
+		new Analyzer().getSuggestions(list, "bober");
+		//HashMap<SphereName, Double> m = generateSpheres(new double[]{0.5,0.3});
+	    //UserProfile p = new UserProfile("msb08", "Macj", "obr@op.pl",m, true, 90 );
+		//p.makePersistent();
 		
-		new Analyzer().getSuggestions(list, "", generateSpheres(new double[]{0.6,0.4}), true);
-//		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.5,0.3});
-//		UserProfile p = new UserProfile("msb08", "Macj", "obr", "obr@op.pl",m, true );
-//		p.makePersistent();
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Collection<UserProfile> users = (Collection<UserProfile>) pm.newQuery("SELECT FROM " + UserProfile.class.getName()).execute();
-		for(UserProfile user : users)
-			System.out.println(user.getSpherePreferences().get(SphereName.HEALTH));
-		Proposal p2 = new Proposal("dsa", "dfsa", null, null);
-		p2.setDurationInterval(new Pair<Double, Double>(12.0, 45.0));
-		p2.makePersistent();
+//		UserProfile profile = new UserProfile("rysio", "kaletnik", "ryszardKaleta@op.lp", generateSpheres(new double[]{0.5,0.1,0.2,0.2}), false,310);
+//		//profile.makePersistent();
+//		PersistenceManager pm = PMF.get().getPersistenceManager();
+//		Collection<UserProfile> users = (Collection<UserProfile>) pm.newQuery("SELECT FROM " + UserProfile.class.getName()).execute();
+//		printProfiles(users);
 	}
+	
+	private void printProfiles(Collection<UserProfile> profiles){
+		for(UserProfile profile : profiles)
+			System.out.println(profile);
+	}
+	
 	
 	private HashMap<SphereName, Double> generateSpheres(double[] values){
 		SphereName[] names = SphereName.values();

@@ -11,10 +11,10 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
-import com.appspot.iclifeplanning.events.Event;
+import com.appspot.datastore.UserProfile;
+import com.appspot.datastore.UserProfileStore;
 
 public class Analyzer {
 
@@ -26,17 +26,19 @@ public class Analyzer {
 	public Analyzer() {
 	}
 
-	public LinkedList<List<Suggestion>> getSuggestions(List<Event> events, String currentUserId, boolean b) throws IOException {
-		return convertToSuggestions(this.getSuggestions(events, currentUserId, generateSpheres(new double[] { 0.7, 0.3 }), b));
+	public List<List<Suggestion>> getSuggestions(List<? extends IEvent> events, String currentUserId) throws IOException {
+		UserProfile profile = UserProfileStore.getUserProfile(currentUserId);
+		return convertToSuggestions(this.getSuggestions(events, currentUserId, profile.getSpherePreferences(), profile.isFullyOptimized()));
 	}
 
-	public List<List<CalendarStatus>> getSuggestions(List<? extends IEvent> externalEvents, String userID, Map<SphereName, Double> spherePreferences,
-			boolean optimizeFull) throws IOException {
-		// wyciagnac spherePreferences i optimize z bazy danych
+	@SuppressWarnings("unchecked")
+	private List<List<CalendarStatus>> getSuggestions(List<? extends IEvent> externalEvents, String userID,
+			Map<SphereName, Double> spherePreferences, boolean optimizeFull) throws IOException {
 		if (externalEvents.size() == 0)
 			return null;
-		removeStaticEvents(externalEvents);
 		List<IEvent> events = (List<IEvent>) externalEvents;
+		List<BaseCalendarSlot> freeSlots = getFreeSlots(events);
+		removeStaticEvents(events);
 		LinkedList<List<CalendarStatus>> result = new LinkedList<List<CalendarStatus>>();
 		CalendarStatus start = checkGoals(events, spherePreferences);
 		if (isCloseEnough(start, optimizeFull))
@@ -48,6 +50,7 @@ public class Analyzer {
 			// best event can't improve the status
 			if (nextMin.compareTo(start) >= 0)
 				break;
+			//check neighbours for possible alternatives - run loop which won't modify i (we want i sets of proposals) - proposals
 			list.add(nextMin);
 			events.remove(nextMin.getEvent());
 			List<CalendarStatus> rest = getSuggestions(events, nextMin, optimizeFull, maxDepth);
@@ -68,6 +71,7 @@ public class Analyzer {
 		CalendarStatus minimum = statuses.get(0);
 		if (minimum.compareTo(currentStatus) >= 0)
 			return null;
+		//check for alternatives again - run proposals??
 		list.add(minimum);
 		events.remove(minimum.getEvent());
 		List<CalendarStatus> rest = getSuggestions(events, minimum, optimizeFull, depth - 1);
@@ -75,6 +79,39 @@ public class Analyzer {
 			list.addAll(rest);
 		events.add(minimum.getEvent());
 		return list;
+	}
+
+	private List<BaseCalendarSlot> getFreeSlots(List<? extends IEvent> events) {
+		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
+		Collections.sort(events);
+		System.out.println("-Free slots generation-");
+		Iterator<? extends IEvent> it = events.iterator();
+		IEvent beginning = it.next();
+		it.remove();
+		IEvent curr = beginning;
+		while (it.hasNext()) {
+			IEvent next = it.next();
+			// Set max durations here as well - look what the difference is and
+			// set ONLY curr max duration based on this (min won;t move back)
+			if (curr.getEndDate().compareTo(next.getStartDate()) < 0) {
+				BaseCalendarSlot newSlot = new BaseCalendarSlot("Free Slot", null, curr.getEndDate(), next.getStartDate());
+				ret.add(newSlot);
+				Pair<Double, Double> durationInterval = curr.getDurationInterval();
+				durationInterval.setSecond(Math.min(durationInterval.getSecond(), curr.getDuration() + newSlot.getDuration()));
+				curr = next;
+			}
+			else {
+				// event already clashiung
+				if (curr.getEndDate().compareTo(next.getEndDate()) <= 0) {
+					Pair<Double, Double> durationInterval = curr.getDurationInterval();
+					durationInterval.setSecond(curr.getDuration());
+					curr = next;
+				}
+				//case for overlapping other event - allow min/max??
+			}
+		}
+		it.remove();
+		return ret;
 	}
 
 	private boolean isCloseEnough(CalendarStatus currentStatus, boolean optimizeFull) {
@@ -118,40 +155,11 @@ public class Analyzer {
 
 	private void removeStaticEvents(List<? extends IEvent> events) {
 		Iterator<? extends IEvent> it = events.iterator();
-		while(it.hasNext()){
+		while (it.hasNext()) {
 			IEvent current = it.next();
-			if(!current.canReschedule())
+			if (!current.canReschedule())
 				it.remove();
 		}
-	}
-
-	private Map<SphereName, Double> generateSpheres(double[] values) {
-		SphereName[] names = SphereName.values();
-		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
-		for (int i = 0; i < names.length; i++) {
-			if (i < values.length)
-				res.put(names[i], values[i]);
-			else
-				res.put(names[i], 0.0);
-		}
-		return res;
-	}
-
-	private List<BaseCalendarSlot> getFreeSlots(List<? extends ICalendarSlot> events) {
-		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
-		Collections.sort(events);
-		System.out.println("----------------------------------");
-		Iterator<? extends ICalendarSlot> it = events.iterator();
-		ICalendarSlot curr = it.next();
-		while (it.hasNext()) {
-			ICalendarSlot next = it.next();
-			if (curr.getEndDate().compareTo(next.getStartDate()) < 0) {
-				ret.add(new BaseCalendarSlot("Free Slot", null, curr.getEndDate(), next.getStartDate()));
-				curr = next;
-			} else if (curr.getEndDate().compareTo(next.getEndDate()) < 0)
-				curr = next;
-		}
-		return ret;
 	}
 
 	public CalendarStatus checkGoals(Collection<? extends IEvent> events, Map<SphereName, Double> choices) throws IOException {
