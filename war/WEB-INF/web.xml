@@ -58,6 +58,16 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<url-pattern>/notifications</url-pattern>
 	</servlet-mapping>
 
+	<!-- Servlet responsible settings. -->
+	<servlet>
+		<servlet-name>Settings</servlet-name>
+		<servlet-class>com.appspot.iclifeplanning.SettingsServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>Settings</servlet-name>
+		<url-pattern>/dashboard/settings</url-pattern>
+	</servlet-mapping>
+
 	<!-- Top-level web-page for our app -->
 	<welcome-file-list>
 	    <welcome-file>index.jsp</welcome-file>
