@@ -3,15 +3,11 @@ package com.appspot.iclifeplanning.events;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import com.appspot.iclifeplanning.authentication.AuthService;
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
-import com.google.appengine.api.datastore.Query;
 import com.google.gdata.client.Query.CustomParameter;
 import com.google.gdata.client.calendar.CalendarQuery;
 import com.google.gdata.data.DateTime;
@@ -89,6 +85,10 @@ public class EventStore {
 			  System.out.println("Time: " + event.getStartDate().getTimeInMillis());
 			  allEvents.add(event);
 		  }
+		  Event firstDummyEvent = new Event(now, now);
+		  Event lastDummyEvent = new Event(future, future);
+		  allEvents.add(0, firstDummyEvent);
+		  allEvents.add(lastDummyEvent);
         }
 	}
 

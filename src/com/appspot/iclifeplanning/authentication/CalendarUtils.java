@@ -159,7 +159,7 @@ public class CalendarUtils {
 			UserProfile newProfile 
 			    = new UserProfile(id, user.getNickname(), user.getEmail(), 
 			    		spherePreferences, true, Calendar.getInstance().getTimeInMillis());
-			UserProfileStore.addUserProfile(newProfile);
+			newProfile.makePersistent();
 		}
 	}
 

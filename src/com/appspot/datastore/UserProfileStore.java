@@ -10,21 +10,11 @@ public class UserProfileStore {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     try {
-      UserProfile userProfile = pm.getObjectById(UserProfile.class, userID);
+    	UserProfile userProfile = pm.detachCopy(pm.getObjectById(UserProfile.class, userID));
 
       return userProfile;
     } catch (JDOObjectNotFoundException e) {
       return null;
-    } finally {
-      pm.close();
-    }
-  }
-
-  public static void addUserProfile(UserProfile profile) {
-    PersistenceManager pm = PMF.get().getPersistenceManager();
-
-    try {
-      pm.makePersistent(profile);
     } finally {
       pm.close();
     }

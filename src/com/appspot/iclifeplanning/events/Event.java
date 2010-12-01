@@ -1,5 +1,6 @@
 package com.appspot.iclifeplanning.events;
 
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -28,6 +29,13 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		canReschedule = calendarEventEntry.getCanEdit();
 		isRecurring = calendarEventEntry.getRecurrence() != null;
 		parseKeywords(title);
+	}
+
+	public Event(long startTime, long endTime) {
+		this.startDate = new GregorianCalendar();
+		startDate.setTimeInMillis(startTime);
+		this.endDate = new GregorianCalendar();
+		endDate.setTimeInMillis(endTime);
 	}
 
 	public String getId() {
@@ -110,5 +118,8 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	public CalendarEventEntry getCalendarEvent() {
 		return calendarEventEntry;
+	}
+
+	public void setDurationInterval(Pair<Double, Double> newInterval) {
 	}
 }
