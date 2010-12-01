@@ -15,7 +15,7 @@ public class UserProfile extends BaseDataObject {
 	private String nickname;
 	@Persistent
 	private String email;
-	@Persistent(serialized="true")
+	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private HashMap<SphereName, Double> spherePreferences;
 	@Persistent
 	private boolean fullyOptimized;
@@ -31,10 +31,6 @@ public class UserProfile extends BaseDataObject {
 		this.spherePreferences = spherePreferences;
 		this.fullyOptimized = fullyOptimized;
 		this.joinTime = joinTime;
-	}
-
-	public void setSpherePreferences(HashMap<SphereName, Double> spherePreferences) {
-		this.spherePreferences = spherePreferences;
 	}
 
 	public String getEmail() {

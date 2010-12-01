@@ -36,43 +36,47 @@ import com.appspot.iclifeplanning.events.EventStore;
 public class ChartDataServlet extends HttpServlet {
 	private static long startTime = 0;
 	private static long endTime = 0;
+	private static int weekNumber = 0;
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
 
-		// Need to be getting deired life balance from the data base!
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		Query query = pm.newQuery("SELECT userID FROM " + UserProfile.class.getName());
 		List<String> userIDs = (List<String>) query.execute();
-		HashMap<SphereName, Double> currentDesiredBalance = generateSpheres();
+		HashMap<SphereName, Double> currentDesiredBalance;
 		UserProfile userProfile;
 		String token;
 
-		System.out.println("Hey!");
 		for (String userID : userIDs) {
-			System.out.println("Hey1!");
+			System.out.println("Analyzing user: " + userID);
 			userProfile = UserProfileStore.getUserProfile(userID);
-			//currentDesiredBalance = userProfile.getSpherePreferences();
+			currentDesiredBalance = userProfile.getSpherePreferences();
 			endTime = Calendar.getInstance().getTimeInMillis();
 			startTime = endTime - (long)7*24*60*60*1000;
-			startTime = Math.max(startTime, userProfile.getJoinTime());
+			//startTime = Math.max(startTime, userProfile.getJoinTime());
 			token = TokenStore.getToken(userID);
 			CalendarUtils.client.setAuthSubToken(token);
 			List<Event> events = EventStore.getInstance().getEventsFromTimeRange(startTime, endTime);
-			HashMap<SphereName, Double> sphereResults = analyseEvents(userID, events, currentDesiredBalance);
-			WeeklyDataProfile profile = new WeeklyDataProfile(userID, startTime, endTime, sphereResults, currentDesiredBalance);
-			WeeklyDataProfileStore.addUserProfile(profile);
+			if (events != null) {
+				System.out.println("Saving data");
+				HashMap<SphereName, Double> sphereResults = analyseEvents(userID, events, currentDesiredBalance);
+				WeeklyDataProfile profile = new WeeklyDataProfile(userID, weekNumber, sphereResults, currentDesiredBalance);
+				WeeklyDataProfileStore.addWeeklyDataProfile(profile);
+			}
+			List<WeeklyDataProfile> data = WeeklyDataProfileStore.getUserWeeklyData(userID);
+			System.out.println(data.size() == 0);
+			for (int i = 0; i < data.size(); i++) {
+				System.out.println(data.get(i).getSphereResults().get(SphereName.values()[0]));
+			}
 		}
+		weekNumber++;
 	}
 
 	private HashMap<SphereName, Double> analyseEvents(String userID,
 			    List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
-
-		Map<SphereName, Double> currentBalance 
-	        = new HashMap<SphereName, Double>();
-
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
-		initializeTimes(times, currentDesiredBalance.keySet());;
+		initializeTimes(times, currentDesiredBalance.keySet());
 		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
 		int sum = 0;
 
@@ -96,14 +100,5 @@ public class ChartDataServlet extends HttpServlet {
 	private void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
 		for (SphereName key : keys)
 			times.put(key, 0.0);
-	}
-
-	private HashMap<SphereName, Double> generateSpheres() {
-		SphereName[] names = SphereName.values();
-		HashMap<SphereName, Double> res = new HashMap<SphereName, Double>();
-		for (int i = 0; i < names.length; i++) {
-			res.put(names[i], names[i].defaultValue());
-		}
-		return res;
 	}
 }

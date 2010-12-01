@@ -10,7 +10,7 @@ public class UserProfileStore {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     try {
-      UserProfile userProfile = pm.getObjectById(UserProfile.class, userID);
+      UserProfile userProfile = pm.detachCopy(pm.getObjectById(UserProfile.class, userID));
 
       return userProfile;
     } catch (JDOObjectNotFoundException e) {

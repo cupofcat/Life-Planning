@@ -11,38 +11,30 @@ import com.appspot.datastore.SphereName;
 @PersistenceCapable
 public class WeeklyDataProfile {
 	
-	@Persistent
 	@PrimaryKey
+	@Persistent
+	private String key;
+	@Persistent
 	private String userID;
 	@Persistent
-	private long startDate;
-	@Persistent
-	private long endDate;
-	@Persistent(serialized="true")
+	private Integer weekNumber;
+	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private HashMap<SphereName, Double> sphereResults;
-	@Persistent(serialized="true")
+	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private HashMap<SphereName, Double> desiredSphereResults;
 	
-	public WeeklyDataProfile(String userID, long startdate, long endDate, 
-			HashMap<SphereName, Double> sphereResults, HashMap<SphereName, Double> desiredSphereResults) {
+	public WeeklyDataProfile(String userID, Integer weekNumber, HashMap<SphereName, Double> sphereResults, 
+			HashMap<SphereName, Double> desiredSphereResults) {
 		super();
 		this.userID = userID;
-		this.startDate = startdate;
-		this.endDate = endDate;
 		this.sphereResults = sphereResults;
 		this.desiredSphereResults = desiredSphereResults;
+		this.weekNumber = weekNumber;
+		this.key = userID + weekNumber.toString();
 	}
 
 	public String getUserID() {
 		return userID;
-	}
-
-	public long getStartDate() {
-		return startDate;
-	}
-
-	public long getEndDate() {
-		return endDate;
 	}
 
 	public Map<SphereName, Double> getSphereResults() {
@@ -50,6 +42,10 @@ public class WeeklyDataProfile {
 	}
 
 	public HashMap<SphereName, Double> getDesiredSphereResults() {
-		return sphereResults;
+		return desiredSphereResults;
+	}
+
+	public int getWeekNumber() {
+		return weekNumber;
 	}
 }
