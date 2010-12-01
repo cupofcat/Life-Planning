@@ -10,7 +10,7 @@ import com.appspot.datastore.PMF;
 
 public class WeeklyDataProfileStore {
 
-  public static List<WeeklyDataProfile> getUserWeeklyData(String userID) {
+  public static List<WeeklyDataProfile> getUserWeeklyDataProfiles(String userID) {
     PersistenceManager pm = PMF.get().getPersistenceManager();
 
     try {
@@ -18,7 +18,7 @@ public class WeeklyDataProfileStore {
           = (List<WeeklyDataProfile>) pm.detachCopyAll((List<WeeklyDataProfile>)
         		  pm.newQuery("SELECT FROM " + 
         		  WeeklyDataProfile.class.getName() + 
-        		  " WHERE userID==\"" + userID + "\"" + " ORDER BY userID, weekNumber").execute());
+        		  " WHERE userID==\"" + userID + "\"" + " ORDER BY weekNumber").execute());
 
       return dataProfiles;
     } catch (JDOObjectNotFoundException e) {

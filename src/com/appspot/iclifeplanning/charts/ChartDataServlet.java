@@ -64,11 +64,6 @@ public class ChartDataServlet extends HttpServlet {
 				WeeklyDataProfile profile = new WeeklyDataProfile(userID, weekNumber, sphereResults, currentDesiredBalance);
 				WeeklyDataProfileStore.addWeeklyDataProfile(profile);
 			}
-			List<WeeklyDataProfile> data = WeeklyDataProfileStore.getUserWeeklyData(userID);
-			System.out.println(data.size() == 0);
-			for (int i = 0; i < data.size(); i++) {
-				System.out.println(data.get(i).getSphereResults().get(SphereName.values()[0]));
-			}
 		}
 		weekNumber++;
 	}
