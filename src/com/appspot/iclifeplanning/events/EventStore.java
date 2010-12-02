@@ -54,7 +54,11 @@ public class EventStore {
 		Event event;
 		List<CalendarEventEntry> allCalendarEvents;
 
-        for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
+		// temporary default values. Should really be set by user through UI
+		long now = System.currentTimeMillis();
+		long future = now + (long)30*24*60*60*1000;//2592000000l; // month in miliseconds
+        
+		for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
           calendarEntry = calendarResultFeed.getEntries().get(i);
 	  	  eventFeedLink = calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
 		  eventFeedUrl = new URL(eventFeedLink.getHref());
@@ -62,12 +66,6 @@ public class EventStore {
 		  query.addCustomParameter(new CustomParameter("singleevents", "true"));
 		  query.addCustomParameter(new CustomParameter("orderby", "starttime"));
 		  query.addCustomParameter(new CustomParameter("sortorde", "ascending"));
-		  
-		  // temporary default values. Should really be set by user through UI
-		  long now = System.currentTimeMillis();
-		  System.out.println(now);
-		  long future = now + (long)30*24*60*60*1000;//2592000000l; // month in miliseconds
-		  System.out.println(future);
 
 		  query.setMinimumStartTime(new DateTime(now));
 		  query.setMaximumStartTime(new DateTime(future));
@@ -85,11 +83,11 @@ public class EventStore {
 			  System.out.println("Time: " + event.getStartDate().getTimeInMillis());
 			  allEvents.add(event);
 		  }
-		  Event firstDummyEvent = new Event(now, now);
-		  Event lastDummyEvent = new Event(future, future);
-		  allEvents.add(0, firstDummyEvent);
-		  allEvents.add(lastDummyEvent);
         }
+		Event firstDummyEvent = new Event(now, now);
+		Event lastDummyEvent = new Event(future, future);
+		allEvents.add(0, firstDummyEvent);
+		allEvents.add(lastDummyEvent);
 	}
 
 	public List<Event> getEvents() {
