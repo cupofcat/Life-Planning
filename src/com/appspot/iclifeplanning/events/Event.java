@@ -73,7 +73,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	private boolean isKeyword(String string) {
 		return true;
 	}
-//zobaczyc czy dziala
+
 	public Map<SphereName, Double> getSpheres() {
 		Map<String, Double> tmp = UClasifier.analyse(title);
 		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
