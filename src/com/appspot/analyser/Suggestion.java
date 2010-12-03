@@ -96,8 +96,4 @@ public abstract class Suggestion extends BaseCalendarSlot implements IEvent {
 	public void setAlternativeSuggetions(List<Suggestion> alternativeSuggestions) {
 		this.alternativeSuggestions = alternativeSuggestions;
 	}
-
-	public void setDurationInterval(Pair<Double, Double> newInterval) {
-		// TODO Auto-generated method stub
-	}
 }

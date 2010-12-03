@@ -10,7 +10,6 @@ public interface IEvent extends ICalendarSlot {
 	public boolean canReschedule();
 	public Map<SphereName, Double> getSpheres();
 	public Pair<Double, Double> getDurationInterval();
-	public void setDurationInterval(Pair<Double, Double> newInterval);
 	public void makePersistent(int alternative);
 	public CalendarEventEntry getCalendarEvent();
 }

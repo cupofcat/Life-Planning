@@ -16,9 +16,16 @@ import com.appspot.datastore.SphereName;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
 
+import org.junit.Test;
+import junit.framework.TestCase;
+import org.junit.runner.RunWith;
+import org.junit.experimental.runners.Enclosed;
+
+@RunWith(Enclosed.class)
 public class Analyzer {
 
 	public static final double CONFIDENCE = 0.1;
+	private static final double ALTERNATIVE = 0.3;
 	static final int TRIES = 10;
 	private int maxDepth = 3;
 	private int maxSuggestions = 3;
@@ -38,6 +45,7 @@ public class Analyzer {
 			return null;
 		List<IEvent> events = (List<IEvent>) externalEvents;
 		List<BaseCalendarSlot> freeSlots = getFreeSlots(events);
+		printEvents(freeSlots);
 		removeStaticEvents(events);
 		LinkedList<List<CalendarStatus>> result = new LinkedList<List<CalendarStatus>>();
 		CalendarStatus start = checkGoals(events, spherePreferences);
@@ -51,6 +59,14 @@ public class Analyzer {
 			if (nextMin.compareTo(start) >= 0)
 				break;
 			//check neighbours for possible alternatives - run loop which won't modify i (we want i sets of proposals) - proposals
+			while(i < statuses.size()){
+				CalendarStatus next = statuses.get(i);
+				if(next.compareTo(start) < 0 || next.getCoefficient() <= nextMin.getCoefficient()*(1+Analyzer.ALTERNATIVE))
+					break;
+				nextMin.addAlternative(next);
+				events.remove(next.getEvent());
+				++i;
+			}
 			list.add(nextMin);
 			events.remove(nextMin.getEvent());
 			List<CalendarStatus> rest = getSuggestions(events, nextMin, optimizeFull, maxDepth);
@@ -58,12 +74,18 @@ public class Analyzer {
 				list.addAll(rest);
 			result.add(list);
 			events.add(nextMin.getEvent());
+			if (nextMin.hasAlternatives()) {
+				for (CalendarStatus status : nextMin.getAlternatives()) {
+					events.add(status.getEvent());
+				}
+			}
+
 		}
 		return result;
 	}
 
 	private List<CalendarStatus> getSuggestions(List<IEvent> events, CalendarStatus currentStatus, boolean optimizeFull, int depth)
-			throws IOException {
+	throws IOException {
 		if (isCloseEnough(currentStatus, optimizeFull) || events.size() == 0 || depth <= 0)
 			return null;
 		List<CalendarStatus> statuses = getSortedStatuses(events, currentStatus);
@@ -72,12 +94,27 @@ public class Analyzer {
 		if (minimum.compareTo(currentStatus) >= 0)
 			return null;
 		//check for alternatives again - run proposals??
+		//check neighbours for possible alternatives - run loop which won't modify i (we want i sets of proposals) - proposals
+		int i  = 1;
+		while(i < statuses.size()){
+			CalendarStatus next = statuses.get(i);
+			if(next.compareTo(currentStatus) < 0 || next.getCoefficient() <= minimum.getCoefficient()*(1+Analyzer.ALTERNATIVE))
+				break;
+			minimum.addAlternative(next);
+			events.remove(next.getEvent());
+			++i;
+		}
 		list.add(minimum);
 		events.remove(minimum.getEvent());
 		List<CalendarStatus> rest = getSuggestions(events, minimum, optimizeFull, depth - 1);
 		if (rest != null)
 			list.addAll(rest);
 		events.add(minimum.getEvent());
+		if (minimum.hasAlternatives()) {
+			for (CalendarStatus status : minimum.getAlternatives()) {
+				events.add(status.getEvent());
+			}
+		}
 		return list;
 	}
 
@@ -91,8 +128,6 @@ public class Analyzer {
 		IEvent curr = beginning;
 		while (it.hasNext()) {
 			IEvent next = it.next();
-			// Set max durations here as well - look what the difference is and
-			// set ONLY curr max duration based on this (min won;t move back)
 			if (curr.getEndDate().compareTo(next.getStartDate()) < 0) {
 				BaseCalendarSlot newSlot = new BaseCalendarSlot("Free Slot", null, curr.getEndDate(), next.getStartDate());
 				ret.add(newSlot);
@@ -101,13 +136,11 @@ public class Analyzer {
 				curr = next;
 			}
 			else {
-				// event already clashiung
 				if (curr.getEndDate().compareTo(next.getEndDate()) <= 0) {
 					Pair<Double, Double> durationInterval = curr.getDurationInterval();
 					durationInterval.setSecond(curr.getDuration());
 					curr = next;
 				}
-				//case for overlapping other event - allow min/max??
 			}
 		}
 		it.remove();
@@ -134,23 +167,32 @@ public class Analyzer {
 		LinkedList<List<Suggestion>> listSuggestions = new LinkedList<List<Suggestion>>();
 		Iterator<List<CalendarStatus>> it = statuses.iterator();
 		while (it.hasNext()) {
-			List<Suggestion> suggestions = new LinkedList<Suggestion>();
-			Iterator<CalendarStatus> iterator = it.next().iterator();
-			while (iterator.hasNext()) {
-				CalendarStatus status = iterator.next();
-				IEvent event = status.getEvent();
-				Double additionalTime = status.getAdditionalEventTime();
-				if (event.getDuration() + additionalTime == 0) {
-					suggestions.add(new DeleteSuggestion(event));
-				} else {
-					Calendar end = new GregorianCalendar();
-					end.setTimeInMillis(event.getEndDate().getTimeInMillis() + (long) (additionalTime * 60000));
-					suggestions.add(new RescheduleSuggestion(event, event.getStartDate(), end));
-				}
-			}
-			listSuggestions.add(suggestions);
+			listSuggestions.add(convert(it.next()));
 		}
 		return listSuggestions;
+	}
+
+	public List<Suggestion> convert(List<CalendarStatus> statuses) {
+		List<Suggestion> suggestions = new LinkedList<Suggestion>();
+		Iterator<CalendarStatus> iterator = statuses.iterator();
+		while (iterator.hasNext()) {
+			CalendarStatus status = iterator.next();
+			IEvent event = status.getEvent();
+			Double additionalTime = status.getAdditionalEventTime();
+			Suggestion result;
+			if (event.getDuration() + additionalTime == 0) {
+				result = new DeleteSuggestion(event);
+			} else {
+				Calendar end = new GregorianCalendar();
+				end.setTimeInMillis(event.getEndDate().getTimeInMillis() + (long) (additionalTime * 60000));
+				result = new RescheduleSuggestion(event, event.getStartDate(), end);
+			}
+			if(status.hasAlternatives()) {
+				result.setAlternativeSuggetions(convert(status.getAlternatives()));
+			}
+			suggestions.add(result);
+		}
+		return suggestions;
 	}
 
 	private void removeStaticEvents(List<? extends IEvent> events) {
@@ -197,7 +239,7 @@ public class Analyzer {
 
 	private String printDate(Calendar cal) {
 		return cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH) + "/" + cal.get(Calendar.YEAR) + "  " + cal.get(Calendar.HOUR_OF_DAY)
-				+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+		+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
 	}
 
 	private void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
@@ -205,4 +247,22 @@ public class Analyzer {
 			times.put(key, 0.0);
 	}
 
+
+	public static class AlgoTest extends TestCase {
+
+		protected boolean b;
+
+		@ Test 
+		public void testConvertToSuggestionsEmpty() {
+			b = true;
+			assertTrue(b);
+		}
+
+//		@Test
+//		private void testConvertToSuggestions() {
+//			LinkedList<List<CalendarStatus>> lists = new LinkedList<List<CalendarStatus>>();
+//			LinkedList<CalendarStatus> statuses2 = new LinkedList<CalendarStatus>();
+//			LinkedList<CalendarStatus> statuses1 = new LinkedList<CalendarStatus>();
+//		}
+}
 }

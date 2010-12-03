@@ -1,40 +1,39 @@
 package com.appspot.analyser;
 
 import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Map;
 
 import javax.jdo.PersistenceManager;
-import javax.jdo.annotations.*;
+import javax.jdo.annotations.NotPersistent;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
 
 import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereName;
-import com.google.appengine.api.datastore.Key;
 import com.google.appengine.api.datastore.KeyFactory;
-
 import com.google.appengine.api.users.User;
 import com.google.gdata.data.calendar.CalendarEventEntry;
 
 
 @PersistenceCapable
 public class Proposal extends BaseCalendarSlot implements IEvent  {
-	
-    @NotPersistent
+
+	@NotPersistent
 	private boolean isRecurring;
-    @NotPersistent
+	@NotPersistent
 	private boolean canReschedule;
-    @Persistent
+	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Map<SphereName, Double> spheres;
-    @Persistent
+	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Pair<Double, Double> durationInterval;
-    @Persistent
-	private double multiplier;
-    @Persistent
+	@Persistent
 	private boolean disabled;
-    @Persistent
-	private Pair<Calendar, Calendar> possibleTimeSlot;
-    @Persistent
+	@Persistent(serialized="true", defaultFetchGroup = "true")
+	private Pair<Long, Long> possibleTimeSlot;
+	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Pair<Integer, Integer> possibleAge;
-	
+
 	public Proposal(Calendar startDate, Calendar endDate, User user) {
 		super(startDate, endDate);
 		key = KeyFactory.createKey(Proposal.class.getSimpleName(), title + description);
@@ -43,8 +42,10 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 	public Proposal(String title, String description, Calendar startDate,
 			Calendar endDate) {
 		super(title, description, startDate, endDate);
+		key = KeyFactory.createKey(Proposal.class.getSimpleName(), title + description);
+
 	}
-	
+
 	public Proposal(String title, String description, Calendar startDate,
 			Calendar endDate, double minDuration, double maxDuration,
 			boolean isRecurring, boolean canReschedule, Map<SphereName, Double> s) {
@@ -54,13 +55,13 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 		setReschedule(canReschedule);
 		setSpheres(s);
 	}
-	
+
 	public Proposal(IEvent e){
 		this(e.getTitle(), e.getDescription(), e.getStartDate(), e.getEndDate(), 
 				e.getDurationInterval().getFirst(), e.getDurationInterval().getSecond(),
 				e.isRecurring(), e.canReschedule(), e.getSpheres());
 	}
-	
+
 	public void setRecurring(boolean isRecurring) {
 		this.isRecurring = isRecurring;
 	}
@@ -68,7 +69,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 	public boolean canReschedule() {
 		return canReschedule;
 	}
-	
+
 	public void setReschedule(boolean schedule){
 		canReschedule = schedule;
 	}
@@ -76,7 +77,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 	public Pair<Double, Double> getDurationInterval() {
 		return this.durationInterval;
 	}
-	
+
 	public void setDurationInterval(Double min, Double max){
 		durationInterval = new Pair<Double, Double>(min, max);
 	}
@@ -84,7 +85,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 	public Map<SphereName, Double> getSpheres() {
 		return this.spheres;
 	}
-	
+
 	public void setSpheres(Map<SphereName, Double> s){
 		spheres = s;
 	}
@@ -93,12 +94,11 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 		return this.isRecurring;
 	}
 
-	public double getMultiplier() {
-		return multiplier;
-	}
-
 	public void setMultiplier(double multiplier) {
-		this.multiplier = multiplier;
+		for (SphereName sphere : spheres.keySet()) {
+			Double influence = spheres.get(sphere);
+			spheres.put(sphere, influence*multiplier);
+		}
 	}
 
 	public boolean isDisabled() {
@@ -110,11 +110,18 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 	}
 
 	public Pair<Calendar, Calendar> getPossibleTimeSlot() {
+		Calendar possibleStart = new GregorianCalendar();
+		possibleStart.setTimeInMillis(possibleTimeSlot.getFirst());
+		Calendar possibleEnd = new GregorianCalendar();
+		possibleEnd.setTimeInMillis(possibleTimeSlot.getSecond());
+		Pair<Calendar, Calendar> possibleTimeSlot = new Pair<Calendar, Calendar>(possibleStart, possibleEnd);
 		return possibleTimeSlot;
 	}
 
 	public void setPossibleTimeSlot(Pair<Calendar, Calendar> possibleTimeSlot) {
-		this.possibleTimeSlot = possibleTimeSlot;
+		Long possibleStart = possibleTimeSlot.getFirst().getTimeInMillis();
+		Long possibleEnd = possibleTimeSlot.getSecond().getTimeInMillis();
+		this.possibleTimeSlot = new Pair<Long, Long>(possibleStart, possibleEnd);
 	}
 
 	public Pair<Integer, Integer> getPossibleAge() {
@@ -128,14 +135,12 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 	public void setDurationInterval(Pair<Double, Double> durationInterval) {
 		this.durationInterval = durationInterval;
 	}
-	
+
 	public void makePersistent(int alternative) {
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 	}
 
 	public CalendarEventEntry getCalendarEvent() {
-		// TODO Auto-generated method stub
 		return null;
-	}
-	
+	}	
 }

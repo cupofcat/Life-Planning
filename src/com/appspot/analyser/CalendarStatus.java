@@ -1,7 +1,6 @@
 package com.appspot.analyser;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
@@ -11,6 +10,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	private double additionalEventTime;
 	private double coefficient;
 	private double userBusyTime;
+	private List<CalendarStatus> alternatives;
 	private Map<SphereName, SphereInfo> sphereResults;
 	
 	public CalendarStatus(double userBusyTime, Map<SphereName, SphereInfo> currentSphereResults){
@@ -71,6 +71,20 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	
 	public boolean isWithinConfidenceInterval(){
 		return coefficient < Analyzer.CONFIDENCE;
+	}
+	
+	public void addAlternative(CalendarStatus alternativeSuggestion){
+		if(alternatives == null)
+			alternatives = new LinkedList<CalendarStatus>();
+		alternatives.add(alternativeSuggestion);
+	}
+	
+	public boolean hasAlternatives(){
+		return alternatives != null;
+	}
+	
+	public List<CalendarStatus> getAlternatives(){
+		return alternatives;
 	}
 	
 	public void analyse(){

@@ -1,6 +1,8 @@
 package com.appspot.analyser;
 
-public class Pair<K, V> {
+import java.io.Serializable;
+
+public class Pair<K, V> implements Serializable {
 	private K first;
 	private V second;
 		
@@ -21,7 +23,4 @@ public class Pair<K, V> {
 	public void setSecond(V second) {
 		this.second = second;
 	}
-	
-	
-
 }
