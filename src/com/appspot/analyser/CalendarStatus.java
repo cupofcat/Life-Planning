@@ -148,4 +148,27 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		else 
 			return 0;
 	}
+	
+	public List<SphereName> hasDeficit(boolean optimize){
+		List<SphereName> deficits = new LinkedList<SphereName>();
+		if (optimize) {
+			for(SphereName name : SphereName.values()) {
+				if(sphereResults.get(name).getRatioDifference() > 0)
+					deficits.add(name);
+			}
+		}
+		else {
+			double max = -1;
+			SphereName currentMajor = null;
+			for(SphereName name : SphereName.values()) {
+				if(sphereResults.get(name).getRatioDifference() > max){
+					currentMajor = name;
+					max = sphereResults.get(currentMajor).getRatioDifference();
+				}
+
+			}
+			deficits.add(currentMajor);
+		}
+		return deficits;
+	}
 }

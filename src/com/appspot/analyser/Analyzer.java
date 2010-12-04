@@ -16,12 +16,6 @@ import com.appspot.datastore.SphereName;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
 
-import org.junit.Test;
-import junit.framework.TestCase;
-import org.junit.runner.RunWith;
-import org.junit.experimental.runners.Enclosed;
-
-@RunWith(Enclosed.class)
 public class Analyzer {
 
 	public static final double CONFIDENCE = 0.1;
@@ -29,8 +23,11 @@ public class Analyzer {
 	static final int TRIES = 10;
 	private int maxDepth = 3;
 	private int maxSuggestions = 3;
-
+	private Map<SphereName, List<? extends IEvent>> proposals;
+	
+	
 	public Analyzer() {
+		proposals = new HashMap<SphereName, List<? extends IEvent>>();
 	}
 
 	public List<List<Suggestion>> getSuggestions(List<? extends IEvent> events, String currentUserId) throws IOException {
@@ -44,16 +41,25 @@ public class Analyzer {
 		if (externalEvents.size() == 0)
 			return null;
 		List<IEvent> events = (List<IEvent>) externalEvents;
-		List<BaseCalendarSlot> freeSlots = getFreeSlots(events);
-		printEvents(freeSlots);
+		List<BaseCalendarSlot>[] freeSlots = getFreeSlots(events);
 		removeStaticEvents(events);
 		LinkedList<List<CalendarStatus>> result = new LinkedList<List<CalendarStatus>>();
 		CalendarStatus start = checkGoals(events, spherePreferences);
 		if (isCloseEnough(start, optimizeFull))
 			return null;
 		List<CalendarStatus> statuses = getSortedStatuses(events, start);
+		//proposals
+		/* 	1. Dodac freesloty do calendarStatus i zmiany na poziomie nowych linkedlistow
+		 * 	2. wyciagnac proposale po majorSphere
+		 * 	3  idac po proposalach, szukac freslotow z bucketow in startTime + duration
+		 * 	4. build calendarStatuses around picked proposals
+		 * 	5. (statuses) union (result from 4) 
+		 * 	6. if nextMin is proposal, store currentfreeslots somewhere and update currentStatus na nowe freesloty
+		*/
+		
+		
 		for (int i = 0; i < maxSuggestions || i < statuses.size(); i++) {
-			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
+			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();			
 			CalendarStatus nextMin = statuses.get(i);
 			// best event can't improve the status
 			if (nextMin.compareTo(start) >= 0)
@@ -118,8 +124,8 @@ public class Analyzer {
 		return list;
 	}
 
-	private List<BaseCalendarSlot> getFreeSlots(List<? extends IEvent> events) {
-		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
+	private List<BaseCalendarSlot>[] getFreeSlots(List<? extends IEvent> events) {
+		LinkedList<BaseCalendarSlot>[] ret = (LinkedList<BaseCalendarSlot>[]) new LinkedList[24];
 		Collections.sort(events);
 		System.out.println("-Free slots generation-");
 		Iterator<? extends IEvent> it = events.iterator();
@@ -130,7 +136,12 @@ public class Analyzer {
 			IEvent next = it.next();
 			if (curr.getEndDate().compareTo(next.getStartDate()) < 0) {
 				BaseCalendarSlot newSlot = new BaseCalendarSlot("Free Slot", null, curr.getEndDate(), next.getStartDate());
-				ret.add(newSlot);
+				int index = newSlot.getStartDate().get(Calendar.HOUR_OF_DAY);
+				LinkedList<BaseCalendarSlot> updatedList = ret[index];
+				if (updatedList == null)
+					updatedList = new LinkedList<BaseCalendarSlot>();
+				updatedList.add(newSlot);
+				ret[index] = updatedList;
 				Pair<Double, Double> durationInterval = curr.getDurationInterval();
 				durationInterval.setSecond(Math.min(durationInterval.getSecond(), curr.getDuration() + newSlot.getDuration()));
 				curr = next;
@@ -143,7 +154,7 @@ public class Analyzer {
 				}
 			}
 		}
-		it.remove();
+		it.remove();		
 		return ret;
 	}
 
@@ -246,23 +257,4 @@ public class Analyzer {
 		for (SphereName key : keys)
 			times.put(key, 0.0);
 	}
-
-
-	public static class AlgoTest extends TestCase {
-
-		protected boolean b;
-
-		@ Test 
-		public void testConvertToSuggestionsEmpty() {
-			b = true;
-			assertTrue(b);
-		}
-
-//		@Test
-//		private void testConvertToSuggestions() {
-//			LinkedList<List<CalendarStatus>> lists = new LinkedList<List<CalendarStatus>>();
-//			LinkedList<CalendarStatus> statuses2 = new LinkedList<CalendarStatus>();
-//			LinkedList<CalendarStatus> statuses1 = new LinkedList<CalendarStatus>();
-//		}
-}
 }

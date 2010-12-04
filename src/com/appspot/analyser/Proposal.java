@@ -20,15 +20,18 @@ import com.google.gdata.data.calendar.CalendarEventEntry;
 public class Proposal extends BaseCalendarSlot implements IEvent  {
 
 	@NotPersistent
-	private boolean isRecurring;
+	private Boolean isRecurring;
 	@NotPersistent
-	private boolean canReschedule;
+	private Boolean canReschedule;
 	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Map<SphereName, Double> spheres;
+	
+	private SphereName majorSphere;
+	
 	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Pair<Double, Double> durationInterval;
 	@Persistent
-	private boolean disabled;
+	private Boolean disabled;
 	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Pair<Long, Long> possibleTimeSlot;
 	@Persistent(serialized="true", defaultFetchGroup = "true")
@@ -88,6 +91,15 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 
 	public void setSpheres(Map<SphereName, Double> s){
 		spheres = s;
+		double max = -1;
+		SphereName currentMajor = null;
+		for(SphereName name : s.keySet()){
+			if(s.get(name) > max){
+				currentMajor = name;
+				max = s.get(currentMajor);
+			}
+		}
+		majorSphere = currentMajor;
 	}
 
 	public boolean isRecurring() {
@@ -142,5 +154,9 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 
 	public CalendarEventEntry getCalendarEvent() {
 		return null;
+	}
+
+	public SphereName getMajorSphere() {
+		return majorSphere;
 	}	
 }

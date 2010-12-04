@@ -54,17 +54,23 @@ public class LifePlanningServlet extends HttpServlet {
 		list.add(beginning);
 		list.add(s2);
 		list.add(s3);
-		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.5,0.3});
+		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.7,0.3});
 	    UserProfile p = new UserProfile("bober", "Macj", "obr@op.pl",m, true, 90 );
 	//    Collection<UserProfile> users = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + UserProfile.class.getName()).execute();
 	 //   printProfiles(users);
 	    	    
+	    
+	    
 	    Proposal a = new Proposal(s);
 	    a.setSpheres(m);
-	    a.makePersistent();
+	  a.makePersistent();
 	    
-//	    Collection<UserProfile> spheres = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + Proposal.class.getName()).execute();// + " where spheres.get(SphereName.HEALTH) > 0.0").execute();
-		new Analyzer().getSuggestions(list, "bober");
+	    PersistenceManager pmf = PMF.get().getPersistenceManager();
+	    
+	   Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName() + " where majorSphere =='" + SphereName.WORK+"'").execute();
+		//pmf.deletePersistentAll(spheres);
+	    printEvents(spheres);
+	    new Analyzer().getSuggestions(list, "bober");
 
 		
 //		UserProfile profile = new UserProfile("rysio", "kaletnik", "ryszardKaleta@op.lp", generateSpheres(new double[]{0.5,0.1,0.2,0.2}), false,310);
@@ -98,30 +104,10 @@ public class LifePlanningServlet extends HttpServlet {
 			times.put(key, 0.0);
 	}
 
-	private void printEvents(Set<Event> events) throws IOException {
-		response.setContentType("text/html");
-		response.getWriter().println("<h3>Your events: </h3>");
-
-		for (Event e : events) {
-			response.getWriter().println(
-					"<ul><li>" + e.getDescription() + " List of spheres: "
-							+ "</li></ul>");
-			for (SphereName k : e.getSpheres().keySet())
-				response.getWriter().print(
-						k.toString()
-								+ " "
-								+ String.valueOf(e.getSpheres().get(
-										k.toString())));
+	private void printEvents(Collection<? extends IEvent> events) throws IOException {
+		for (IEvent e : events) {
+			int x = 0;
 		}
-
-		String logOutURL = authService.getLogOutURL(request);
-		response
-				.getWriter()
-				.println(
-						"<a href=\""
-								+ logOutURL
-								+ "\">"
-								+ "Log Out (will log you out of all google services)</a>");
 	}
 
 	/**
