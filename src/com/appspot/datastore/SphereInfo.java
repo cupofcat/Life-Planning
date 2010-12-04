@@ -1,6 +1,6 @@
 package com.appspot.datastore;
 
-import com.appspot.analyser.Analyzer;
+import com.appspot.analyser.Analyser;
 
 public class SphereInfo {
 	private double currentRatio;
@@ -21,33 +21,34 @@ public class SphereInfo {
 		return currentRatio;
 	}
 
-	public double getSphereTotalTime(){
+	public double getSphereTotalTime() {
 		return sphereTotalTime;
 	}
 
-	public boolean isWithinConfidenceInterval(){
+	public boolean isWithinConfidenceInterval() {
 		return isWithinConfidenceInterval(getCurrentRatio());
 	}
 
 	private boolean isWithinConfidenceInterval(double ratio) {
-		return (Math.abs(getTargetRatio() - ratio ))/getTargetRatio() < Analyzer.CONFIDENCE;
+		return (Math.abs(getTargetRatio() - ratio ))/getTargetRatio() < Analyser.CONFIDENCE;
 	}
 
+	/* Calculate new ratio for some sphere after new 
+	 * duration for some event affecting that sphere */
 	public double getRatioAccuracy(double additionalTime, double totalTime) {
 		double newRatio = (sphereTotalTime+additionalTime)/totalTime;
 		double result = Math.abs(getTargetRatio() - newRatio);
 		if (!isWithinConfidenceInterval(newRatio)) {
+			/* Decreases chances of scheduling */
 			result *= 100000.0;
 		}
 		return result;
 	}
 
-	public void saveResults(double additionalTime, double totalTime){
+	public void saveResults(double additionalTime, double totalTime) {
 		sphereTotalTime += additionalTime; 
 		currentRatio = sphereTotalTime/totalTime;
 	}
-
-	///////////////////////////////////////////////////
 
 	private double getDuration(double sphereInfluence, double userBusyTime, double multiplier) {
 		double targetRatio = this.targetRatio * multiplier;
@@ -56,14 +57,16 @@ public class SphereInfo {
 
 
 	public double getConfidenceTime() {
-		return sphereTotalTime *  Analyzer.CONFIDENCE * targetRatio;
+		return sphereTotalTime *  Analyser.CONFIDENCE * targetRatio;
 	}
 
+	/* Calculate extra duration for some event until this 
+	 * sphere is within confidence interval of the target */
 	public double getDurationToConfidence(double sphereInfluence, double userBusyTime) {
-		if (currentRatio > targetRatio*(1+Analyzer.CONFIDENCE)) 
-			return getDuration(sphereInfluence, userBusyTime, 1+Analyzer.CONFIDENCE);
+		if (currentRatio > targetRatio * (1 + Analyser.CONFIDENCE)) 
+			return getDuration(sphereInfluence, userBusyTime, 1 + Analyser.CONFIDENCE);
 		else
-			return getDuration(sphereInfluence, userBusyTime, 1-Analyzer.CONFIDENCE);
+			return getDuration(sphereInfluence, userBusyTime, 1 - Analyser.CONFIDENCE);
 	}
 
 	public double getDurationToTarget(double sphereInfluence, double userBusyTime) { 

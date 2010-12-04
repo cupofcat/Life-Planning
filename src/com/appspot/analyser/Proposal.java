@@ -25,17 +25,16 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 	private Boolean canReschedule;
 	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Map<SphereName, Double> spheres;
-	
+	@Persistent
 	private SphereName majorSphere;
-	
 	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Pair<Double, Double> durationInterval;
 	@Persistent
 	private Boolean disabled;
-	@Persistent(serialized="true", defaultFetchGroup = "true")
-	private Pair<Long, Long> possibleTimeSlot;
-	@Persistent(serialized="true", defaultFetchGroup = "true")
-	private Pair<Integer, Integer> possibleAge;
+//	@Persistent(serialized="true", defaultFetchGroup = "true")
+//	private Pair<Long, Long> possibleTimeSlot;
+//	@Persistent(serialized="true", defaultFetchGroup = "true")
+//	private Pair<Integer, Integer> possibleAge;
 
 	public Proposal(Calendar startDate, Calendar endDate, User user) {
 		super(startDate, endDate);
@@ -46,7 +45,6 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 			Calendar endDate) {
 		super(title, description, startDate, endDate);
 		key = KeyFactory.createKey(Proposal.class.getSimpleName(), title + description);
-
 	}
 
 	public Proposal(String title, String description, Calendar startDate,
@@ -59,7 +57,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 		setSpheres(s);
 	}
 
-	public Proposal(IEvent e){
+	public Proposal(IEvent e) {
 		this(e.getTitle(), e.getDescription(), e.getStartDate(), e.getEndDate(), 
 				e.getDurationInterval().getFirst(), e.getDurationInterval().getSecond(),
 				e.isRecurring(), e.canReschedule(), e.getSpheres());
@@ -73,7 +71,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 		return canReschedule;
 	}
 
-	public void setReschedule(boolean schedule){
+	public void setReschedule(boolean schedule) {
 		canReschedule = schedule;
 	}
 
@@ -89,7 +87,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 		return this.spheres;
 	}
 
-	public void setSpheres(Map<SphereName, Double> s){
+	public void setSpheres(Map<SphereName, Double> s) {
 		spheres = s;
 		double max = -1;
 		SphereName currentMajor = null;
@@ -121,28 +119,28 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 		this.disabled = disabled;
 	}
 
-	public Pair<Calendar, Calendar> getPossibleTimeSlot() {
-		Calendar possibleStart = new GregorianCalendar();
-		possibleStart.setTimeInMillis(possibleTimeSlot.getFirst());
-		Calendar possibleEnd = new GregorianCalendar();
-		possibleEnd.setTimeInMillis(possibleTimeSlot.getSecond());
-		Pair<Calendar, Calendar> possibleTimeSlot = new Pair<Calendar, Calendar>(possibleStart, possibleEnd);
-		return possibleTimeSlot;
-	}
+//	public Pair<Calendar, Calendar> getPossibleTimeSlot() {
+//		Calendar possibleStart = new GregorianCalendar();
+//		possibleStart.setTimeInMillis(possibleTimeSlot.getFirst());
+//		Calendar possibleEnd = new GregorianCalendar();
+//		possibleEnd.setTimeInMillis(possibleTimeSlot.getSecond());
+//		Pair<Calendar, Calendar> possibleTimeSlot = new Pair<Calendar, Calendar>(possibleStart, possibleEnd);
+//		return possibleTimeSlot;
+//	}
 
-	public void setPossibleTimeSlot(Pair<Calendar, Calendar> possibleTimeSlot) {
-		Long possibleStart = possibleTimeSlot.getFirst().getTimeInMillis();
-		Long possibleEnd = possibleTimeSlot.getSecond().getTimeInMillis();
-		this.possibleTimeSlot = new Pair<Long, Long>(possibleStart, possibleEnd);
-	}
+//	public void setPossibleTimeSlot(Pair<Calendar, Calendar> possibleTimeSlot) {
+//		Long possibleStart = possibleTimeSlot.getFirst().getTimeInMillis();
+//		Long possibleEnd = possibleTimeSlot.getSecond().getTimeInMillis();
+//		this.possibleTimeSlot = new Pair<Long, Long>(possibleStart, possibleEnd);
+//	}
 
-	public Pair<Integer, Integer> getPossibleAge() {
-		return possibleAge;
-	}
-
-	public void setPossibleAge(Pair<Integer, Integer> possibleAge) {
-		this.possibleAge = possibleAge;
-	}
+//	public Pair<Integer, Integer> getPossibleAge() {
+//		return possibleAge;
+//	}
+//
+//	public void setPossibleAge(Pair<Integer, Integer> possibleAge) {
+//		this.possibleAge = possibleAge;
+//	}
 
 	public void setDurationInterval(Pair<Double, Double> durationInterval) {
 		this.durationInterval = durationInterval;

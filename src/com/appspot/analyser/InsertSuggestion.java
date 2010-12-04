@@ -16,7 +16,6 @@ import com.google.gdata.util.ServiceException;
 
 public class InsertSuggestion extends Suggestion {
 
-
 	public InsertSuggestion(BaseCalendarSlot slot) {
 		super(slot);
 	}
@@ -31,20 +30,18 @@ public class InsertSuggestion extends Suggestion {
 			Map<SphereName, Double> s) {
 		super(title, description, startDate, endDate, minDuration, maxDuration,
 				isRecurring, canReschedule, s);
-		// TODO Auto-generated constructor stub
 	}
 
 	public InsertSuggestion(String title, String description,
 			Calendar startDate, Calendar endDate) {
 		super(title, description, startDate, endDate);
-		// TODO Auto-generated constructor stub
 	}
-	
- 	public String getType() {
- 		return "New Event";
- 	}
 
- 	protected void makePersistentInternal() {
+	public String getType() {
+		return "New Event";
+	}
+
+	protected void makePersistentInternal() {
 		CalendarEventEntry newEntry = new CalendarEventEntry();
 
 		newEntry.setTitle(new PlainTextConstruct(title));
@@ -57,7 +54,7 @@ public class InsertSuggestion extends Suggestion {
 		eventTimes.setEndTime(endTime);
 		newEntry.addTime(eventTimes);
 
- 		URL postUrl = null;
+		URL postUrl = null;
 		try {
 			postUrl = new URL(CalendarUtils.DEFAULT_FULL_FEED_REQUEST_URL);
 			CalendarUtils.client.insert(postUrl, newEntry);

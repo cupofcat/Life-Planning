@@ -1,28 +1,30 @@
 package com.appspot.datastore;
 
 public enum SphereName {
-	HEALTH{
-
+	HEALTH {
 		@Override
 		public Double defaultValue() {
 			return 0.2;
 		}
-	}, WORK {
+	}, 
+	WORK {
 		@Override
 		public Double defaultValue() {
 			return 0.4;
 		}
-	}, FAMILY {
+	}, 
+	FAMILY {
 		@Override
 		public Double defaultValue() {
 			return 0.25;
 		}
-	}, RECREATION {
+	}, 
+	RECREATION {
 		@Override
 		public Double defaultValue() {
 			return 0.15;
 		}
 	};
-	
+
 	public abstract Double defaultValue();
 }

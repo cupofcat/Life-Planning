@@ -15,10 +15,9 @@ import com.google.gdata.util.ServiceException;
 
 public class RescheduleSuggestion extends Suggestion {
 
-	//Calendars held as longs (timeInMillis)
 	private Pair<Long, Long> newDates;
 	private CalendarEventEntry event;
-	
+
 	public RescheduleSuggestion(BaseCalendarSlot slot) {
 		super(slot);
 	}
@@ -41,16 +40,16 @@ public class RescheduleSuggestion extends Suggestion {
 		setNewDates(newStart.getTimeInMillis(), newEnd.getTimeInMillis());
 		event = e.getCalendarEvent();
 	}
-	
+
 	public void setNewDates(long newStart, long newEnd){
 		newDates = new Pair<Long, Long>(newStart, newEnd);
 	}
-		
- 	public String getType() {
- 		return "Reschedule";
- 	}
 
- 	protected void makePersistentInternal() {
+	public String getType() {
+		return "Reschedule";
+	}
+
+	protected void makePersistentInternal() {
 		event.setTitle(new PlainTextConstruct("Rescheduling!"));
 		event.getTimes().get(0).setStartTime(new DateTime(newDates.getFirst()));
 		event.getTimes().get(0).setEndTime(new DateTime(newDates.getSecond()));
@@ -70,5 +69,4 @@ public class RescheduleSuggestion extends Suggestion {
 	public CalendarEventEntry getCalendarEvent() {
 		return null;
 	}
-
 }

@@ -3,11 +3,13 @@ package com.appspot.datastore;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.jdo.annotations.*;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 @PersistenceCapable
 public class UserProfile extends BaseDataObject {
-	
+
 	@Persistent
 	@PrimaryKey
 	private String userID;
@@ -21,7 +23,7 @@ public class UserProfile extends BaseDataObject {
 	private boolean fullyOptimized;
 	@Persistent
 	private Long joinTime;
-	
+
 	public UserProfile(String userID, String nickname, String email, 
 			HashMap<SphereName, Double> spherePreferences, boolean fullyOptimized, long joinTime) {
 		super();
@@ -69,14 +71,13 @@ public class UserProfile extends BaseDataObject {
 	public Map<SphereName, Double> getSpherePreferences() {
 		return spherePreferences;
 	}	
-	
-	public String toString(){
+
+	public String toString() {
 		String res = getUserID() + " nick: " + nickname + " email: " + getEmail() +"\n";
 		res = res.concat("Sphere Choices: \n");
 		for(SphereName name : spherePreferences.keySet()){
 			res = res.concat(name.toString() + " : " + spherePreferences.get(name) + "\n");
 		}
 		return res;
-		
 	}
 }

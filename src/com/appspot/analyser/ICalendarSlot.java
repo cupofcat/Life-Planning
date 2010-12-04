@@ -2,11 +2,10 @@ package com.appspot.analyser;
 
 import java.util.Calendar;
 
-import com.google.appengine.api.users.User;
 import com.google.gdata.data.TextConstruct;
 
 public interface ICalendarSlot extends Comparable<ICalendarSlot> {
-	
+
 	public String getTitle();
 	public void setTitle(TextConstruct title);
 	public String getDescription();
@@ -16,5 +15,4 @@ public interface ICalendarSlot extends Comparable<ICalendarSlot> {
 	public Calendar getEndDate();
 	public void setEndDate(Calendar end);	
 	public double getDuration();
-
 }

@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.appspot.analyser.Analyzer;
+import com.appspot.analyser.Analyser;
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Suggestion;
@@ -48,7 +48,7 @@ public class SuggestionServlet extends HttpServlet {
 		eventStore.initizalize();
 		List<Event> events = eventStore.getEvents();
 		// ------------------- Dummy data
-		Analyzer analyser = new Analyzer();
+		Analyser analyser = new Analyser();
 
 		//List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
 		List<List<Suggestion>> suggestions = new ArrayList<List<Suggestion>>();

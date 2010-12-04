@@ -31,7 +31,7 @@ public class LifePlanningServlet extends HttpServlet {
 	private String sessionToken;
 
 	public synchronized void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws IOException {
+	throws IOException {
 		Suggestion beginning = new RescheduleSuggestion("Begin", null, new GregorianCalendar(2000, 3, 3, 0, 0, 0),new GregorianCalendar(2000, 3, 3, 0, 0, 0) );
 		beginning.setDeurationInterval(0, 0);
 		Suggestion end = new RescheduleSuggestion("End", null, new GregorianCalendar(2000, 3, 3, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
@@ -55,37 +55,37 @@ public class LifePlanningServlet extends HttpServlet {
 		list.add(s2);
 		list.add(s3);
 		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.7,0.3});
-	    UserProfile p = new UserProfile("bober", "Macj", "obr@op.pl",m, true, 90 );
-	//    Collection<UserProfile> users = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + UserProfile.class.getName()).execute();
-	 //   printProfiles(users);
-	    	    
-	    
-	    
-	    Proposal a = new Proposal(s);
-	    a.setSpheres(m);
-	  a.makePersistent();
-	    
-	    PersistenceManager pmf = PMF.get().getPersistenceManager();
-	    
-	   Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName() + " where majorSphere =='" + SphereName.WORK+"'").execute();
-		//pmf.deletePersistentAll(spheres);
-	    printEvents(spheres);
-	    new Analyzer().getSuggestions(list, "bober");
+		UserProfile p = new UserProfile("bober", "Macj", "obr@op.pl",m, true, 90 );
+		//    Collection<UserProfile> users = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + UserProfile.class.getName()).execute();
+		//   printProfiles(users);
 
-		
-//		UserProfile profile = new UserProfile("rysio", "kaletnik", "ryszardKaleta@op.lp", generateSpheres(new double[]{0.5,0.1,0.2,0.2}), false,310);
-//		//profile.makePersistent();
-//		PersistenceManager pm = PMF.get().getPersistenceManager();
-//		Collection<UserProfile> users = (Collection<UserProfile>) pm.newQuery("SELECT FROM " + UserProfile.class.getName()).execute();
-//		printProfiles(users);
+
+
+		Proposal a = new Proposal(s);
+		a.setSpheres(m);
+		a.makePersistent();
+
+		PersistenceManager pmf = PMF.get().getPersistenceManager();
+
+		Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName() + " where majorSphere =='" + SphereName.WORK+"'").execute();
+		//pmf.deletePersistentAll(spheres);
+		printEvents(spheres);
+		new Analyser().getSuggestions(list, "bober");
+
+
+		//		UserProfile profile = new UserProfile("rysio", "kaletnik", "ryszardKaleta@op.lp", generateSpheres(new double[]{0.5,0.1,0.2,0.2}), false,310);
+		//		//profile.makePersistent();
+		//		PersistenceManager pm = PMF.get().getPersistenceManager();
+		//		Collection<UserProfile> users = (Collection<UserProfile>) pm.newQuery("SELECT FROM " + UserProfile.class.getName()).execute();
+		//		printProfiles(users);
 	}
-	
+
 	private void printProfiles(Collection<UserProfile> profiles){
 		for(UserProfile profile : profiles)
 			System.out.println(profile);
 	}
-	
-	
+
+
 	private HashMap<SphereName, Double> generateSpheres(double[] values){
 		SphereName[] names = SphereName.values();
 		HashMap<SphereName, Double> res = new HashMap<SphereName, Double>();
@@ -122,7 +122,7 @@ public class LifePlanningServlet extends HttpServlet {
 		// Connect to Google Calendar and gather data
 		try {
 			resultFeed = AuthService.client
-					.getFeed(feedUrl, CalendarFeed.class);
+			.getFeed(feedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
 			authService.revokeToken();
 			response.sendRedirect(request.getRequestURI());
@@ -135,18 +135,18 @@ public class LifePlanningServlet extends HttpServlet {
 		for (int i = 0; i < resultFeed.getEntries().size(); i++) {
 			CalendarEntry entry = resultFeed.getEntries().get(i);
 			response.getWriter()
-					.println(
-							"<ul><li>" + entry.getTitle().getPlainText()
-									+ "</li></ul>");
+			.println(
+					"<ul><li>" + entry.getTitle().getPlainText()
+					+ "</li></ul>");
 		}
 
 		String logOutURL = authService.getLogOutURL(request);
 		response
-				.getWriter()
-				.println(
-						"<a href=\""
-								+ logOutURL
-								+ "\">"
-								+ "Log Out (will log you out of all google services)</a>");
+		.getWriter()
+		.println(
+				"<a href=\""
+				+ logOutURL
+				+ "\">"
+				+ "Log Out (will log you out of all google services)</a>");
 	}
 }
