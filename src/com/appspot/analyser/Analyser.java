@@ -135,7 +135,6 @@ public class Analyser {
 	private List<BaseCalendarSlot>[] getFreeSlots(List<? extends IEvent> events) {
 		LinkedList<BaseCalendarSlot>[] ret = (LinkedList<BaseCalendarSlot>[]) new LinkedList[24];
 		Collections.sort(events);
-		System.out.println("-Free slots generation-");
 		Iterator<? extends IEvent> it = events.iterator();
 		IEvent beginning = it.next();
 		it.remove();
@@ -169,7 +168,7 @@ public class Analyser {
 	/* Test if we have reached the confidence interval for spheres */
 	private boolean isCloseEnough(CalendarStatus currentStatus, boolean optimizeFull) {
 		return currentStatus.getCoefficient() < Math.pow(Analyser.CONFIDENCE, 2) 
-			|| (!optimizeFull && currentStatus.isWithinConfidenceInterval());
+		|| (!optimizeFull && currentStatus.isWithinConfidenceInterval());
 	}
 
 	/* Create calendar statuses for all events, order them in terms of 
@@ -230,7 +229,7 @@ public class Analyser {
 	}
 
 	/* Work out overall sphere levels considering current events. 
-	 * Create calendar status for each event */
+	 *  */
 	public CalendarStatus checkGoals(Collection<? extends IEvent> events, Map<SphereName, Double> choices) throws IOException {
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
 		initializeTimes(times, choices.keySet());
@@ -249,23 +248,29 @@ public class Analyser {
 		for (SphereName key : times.keySet()) {
 			currentRatios.put(key, times.get(key) / sum);
 		}
+		Map<SphereName, SphereInfo> sphereResults = generateSphereResults(choices, currentRatios, times);
+		return new CalendarStatus(sum, sphereResults);
+	}
+
+	private Map<SphereName, SphereInfo> generateSphereResults(Map<SphereName, Double> choices,
+			Map<SphereName, Double> currentRatios, Map<SphereName, Double> times) {
 		Map<SphereName, SphereInfo> sphereResults = new HashMap<SphereName, SphereInfo>();
 		for (SphereName key : times.keySet()) {
 			SphereInfo info = new SphereInfo(currentRatios.get(key), choices.get(key), times.get(key));
 			sphereResults.put(key, info);
 		}
-		return new CalendarStatus(sum, sphereResults);
+		return sphereResults;
 	}
 
-//	private void printEvents(Collection<? extends ICalendarSlot> events) {
-//		for (ICalendarSlot event : events)
-//			System.out.println(event.getTitle() + "  " + printDate(event.getStartDate()) + "  " + printDate(event.getEndDate()));
-//	}
-//
-//	private String printDate(Calendar cal) {
-//		return cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH) + "/" + cal.get(Calendar.YEAR) + "  " + cal.get(Calendar.HOUR_OF_DAY)
-//		+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
-//	}
+	//	private void printEvents(Collection<? extends ICalendarSlot> events) {
+	//		for (ICalendarSlot event : events)
+	//			System.out.println(event.getTitle() + "  " + printDate(event.getStartDate()) + "  " + printDate(event.getEndDate()));
+	//	}
+	//
+	//	private String printDate(Calendar cal) {
+	//		return cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH) + "/" + cal.get(Calendar.YEAR) + "  " + cal.get(Calendar.HOUR_OF_DAY)
+	//		+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+	//	}
 
 	private void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
 		for (SphereName key : keys)
@@ -275,49 +280,165 @@ public class Analyser {
 	public static class AlgoTest extends TestCase {
 
 		private Analyser a = new Analyser();
-		private List<? extends IEvent> events = sampleEvents();
+		private List<? extends IEvent> events;
 
 		@Test 
 		public void testConvert() {
-			/* 
-			HashMap<SphereName, SphereInfo> m = generateSpheres(new double[]{0.7,0.3, 0.0, 0.0});
-			BaseCalendarSlot event = new BaseCalendarSlot(new GregorianCalendar(2000, 3, 3, 15, 00, 0), new GregorianCalendar(2000, 3, 3, 15, 30, 0));
-			CalendarStatus c1 = new CalendarStatus(10.0, m);
+			events = sampleEvents();
 			List<CalendarStatus> statuses = new LinkedList<CalendarStatus>();
-			statuses.add(c1);
+			Map<SphereName, SphereInfo> sphereInfos = generateSphereInfos(new double[]{2.5, 4.5, 0.5, 7.5});
+			CalendarStatus other = new CalendarStatus(10.0, sphereInfos);
+			for (IEvent event : events) {
+				CalendarStatus c1 = new CalendarStatus(event, other);
+				statuses.add(c1);
+			}
 			List<Suggestion> suggestions = a.convert(statuses);
-			boolean a = suggestions.get(0) instanceof com.appspot.analyser.RescheduleSuggestion;
-			assertTrue("Calendar statuses not converted properly", a);
-			*/
+			assertTrue("Not all conversions successful", statuses.size() == suggestions.size());
+			boolean s1 = suggestions.get(1) instanceof RescheduleSuggestion;
+			boolean s2 = suggestions.get(2) instanceof DeleteSuggestion;
+			boolean s3 = suggestions.get(3) instanceof RescheduleSuggestion;
+			assertTrue("Converting statuses into suggestions broken", s1&s2&s3);
 		}
-		
+
 		@Test 
-		public void testGetFreeSlots() {
-			
+		public void testGetFreeSlotsBaseCase() {
+			events = sampleEvents();
+			IEvent reschedule1 = events.get(1);
+			double oldIntervalFs14 = reschedule1.getDurationInterval().getSecond();
+			List<BaseCalendarSlot>[] freeSlots = a.getFreeSlots(events);
+
+			List<BaseCalendarSlot> fs14 = freeSlots[14];
+			double fs14Duration = fs14.get(0).getDuration();
+			double newIntervalFs14 = reschedule1.getDurationInterval().getSecond();
+			double reschedule1Duration = reschedule1.getDuration();
+			boolean size = fs14.size()==1;
+			boolean start = fs14.get(0).getStartDate().equals(new GregorianCalendar(2000, 3, 3, 14, 45, 0));
+			boolean end = fs14.get(0).getEndDate().equals(new GregorianCalendar(2000, 3, 3, 15, 30, 0));
+			boolean interval = newIntervalFs14 == Math.min(oldIntervalFs14, reschedule1Duration + fs14Duration);
+			assertTrue("Basic case where curr.end < next.start does not work", size&start&end&interval);
 		}
-		
+
+		@Test 
+		public void testGetFreeSlotsSwallows() {
+			events = sampleEvents();
+			List<BaseCalendarSlot>[] freeSlots = a.getFreeSlots(events);
+			List<BaseCalendarSlot> fs17 = freeSlots[17];
+			List<BaseCalendarSlot> fs18 = freeSlots[18];
+			boolean isNull = fs17==null;
+			boolean size18 = fs18.size()==1;
+			assertTrue("Case where one event entirely overlaps another does not work", isNull&size18);
+		}
+
+		@Test 
+		public void testGetFreeSlotsExtendsBeyond() {
+			events = sampleEvents();
+			IEvent reschedule5 = events.get(6);
+			a.getFreeSlots(events);
+			double newIntervalFs20 = reschedule5.getDurationInterval().getSecond();
+			double reschedule5Duration = reschedule5.getDuration();
+			boolean setIntervalToDuration = newIntervalFs20==reschedule5Duration;
+			assertTrue("Case where one event entirely overlaps another does not work", 
+					setIntervalToDuration);
+		}
+
 		@Test
 		public void testRemoveStaticEvents() {
-			
+			events = sampleEvents();
+			double sizeBefore = events.size();
+			a.removeStaticEvents(events);
+			double sizeAfter = events.size();
+			boolean size = sizeBefore != sizeAfter + 1;
+			for (IEvent event: events) {
+				assertTrue("An event that cannot be rescheduled is not removed properly", !event.getTitle().equals("reschedule 6"));
+			}
+			assertTrue("A rescheduable event might have been removed", size);
 		}
-		
+
 		@Test
 		public void testIsCloseEnough() {
-			
+			/*		Not sure what figures I need for si1 and si2!
+			events = sampleEvents();
+			Map<SphereName, SphereInfo> si1 = generateSphereInfos(new double[]{0.1, 0.3, 0.3, 0.4});
+			Map<SphereName, SphereInfo> si2 = generateSphereInfos(new double[]{0.3, 0.3, 0.3, 0.1});
+			CalendarStatus c1 = new CalendarStatus(events.get(1), 
+					new CalendarStatus(100.0, si1));
+			CalendarStatus c2 = new CalendarStatus(events.get(2), 
+					new CalendarStatus(100.0, si2));
+			assertTrue("", !a.isCloseEnough(c1, true));
+			assertTrue("", a.isCloseEnough(c2, true));
+			assertTrue("", !a.isCloseEnough(c1, false));
+			assertTrue("", a.isCloseEnough(c2, false));
+			 */
 		}
-		
+
 		@Test
 		public void testGetSortedStatuses() {
-			
+			events = sampleEvents();
+			events.remove(0);
+			events.remove(events.size()-1);
+			Map<SphereName, Double> times = new HashMap<SphereName, Double>();
+			times.put(SphereName.HEALTH, 11.0);
+			times.put(SphereName.WORK, 492.0);
+			times.put(SphereName.FAMILY, 32.0);
+			times.put(SphereName.RECREATION, 42.0);
+			Map<SphereName, Double> currentRatios = new HashMap<SphereName, Double>();
+			currentRatios.put(SphereName.HEALTH, 0.019469026548672566);
+			currentRatios.put(SphereName.WORK, 0.8707964601769912);
+			currentRatios.put(SphereName.FAMILY, 0.05663716814159292);
+			currentRatios.put(SphereName.RECREATION, 0.0743362831858407);
+			double sum = 565.0;
+			Map<SphereName, SphereInfo> results = 
+				a.generateSphereResults(generateSpheres(new double[]{0.1, 0.3, 0.3, 0.4}),
+						currentRatios, times);
+			CalendarStatus start = new CalendarStatus(sum, results);
+			List<CalendarStatus> sortedStatuses = a.getSortedStatuses(events, start);
+			assertTrue("Not all events translated into statuses correctly", 
+					sortedStatuses.size() == events.size());
+			double min = 0.0;
+			for (CalendarStatus status : sortedStatuses) {
+				assertTrue("Get sorted statuses orders events incorectly", status.getCoefficient() >= min);
+				min = status.getCoefficient();
+			}
 		}
-		
+
 		@Test
 		public void testCheckGoals() {
-			
+			events = sampleEvents();
+			events.remove(0);
+			events.remove(events.size()-1);
+			Map<SphereName, Double> times = new HashMap<SphereName, Double>();
+			times.put(SphereName.HEALTH, 11.0);
+			times.put(SphereName.WORK, 492.0);
+			times.put(SphereName.FAMILY, 32.0);
+			times.put(SphereName.RECREATION, 42.0);
+			Map<SphereName, Double> currentRatios = new HashMap<SphereName, Double>();
+			currentRatios.put(SphereName.HEALTH, 0.019469026548672566);
+			currentRatios.put(SphereName.WORK, 0.8707964601769912);
+			currentRatios.put(SphereName.FAMILY, 0.05663716814159292);
+			currentRatios.put(SphereName.RECREATION, 0.0743362831858407);
+			double sum = 565.0;
+			Map<SphereName, Double> choices = generateSpheres(new double[]{0.1, 0.3, 0.3, 0.4});
+			try {
+				CalendarStatus start = a.checkGoals(events, choices);
+				assertTrue("Incorrect coefficient in sphere info creation",
+						start.getCoefficient() == 122035.3982300885);
+				assertTrue("Incorrect userBusyTime in sphere info creation", 
+						start.getUserBusyTime() == sum);
+				for(SphereName sn : start.getSphereResults().keySet()) {
+					SphereInfo si = start.getSphereResults().get(sn);
+					assertTrue("Sphere time incorrect in sphere info creation", 
+							si.getSphereTotalTime() == times.get(sn));
+					assertTrue("Sphere current ratio incorrect in sphere info creation", 
+							si.getCurrentRatio() == currentRatios.get(sn));
+				}
+			}
+			catch (Exception e) {
+				fail("Checking goals failed - exception thrown: " + e.getLocalizedMessage());
+			}
 		}
 
 		/* Utils */
-		private HashMap<SphereName, SphereInfo> generateSpheres(double[] values){
+		private HashMap<SphereName, SphereInfo> generateSphereInfos(double[] values){
 			SphereName[] names = SphereName.values();
 			HashMap<SphereName, SphereInfo> res = new HashMap<SphereName, SphereInfo>();
 			for(int i = 0; i < names.length; i++) {
@@ -327,7 +448,7 @@ public class Analyser {
 			return res;
 		}
 
-		private HashMap<SphereName, Double> generateSpheres2(double[] values){
+		private HashMap<SphereName, Double> generateSpheres(double[] values){
 			SphereName[] names = SphereName.values();
 			HashMap<SphereName, Double> res = new HashMap<SphereName, Double>();
 			for(int i = 0; i < names.length; i++){
@@ -337,33 +458,62 @@ public class Analyser {
 		}
 
 		private List<? extends IEvent> sampleEvents() {
-			Suggestion beginning = new RescheduleSuggestion("Begin", null, 
+			Suggestion begin = new RescheduleSuggestion("begin", null, 
 					new GregorianCalendar(2000, 3, 3, 0, 0, 0),new GregorianCalendar(2000, 3, 3, 0, 0, 0) );
-			beginning.setDeurationInterval(0, 0);
-			Suggestion end = new RescheduleSuggestion("End", null, 
+			begin.setDeurationInterval(0, 0);
+			Suggestion end = new RescheduleSuggestion("end", null, 
 					new GregorianCalendar(2000, 3, 3, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
 			end.setDeurationInterval(0, 0);
-			Suggestion s = new RescheduleSuggestion("Big health small work", null, 
+			/* Should remain a RescheduleSuggestion */
+			Suggestion s1 = new RescheduleSuggestion("reschedule 1", null, 
 					new GregorianCalendar(2000, 3, 3, 13, 0, 0),new GregorianCalendar(2000, 3, 3, 14, 45, 0) );
-			s.setSpheres(generateSpheres2(new double[]{0.7, 0.2, 0.0, 0.0}));
-			s.setDeurationInterval(30, 120);
-			s.setReschedule(true);
-			Suggestion s2 = new RescheduleSuggestion("small health", null, 
-					new GregorianCalendar(2000, 3, 3, 15, 00, 0),new GregorianCalendar(2000, 3, 3, 15, 30, 0) );
-			s2.setSpheres(generateSpheres2(new double[]{1.0, 0.0, 0.0, 0.0}));
-			s2.setDeurationInterval(0, 60);
+			s1.setSpheres(generateSpheres(new double[]{0.1, 0.3, 0.3, 0.4}));
+			s1.setDeurationInterval(30, 151);
+			s1.setReschedule(true);
+			/* Should get converted to a DeleteSuggestion */
+			Suggestion s2 = new RescheduleSuggestion("delete", null, 
+					new GregorianCalendar(2000, 3, 3, 15, 30, 0),new GregorianCalendar(2000, 3, 3, 15, 30, 0) );
+			s2.setSpheres(generateSpheres(new double[]{0.3, 0.3, 0.3, 0.1}));
+			s2.setDeurationInterval(0, 40);
 			s2.setReschedule(true);
-			Suggestion s3 = new RescheduleSuggestion("small work", null, 
-					new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 16, 40, 0) );
-			s3.setSpheres(generateSpheres2(new double[]{0.0, 1.0, 0.0, 0.0}));
-			s3.setDeurationInterval(0, 20);
+			/* Should get converted to a RescheduleSuggestion */
+			Suggestion s3 = new InsertSuggestion("reschedule 2", null, 
+					new GregorianCalendar(2000, 3, 3, 16, 00, 0),new GregorianCalendar(2000, 3, 3, 18, 30, 0) );
+			s3.setSpheres(generateSpheres(new double[]{0.0, 1.0, 0.0, 0.0}));
+			s3.setDeurationInterval(0, 170);
 			s3.setReschedule(true);
+			/* Special case - s4 and s5 fits inside s3 */
+			Suggestion s4 = new InsertSuggestion("reschedule 3", null, 
+					new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 17, 20, 0) );
+			s4.setSpheres(generateSpheres(new double[]{0.0, 1.0, 0.0, 0.0}));
+			s4.setDeurationInterval(0, 100);
+			s4.setReschedule(true);
+			Suggestion s5 = new InsertSuggestion("reschedule 4", null, 
+					new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 18, 20, 0) );
+			s5.setSpheres(generateSpheres(new double[]{0.0, 1.0, 0.0, 0.0}));
+			s5.setDeurationInterval(0, 61);
+			s5.setReschedule(true);
+			Suggestion s6 = new InsertSuggestion("reschedule 5", null, 
+					new GregorianCalendar(2000, 3, 3, 19, 30, 0),new GregorianCalendar(2000, 3, 3, 20, 20, 0) );
+			s6.setSpheres(generateSpheres(new double[]{0.0, 1.0, 0.0, 0.0}));
+			s6.setDeurationInterval(0, 60);
+			s6.setReschedule(true);
+			Suggestion s7 = new InsertSuggestion("reschedule 6", null, 
+					new GregorianCalendar(2000, 3, 3, 19, 40, 0),new GregorianCalendar(2000, 3, 3, 21, 20, 0) );
+			s7.setSpheres(generateSpheres(new double[]{0.0, 1.0, 0.0, 0.0}));
+			s7.setDeurationInterval(0, 180);
+			s7.setReschedule(false);
 			List<Suggestion> list = new LinkedList<Suggestion>();
-			list.add(s);
-			list.add(end);
-			list.add(beginning);
+			list.add(begin);
+			list.add(s1);
 			list.add(s2);
 			list.add(s3);
+			list.add(s4);
+			list.add(s5);
+			list.add(s6);
+			list.add(s7);
+			list.add(end);
+			Collections.sort(list);
 			return list;
 		}
 	}

@@ -100,8 +100,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		double maxShortening = eventDuration - eventDurationInterval.getFirst();
 		/* Work out effects of making event longer/shorter 
 		 	* e.g. [(-maxShortening) / Analyser.TRIES] tells us at what 
-		 	* time intervals we should be decreasing the duration of event
-		 */
+		 	* time intervals we should be decreasing the duration of event */
 		Pair<Double, Double> lenRes = getRatioStatus(maxLengthening / Analyser.TRIES, sphereResults, sphereInfluences);
 		Pair<Double, Double> shortRes = getRatioStatus((-maxShortening) / Analyser.TRIES, sphereResults, sphereInfluences);
 		if (lenRes.getFirst() < shortRes.getFirst()) {
