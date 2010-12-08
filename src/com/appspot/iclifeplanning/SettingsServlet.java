@@ -13,6 +13,7 @@ import com.appspot.datastore.UserDesiredLifeBalance;
 import com.appspot.datastore.UserDesiredLifeBalanceStore;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
+import com.google.appengine.repackaged.org.json.JSONArray;
 import com.google.appengine.repackaged.org.json.JSONException;
 import com.google.appengine.repackaged.org.json.JSONObject;
 
@@ -33,16 +34,24 @@ public class SettingsServlet extends HttpServlet {
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws IOException {
 
-		JSONObject settingsJSON = null;
-
 		try {
-			settingsJSON = new JSONObject(request.getReader().readLine());
+			JSONObject settingsJSON = new JSONObject(request.getReader().readLine());
 			String userID = settingsJSON.getString("userID");
 			boolean fullOpt = settingsJSON.getBoolean("fullOpt");
-			// TODO(amadurska): Get this from JSON
+			JSONArray spheres = settingsJSON.getJSONArray("spheresSettings");
 			HashMap<SphereName, Double> spherePreferences = new HashMap<SphereName, Double>();
+			JSONObject preference;
+			String sphere;
+
+			for (int i = 0 ; i < spheres.length(); i++) {
+				preference = spheres.getJSONObject(i);
+				sphere = preference.getString("name");
+				spherePreferences.put(SphereName.getSphereName(sphere), preference.getDouble("value"));
+			}
+
 			UserProfile userProfile = UserProfileStore.getUserProfile(userID);
 			userProfile.setFullyOptimized(fullOpt);
+			userProfile.setSpherePreferences(spherePreferences);
 			userProfile.makePersistent();
 			long now = Calendar.getInstance().getTimeInMillis();
 			UserDesiredLifeBalanceStore
