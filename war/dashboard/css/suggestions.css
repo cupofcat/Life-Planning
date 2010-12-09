@@ -1,0 +1,159 @@
+div#calendar_suggestions {
+	width: 100%;
+}
+
+/* Loading gif */
+div#calendar_suggestions > img {
+	margin: 0 459px;
+}
+/* ------------------ */
+div#calendar_suggestions div.id {
+	display: none;
+}
+
+div#calendar_suggestions div.sugg_set {
+	font-family: Futura;
+	disp lay: inline;
+	float: left;
+}
+
+div#sugg_set1, div#sugg_set2 {
+display: none;
+}
+
+	div#calendar_suggestions div.alter_set {
+		width: 960px;
+		margin-bottom: 10px;
+		border: 0px solid #222;
+		clear: both;
+		float: left;
+		position: relative;
+	}
+		
+		div#calendar_suggestions .remove, div#calendar_suggestions .add, div#calendar_suggestions .change {
+			float: left;
+			margin-left: 5px;
+		}
+		
+		div#calendar_suggestions .remove {
+			background-color: #440000;
+		}
+		
+		div#calendar_suggestions .add {
+			background-color: red;
+		}
+		
+		div#calendar_suggestions .change {
+			background-color: red;
+		}
+		
+			div#calendar_suggestions div.selected, div#calendar_suggestions div.unselected {
+				float: left;
+				margin-left: 20px;
+			}
+	
+				div#calendar_suggestions div.alter_back {
+					position: absolute;
+					top: 0;
+					bottom: 0;
+					z-index: 0;
+				}
+				
+				div#calendar_suggestions div.selected div.alter_back {
+					background-color: #333;
+				}
+				
+				div#calendar_suggestions div.unselected div.alter_back {
+					background-color: #1c1c1c;
+				}
+	
+				div#calendar_suggestions div.alter {
+					position: relative;
+					z-index: 1;
+					margin: 5px 5px 0 5px;
+				}
+				
+				div#calendar_suggestions div.unselected div.alter {
+					color: #333;
+				}
+		
+					div#calendar_suggestions div.left {
+					}
+			
+						div#calendar_suggestions div.title {
+							font-size: 20px;
+							text-transform: uppercase;
+						}
+				
+						div#calendar_suggestions div.datetimes {
+							font-size: 13px;
+						}
+				
+						div#calendar_suggestions div.selected div.datetimes {
+							color: #999;
+						}
+				
+						div#calendar_suggestions div.description {
+							margin-top: 10px;
+						}
+			
+					div#calendar_suggestions div.right {
+						display:none;
+					}
+			
+						div#calendar_suggestions ul.spheres {
+							margin-top: 10px;
+							list-style-type: none;
+							font-size: 12px;
+						}
+
+						div#calendar_suggestions ul.spheres > li {
+							display: inline;
+							float: left;
+							margin-right: 10px;
+						}
+
+						div#calendar_suggestions ul.spheres > li {
+							width: 48px;
+							height: 48px;
+						}
+
+						div#calendar_suggestions ul.spheres > li span {
+							display: none;
+						}
+
+						div#calendar_suggestions ul.spheres > li.health  {
+							background-image: url("health-icon.png");
+						}
+
+						div#calendar_suggestions ul.spheres > li.family  {
+							background-image: url("family-icon.png");
+						}
+
+						div#calendar_suggestions ul.spheres > li.work  {
+							background-image: url("work-icon.png");
+						}
+
+						div#calendar_suggestions ul.spheres > li.recreation  {
+							background-image: url("recreation-icon.png");
+						}
+
+/* BUTTON */
+
+div#calendar_suggestions button {
+	font-family: Futura;
+	font-size: 14px;
+	height: 40px;
+	width: 100%;
+	text-transform: uppercase;
+	background: #247da2;
+	color: white;
+	border: 0;
+	margin-top: 10px;
+	cursor: pointer;
+}
+
+div#calendar_suggestions button:hover {
+	border-top: 1px solid #333;
+	border-left: 1px solid #333;
+}

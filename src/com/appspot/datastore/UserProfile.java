@@ -76,4 +76,8 @@ public class UserProfile extends BaseDataObject {
 		}
 		return res;
 	}
+
+	public void setSpherePreferences(HashMap<SphereName, Double> spherePreferences2) {
+		spherePreferences = spherePreferences2;
+	}
 }

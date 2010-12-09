@@ -93,11 +93,12 @@ public class EventStore {
 			  events.add(event);
 		  }
         }
-		
+
 		Event firstDummyEvent = new Event(now, now);
 		Event lastDummyEvent = new Event(future, future);
 		allEvents.add(0, firstDummyEvent);
 		allEvents.add(lastDummyEvent);
-		return allEvents;	
+		
+		return allEvents;
 	}
 }

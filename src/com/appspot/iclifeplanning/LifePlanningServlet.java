@@ -94,7 +94,6 @@ public class LifePlanningServlet extends HttpServlet {
 			System.out.println(profile);
 	}
 
-
 	private HashMap<SphereName, Double> generateSpheres(double[] values){
 		SphereName[] names = SphereName.values();
 		HashMap<SphereName, Double> res = new HashMap<SphereName, Double>();
