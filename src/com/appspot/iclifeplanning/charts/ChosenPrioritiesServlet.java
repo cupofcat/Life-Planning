@@ -10,6 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.json.JSONArray;
 
+import com.appspot.datastore.SphereName;
+import com.appspot.datastore.UserProfile;
+import com.appspot.datastore.UserProfileStore;
 import com.appspot.iclifeplanning.charts.utils.DataToJSONConverter;
 
 @SuppressWarnings("serial")
@@ -20,19 +23,11 @@ public class ChosenPrioritiesServlet extends HttpServlet
 	public void doGet(HttpServletRequest request_, HttpServletResponse response_)
 			throws IOException
 	{
-
-		// TODO: replace with a call for data
-		// Assumption: numbers in the map are percentages, namely 45% is represented as 45, not 0.45.
-		// If this is not the case, notify Kamil.
-		Map<String, Object> dummy = new HashMap<String, Object>();
-		dummy.put("Kamil", 23);
-		dummy.put("Madur", 01);
-		dummy.put("Makss", 15);
-		dummy.put("Bober", 40);
-		dummy.put("Rysiu", 21);
+		String userID = request_.getParameter("userName");
+		UserProfile userProfile = UserProfileStore.getUserProfile(userID);
 		
 		// converts a map to two-dimensional array
-		JSONArray reply = DataToJSONConverter.convertMapToArray(dummy);
+		JSONArray reply = DataToJSONConverter.convertSphereMapToArray(userProfile.getSpherePreferences());
 		
 		response_.getWriter().print(reply);
 	}

@@ -1,7 +1,7 @@
 var priorities;
 
 		
-$.getJSON("chosen-priorities", function(data){
+$.getJSON("chosen-priorities", parametersForServlet, function(data){
 
 
 	priorities = new Highcharts.Chart({
@@ -19,7 +19,7 @@ $.getJSON("chosen-priorities", function(data){
 		},
 		tooltip: {
 			formatter: function() {
-				return '<b>'+ this.point.name +'</b>: '+ this.y +' %';
+				return '<b>'+ this.point.name +'</b>: '+ 100*this.y +' %';
 			}
 		},
 		// hides the "highchats.com" credits
@@ -35,7 +35,7 @@ $.getJSON("chosen-priorities", function(data){
 					formatter: function() {
 						if (this.y > 5) return this.point.name;
 					},
-					color: 'white',
+					color: 'black',
 					style: {
 						font: '13px Trebuchet MS, Verdana, sans-serif'
 					}

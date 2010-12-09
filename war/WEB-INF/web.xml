@@ -47,6 +47,15 @@ http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" version="2.5">
 		<servlet-name>PlanAchievement</servlet-name>
 		<url-pattern>/dashboard/plan-achievement</url-pattern>
 	</servlet-mapping>
+	<!-- Servlet used for adding userData, to be deleted -->
+	<servlet>
+		<servlet-name>AddUserData</servlet-name>
+		<servlet-class>com.appspot.iclifeplanning.charts.utils.AddUserDataServlet</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>AddUserData</servlet-name>
+		<url-pattern>/addUserData</url-pattern>
+	</servlet-mapping>
 	<servlet>
 		<servlet-name>ChartData</servlet-name>
 		<servlet-class>com.appspot.iclifeplanning.charts.ChartDataServlet</servlet-class>
