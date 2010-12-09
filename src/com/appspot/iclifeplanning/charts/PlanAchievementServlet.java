@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.servlet.http.HttpServlet;
@@ -14,98 +15,89 @@ import javax.servlet.http.HttpServletResponse;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.appspot.datastore.SphereName;
+import com.appspot.datastore.UserProfile;
+import com.appspot.datastore.UserProfileStore;
 import com.appspot.iclifeplanning.charts.utils.DataToJSONConverter;
+import com.appspot.iclifeplanning.charts.utils.WeeklyDataProfile;
+import com.appspot.iclifeplanning.charts.utils.WeeklyDataProfileStore;
 
 @SuppressWarnings("serial")
 // Used to get data for the pie-chart representing user's life priorities
 public class PlanAchievementServlet extends HttpServlet
 {
+	private final static int ACHIEVED = 0;
+	private final static int PLANNED = 1;
 
 	public void doGet(HttpServletRequest request_, HttpServletResponse response_)
 			throws IOException
 	{
-		// TODO: replace with a call for data
-		
-		// enables getting data for any sphere specified as a parameter in the getJSON method in JS
-		// String sphere = request_.getParameter("sphere");
-				
-		Integer[] data2a = {null, null, null, null, null, 6 , 11, 32, 110, 235, 369, 640, 
-				1005, 1436, 2063, 3057, 4618, 6444, 9822, 15468, 20434, 24126, 
-				27387, 29459, 31056, 31982, 32040, 31233, 29224, 27342, 26662, 
-				26956, 27912, 28999, 28965, 27826, 25579, 25722, 24826, 24605, 
-				24304, 23464, 23708, 24099, 24357, 24237, 24401, 24344, 23586, 
-				22380, 21004, 17287, 14747, 13076, 12555, 12144, 11009, 10950, 
-				10871, 10824, 10577, 10527, 10475, 10421, 10358, 10295, 10104};
-		
-		Integer[] data1a = {null, null, null, null, null, null, null , null , null ,null, 
-			5, 25, 50, 120, 150, 200, 426, 660, 869, 1060, 1605, 2471, 3322, 
-			4238, 5221, 6129, 7089, 8339, 9399, 10538, 11643, 13092, 14478, 
-			15915, 17385, 19055, 21205, 23044, 25393, 27935, 30062, 32049, 
-			33952, 35804, 37431, 39197, 45000, 43000, 41000, 39000, 37000, 
-			35000, 33000, 31000, 29000, 27000, 25000, 24000, 23000, 22000, 
-			21000, 20000, 19000, 18000, 18000, 17000, 16000};
-		
-		
-		int[] planned1 = null;
-		int[] planned2 = null;
-		int plan = 20000;
-		int plan2 = 15000;
-		
-		
-		/*
-		 * Sphere 1
-		 */
-		Map<String, Object> plannedMap1 = new HashMap<String, Object>();
-		plannedMap1.put("name", "Planned1");
-		planned1 = new int[data1a.length];
-		for(int i=0; i<planned1.length; i++)
+		String userID = request_.getParameter("userName");
+		UserProfile userProfile = UserProfileStore.getUserProfile(userID);
+		// Get data for all weeks
+		List<WeeklyDataProfile> listOfAllWeeks = WeeklyDataProfileStore.getUserWeeklyDataProfiles(userID);
+		// Extract names of spheres from the first week entry
+		Set<SphereName> sphereNamesSet = listOfAllWeeks.get(0).getSphereResults().keySet();
+		int numberOfSpheres = sphereNamesSet.size();
+		SphereName[] sphereNames = new SphereName[numberOfSpheres];
+		// Put names of spheres in an array
+		int pos = 0;
+		for(SphereName s : sphereNamesSet)
 		{
-			planned1[i] = plan;
+			sphereNames[pos] = s;
+			pos++;
 		}
-		plannedMap1.put("data", planned1);
-		
-		Map<String, Object> achievedMap1 = new HashMap<String, Object>();
-		achievedMap1.put("name", "Achieved1");
-		achievedMap1.put("data", data1a);
-		
-		List<Map<String, Object>> sphere1 = new ArrayList<Map<String, Object>>(3);
-		sphere1.add(plannedMap1);
-		sphere1.add(achievedMap1);
-		
-		Map<String, Object> sphere1Map = new HashMap<String, Object>();
-		sphere1Map.put("sphere", "sport");
-		sphere1Map.put("series", sphere1);
-		
-		/*
-		 * Sphere 2
-		 */
-		Map<String, Object> plannedMap2 = new HashMap<String, Object>();
-		plannedMap2.put("name", "Planned2");
-		planned2 = new int[data2a.length];
-		for(int i=0; i<planned2.length; i++)
+
+		// Three-dimensional array holding weekly data for each sphere. Data for sphere with name
+		// in sphereNames[x] is placed in spheresArray[x]
+		// second dimension distinguishes between planned and achieved data
+		Double[][][] spheresArray = new Double[numberOfSpheres][2][listOfAllWeeks.size()];
+		// Iterate through the list of weekly data and put appropriate numbers in the spheresArray
+		for(WeeklyDataProfile wdp : listOfAllWeeks)
 		{
-			planned2[i] = plan2;
+			Map<SphereName, Double> sphereResults = wdp.getSphereResults();
+			Map<SphereName, Double> desiredSphereResults = wdp.getDesiredSphereResults();
+			for(int s=0; s<numberOfSpheres; s++)
+			{
+				spheresArray[s][ACHIEVED][wdp.getWeekNumber()] = sphereResults.get(sphereNames[s]);
+				spheresArray[s][PLANNED][wdp.getWeekNumber()] = desiredSphereResults.get(sphereNames[s]);
+			}
 		}
-		plannedMap2.put("data", planned2);
 		
-		Map<String, Object> achievedMap2 = new HashMap<String, Object>();
-		achievedMap2.put("name", "Achieved2");
-		achievedMap2.put("data", data2a);
+		// Array of maps holding series that will be sent to JS
+		HashMap<String, Object>[] sphereMaps = new HashMap[numberOfSpheres];
 		
-		List<Map<String, Object>> sphere2 = new ArrayList<Map<String, Object>>(3);
-		sphere2.add(plannedMap2);
-		sphere2.add(achievedMap2);
+		for(int sphereNumber = 0; sphereNumber<numberOfSpheres; sphereNumber++)
+		{
+			HashMap<String, Object> plannedMap = new HashMap<String, Object>(2);
+			plannedMap.put("name", "Planned " + sphereNames[sphereNumber].toString());
+			plannedMap.put("pointInterval", 7 * 24 * 3600 * 1000); // one week
+			plannedMap.put("pointStart", userProfile.getJoinTime());
+			plannedMap.put("data", spheresArray[sphereNumber][PLANNED]);
+			
+			
+			HashMap<String, Object> achievedMap = new HashMap<String, Object>(2);
+			achievedMap.put("name", "Achieved " + sphereNames[sphereNumber].toString());
+			achievedMap.put("pointInterval", 7 * 24 * 3600 * 1000); // one week
+			achievedMap.put("pointStart", userProfile.getJoinTime());
+			achievedMap.put("data", spheresArray[sphereNumber][ACHIEVED]);
+			
+			// put the current map in the array of all sphere maps
+			List<Map<String, Object>> currentSphere = new ArrayList<Map<String, Object>>(2);
+			currentSphere.add(plannedMap);
+			currentSphere.add(achievedMap);
+			
+			sphereMaps[sphereNumber] = new HashMap<String, Object>(2);
+			sphereMaps[sphereNumber].put("sphereName", sphereNames[sphereNumber].toString());
+			sphereMaps[sphereNumber].put("series", currentSphere);
+		}
 		
-		Map<String, Object> sphere2Map = new HashMap<String, Object>();
-		sphere2Map.put("sphere", "family");
-		sphere2Map.put("series", sphere2);
-		
-		/*
-		 * All spheres
-		 */
-		List<Map<String, Object>> allSpheres = new ArrayList<Map<String, Object>>(5);
-		allSpheres.add(sphere1Map);
-		allSpheres.add(sphere2Map);
+		// convert the array to a list
+		List<Map<String, Object>> allSpheres = new ArrayList<Map<String, Object>>(numberOfSpheres);
+		for(int s=0; s<numberOfSpheres; s++)
+		{
+			allSpheres.add(sphereMaps[s]);
+		}
 		
 		// map of everything that is sent to the browser
 		Map<String, Object> allData = new TreeMap<String, Object>();

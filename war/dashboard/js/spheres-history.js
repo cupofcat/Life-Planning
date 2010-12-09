@@ -8,24 +8,13 @@ var masterChart,
 	detailChart;
 			
 
-$.getJSON("spheres-history", function(data){
+$.getJSON("spheres-history", parametersForServlet, function(data){
 	
 	seriesFromServer = data.series;
-				
-	for(i=0; i<seriesFromServer.length; i++)
-	{
-		tempSeries = {
-				type: seriesFromServer[i].type,
-				name: seriesFromServer[i].name,
-				pointInterval: 24 * 3600 * 1000,
-				pointStart: 1136073600000, //Date.UTC(2006, 0, 01),
-				data: seriesFromServer[i].data
-			};
-			
-			serverDataHistory.masterCharts.push(tempSeries);
-	}
+		
+	serverDataHistory.masterCharts = seriesFromServer;
 	
-					
+						
 	// make the container smaller and add a second container for the master chart
 	var $historicChart = $('#historicChart')
 		.css('position', 'relative');
@@ -36,14 +25,16 @@ $.getJSON("spheres-history", function(data){
 	var $masterContainer = $('<div id="master-container">')
 		.css({ position: 'absolute', top: 300, height: 80, width: 800 })
 		.appendTo($historicChart);
-				
+			
+	currentTime = Date.UTC(2011, 2, 14);
+	var	detailStart = currentTime - 180 * 24 * 3600 * 1000;
 			
 	// create the master chart
 	masterChart = new Highcharts.Chart({
 		chart: {
 			renderTo: 'master-container',
 			borderWidth: 0,
-			backgroundColor: null,
+			backgroundColor: '#111111', // null, // 'rgba(240, 0, 0, 1)',
 			zoomType: 'x',
 			marginTop: 0,
 			marginBottom: 20,
@@ -73,8 +64,6 @@ $.getJSON("spheres-history", function(data){
 						
 						detailChart.series[j].setData(detailData);
 					}
-					
-					
 													
 					// move the plot bands to reflect the new detail span
 					// (darker areas on the master chart)
@@ -83,24 +72,23 @@ $.getJSON("spheres-history", function(data){
 						id: 'mask-before',
 						from: Date.UTC(2000, 0, 1),
 						to: min,
-						color: 'rgba(0, 0, 0, 0.2)'
+						color: 'rgba(0, 0, 0, 1)'
 					});
+					
 					
 					xAxis.removePlotBand('mask-after');
 					xAxis.addPlotBand({
 						id: 'mask-after',
 						from: max,
 						to: Date.UTC(2030, 11, 31),
-						color: 'rgba(0, 0, 0, 0.2)'
+						color: 'rgba(0, 0, 0, 1)'
 					});
 					
 					return false;
 				}
 			}
 		},
-		title: {
-			text: 'Mark period to zoom in'
-		},
+		title: 'null',
 		xAxis: {
 			type: 'datetime',
 			showLastTickLabel: true,
@@ -110,9 +98,9 @@ $.getJSON("spheres-history", function(data){
 			// set equal to the initial zoom on the detail chart
 			plotBands: [{
 				id: 'mask-before',
-				from: Date.UTC(2006, 0, 1),
-				to: Date.UTC(2008, 7, 1),
-				color: 'rgba(0, 0, 0, 0.2)'
+				from: Date.UTC(2000, 1, 1),
+				to: detailStart,
+				color: 'rgba(0, 0, 0, 1)'
 			}],
 			title: {
 				text: null
@@ -145,8 +133,8 @@ $.getJSON("spheres-history", function(data){
 				fillColor: {
 					linearGradient: [0, 0, 0, 70],
 					stops: [
-						[0, '#4572A7'],
-						[1, 'rgba(0,0,0,0)']
+						[0, 'rgba(69, 114, 190, 0.3)'],
+						[1, 'rgba(50,50,50, 0.3)']
 					]
 				},
 				lineWidth: 1,
@@ -172,7 +160,7 @@ $.getJSON("spheres-history", function(data){
 			}
 		},
 	
-		series: serverDataHistory.masterCharts,  // tu puste?
+		series: serverDataHistory.masterCharts,
 		
 		exporting: {
 			enabled: false
@@ -180,20 +168,29 @@ $.getJSON("spheres-history", function(data){
 	}); 
 	
 	
-	var	detailStart = Date.UTC(2008, 7, 1);
+	//Date.UTC(2008, 7, 1);
 	
-	emptySeries = {
-			type: 'area',
-			pointStart: detailStart,
-			data: []
-		};
-		
-		
-	// declares template data series for the detail graph
-	templateSeries = [];
+			
+	// declares initial data series for the detail graph
+	initialDetailSeries = [];
 	for(i=0; i<serverDataHistory.masterCharts.length; i++)
 	{
-		templateSeries.push(emptySeries);
+		var detailData = [];
+		jQuery.each(masterChart.series[i].data, function(j, point) {
+		if (point.x >= detailStart) {
+			detailData.push(point.y);
+		}
+		});
+				
+		tempSeries = {
+			type: 'area',
+			name: serverDataHistory.masterCharts[i].name,
+			pointInterval : serverDataHistory.masterCharts[i].pointInterval,
+			pointStart: detailStart,
+			data: detailData
+		};
+		
+		initialDetailSeries.push(tempSeries);
 	}
 	
 	
@@ -201,7 +198,7 @@ $.getJSON("spheres-history", function(data){
 	detailChart = new Highcharts.Chart({
 		chart: {
 			marginBottom: 120,
-			marginRight: 160,
+			marginRight: 180,
 			renderTo: 'detail-container',
 			style: {
 				position: 'absolute'
@@ -211,7 +208,7 @@ $.getJSON("spheres-history", function(data){
 			enabled: false
 		},
 		title: {
-			text: 'Historical USD to EUR Exchange Rate'
+			text: 'Time spent on each sphere of your life'
 		},
 		subtitle: {
 			text: 'Select an area by dragging across the lower chart'
@@ -226,8 +223,8 @@ $.getJSON("spheres-history", function(data){
 		tooltip: {
 			formatter: function() {
 				return '<b>'+ (this.point.name || this.series.name) +'</b><br/>'+
-					Highcharts.dateFormat('%A %B %e %Y', this.x) + ':<br/>'+
-					'1 USD = '+ Highcharts.numberFormat(this.y, 2) +' EUR';
+					'Year: ' + Highcharts.dateFormat('%Y', this.x) + ', week: ' + getWeek(this.x, 4) + ':<br/>'+
+					''+ Highcharts.numberFormat(this.y*100, 0) +' %';
 			}
 		},
 		legend: {
@@ -259,9 +256,20 @@ $.getJSON("spheres-history", function(data){
 					lineWidth: 1,
 					lineColor: '#ffffff'
 				}
-			}
+			},
+			dataLabels: {
+								enabled: true,
+								formatter: function() {
+									if (this.y > 0.05) return this.point.name;
+								},
+								color: 'white',
+								style: {
+									font: '13px Trebuchet MS, Verdana, sans-serif'
+								}
+							}
+
 		},
-		series: templateSeries,
+		series: initialDetailSeries,
 		
 		exporting: {
 			enabled: false
@@ -270,20 +278,4 @@ $.getJSON("spheres-history", function(data){
 	});
 	
 	
-	// copies data from masterChart to initial detailChart
-	for(j=0; j<masterChart.series.length; j++)
-	{
-		detailChart.series[j].name = serverDataHistory.masterCharts[j].name;
-		detailChart.series[j].pointInterval= 24 * 3600 * 1000; // one day?
-		
-		var detailData = [];
-		jQuery.each(masterChart.series[j].data, function(i, point) {
-		if (point.x >= detailStart) {
-			detailData.push(point.y);
-		}
-		});
-		detailChart.series[j].setData(detailData, false);
-	}
-	
-	detailChart.redraw();
 });

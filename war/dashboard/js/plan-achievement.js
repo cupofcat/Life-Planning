@@ -9,10 +9,12 @@ var serverDataPlan = {
 		
 								
 		// gets data from the server
-		$.getJSON("plan-achievement", /*sphereOfInterest,*/ function(data){
+		$.getJSON("plan-achievement", parametersForServlet, function(data){
 			
 			 // Store data from server for future (when another sphere is chosen, no get method is required)
 			serverDataPlan.allSpheres = data.spheres;
+			
+			//alert(serverDataPlan.allSpheres[0].series[0].name),
 					
 			// Prepare settings of a chart
 			planAchievementOptions = {
@@ -21,47 +23,32 @@ var serverDataPlan = {
 					defaultSeriesType: 'line'
 				},
 				title: {
-					text: 'US and USSR nuclear stockpiles'
+					text: 'Planned vs. achieved sphere realisation'
 				},
 				subtitle: {
-					text: 'Source: <a href="http://thebulletin.metapress.com/content/c4120650912x74k7/fulltext.pdf">'+
-						'thebulletin.metapress.com</a>'
+					text: ''
 				},
 				xAxis: {
+					type: 'datetime'
 				},
 				yAxis: {
-					title: {
-						text: 'Nuclear weapon states'
-					},
+					title: null,
 					labels: {
 						formatter: function() {
-							return this.value / 1000 +'k';
+							return Highcharts.numberFormat(this.value*100, 0) +' %'; 
 						}
 					}
 				},
 				tooltip: {
 					formatter: function() {
-						return this.series.name +' produced <b>'+
-							Highcharts.numberFormat(this.y, 0, null, ' ') +'</b><br/>warheads in '+ this.x;
+						return '<b>'+ this.series.name  +'</b><br/>' +
+							'Year: ' + Highcharts.dateFormat('%Y', this.x) + ', week: ' + getWeek(this.x, 4) + ':<br/>'+
+							''+ Highcharts.numberFormat(this.y*100, 0) +' %';
 					}
 				},
 				plotOptions: {
-					area: {
-						pointStart: 1940,
-						marker: {
-							enabled: false,
-							symbol: 'circle',
-							radius: 2,
-							states: {
-								hover: {
-									enabled: true
-								}
-							}
-						}
-					},
 					line: {
-						lineWidth: 4,
-						pointStart: 1940,
+						lineWidth: 3,
 						marker: {
 							enabled: false,
 							symbol: 'circle',
@@ -87,7 +74,7 @@ var serverDataPlan = {
 			// Produce sphere buttons
 			for(i = 0; i<serverDataPlan.allSpheres.length; i++)
 			{
-				sphere = serverDataPlan.allSpheres[i].sphere;
+				sphere = serverDataPlan.allSpheres[i].sphereName;
 				
 				$('#sphereButtonsHolder').append('<button id="' + sphere + '" class="sphereButton">' + sphere + '</button>');
 			}
@@ -96,7 +83,7 @@ var serverDataPlan = {
 			function changeSphere(sphereName) {
 				for(i=0; i<serverDataPlan.allSpheres.length; i++)
 				{
-					if(serverDataPlan.allSpheres[i].sphere == sphereName)
+					if(serverDataPlan.allSpheres[i].sphereName == sphereName)
 					{
 						planAchievementOptions.series = serverDataPlan.allSpheres[i].series;
 						break;

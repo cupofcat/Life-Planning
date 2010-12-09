@@ -33,10 +33,6 @@ public class UserProfile extends BaseDataObject {
 		this.joinTime = joinTime;
 	}
 
-	public void setSpherePreferences(HashMap<SphereName, Double> spherePreferences) {
-		this.spherePreferences = spherePreferences;
-	}
-
 	public String getEmail() {
 		return email;
 	}
@@ -66,7 +62,7 @@ public class UserProfile extends BaseDataObject {
 		return joinTime;
 	}
 
-	public Map<SphereName, Double> getSpherePreferences() {
+	public HashMap<SphereName, Double> getSpherePreferences() {
 		return spherePreferences;
 	}	
 	

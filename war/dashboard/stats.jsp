@@ -46,17 +46,19 @@
       });
     </script>
 	
+	<script type="text/javascript" src="js/dateFunctions.js"></script>
 	<script type="text/javascript" src="js/highcharts-options.js"></script>
 	
+	<script type="text/javascript">
+		// to be deleted and changed for a real name (below)
+		var parametersForServlet = {"userName": "mb1"};
+		//var parametersForServlet = {"userName": "<%= request.getUserPrincipal().getName() %>"};
+	</script>
 	
 	<!-- Loads historic chart -->
 	<script type="text/javascript" src="js/chosen-priorities.js"></script>
 	<script type="text/javascript" src="js/spheres-history.js"></script>
-	<script type="text/javascript">
-		// to be deleted later on if no arguments are needed to be passed to the server while getJSON.
-		// currently not used
-		var sphereOfInterest = {"sphere": "Russia"};
-	</script>
+	
 	<script type="text/javascript" src="js/plan-achievement.js"></script>
 	
 	</head>
