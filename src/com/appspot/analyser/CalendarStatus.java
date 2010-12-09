@@ -1,9 +1,6 @@
 package com.appspot.analyser;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
@@ -15,24 +12,52 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	private double coefficient;
 	private double userBusyTime;
 	private List<CalendarStatus> alternatives;
-	private Map<SphereName, SphereInfo> sphereResults;
+	private FreeSlotsManager slotsManager;
+	private Map<SphereName, SphereInfo> sphereResults;	
+	private boolean containsProposal;
 
-	public CalendarStatus(double userBusyTime, Map<SphereName, SphereInfo> currentSphereResults) {
+	public CalendarStatus(double userBusyTime, Map<SphereName, SphereInfo> currentSphereResults, List<BaseCalendarSlot> freeSlots)  {
 		event = null;
 		this.userBusyTime = userBusyTime;
 		sphereResults = new HashMap<SphereName, SphereInfo>();
 		copySphereResults(currentSphereResults);
 		setCurrentCoefficient();
+		slotsManager = new FreeSlotsManager(freeSlots, this);
 	}
-
+	
+	public CalendarStatus(Proposal proposal, CalendarStatus other, List<BaseCalendarSlot> freeSlots, List<BaseCalendarSlot> possibleSlots)  {
+		this.userBusyTime = other.getUserBusyTime();
+		sphereResults = new HashMap<SphereName, SphereInfo>();
+		copySphereResults(other.getSphereResults());
+		coefficient = other.getCoefficient();
+		this.event = proposal;
+		recordProposal();
+		analyse();
+		slotsManager = new FreeSlotsManager(freeSlots,possibleSlots, this);
+		containsProposal = true;
+	}
+	
 	public CalendarStatus(IEvent event, CalendarStatus other) {
 		this.userBusyTime = other.getUserBusyTime();
 		sphereResults = new HashMap<SphereName, SphereInfo>();
 		copySphereResults(other.getSphereResults());
 		coefficient = other.getCoefficient();
 		this.event = event;
+		slotsManager = new FreeSlotsManager(other.getFreeSlotsManager().getFreeSlots(), this);
+		analyse();
 	}
 	
+	private void recordProposal() {
+		additionalEventTime = event.getDuration();
+		saveSphereInfos();
+		setCurrentCoefficient();
+		additionalEventTime = 0;
+	}
+
+	private FreeSlotsManager getFreeSlotsManager() {
+		return slotsManager;
+	}
+
 	private void copySphereResults(Map<SphereName, SphereInfo> currentSphereResults) {
 		for(SphereName name : currentSphereResults.keySet()){
 			SphereInfo currentInfo = currentSphereResults.get(name);
@@ -91,8 +116,16 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		return alternatives;
 	}
 
+	public CalendarStatus checkProposal(Proposal proposal){
+		return slotsManager.checkProposal(proposal);
+	}
+	
+	public boolean containsProposal() {
+		return containsProposal;
+	}
+
 	/* Update status of calendar after more optimal scheduling of the event */
-	public void analyse() {
+	private void analyse() {
 		Map<SphereName, Double> sphereInfluences = event.getSpheres();
 		Double eventDuration = event.getDuration();
 		Pair<Double, Double> eventDurationInterval = event.getDurationInterval();
@@ -111,11 +144,11 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 			coefficient = shortRes.getFirst();
 			additionalEventTime = shortRes.getSecond();
 		}
-		userBusyTime += additionalEventTime;
 		saveSphereInfos();
 	}
 
 	private void saveSphereInfos() {
+		userBusyTime += additionalEventTime;
 		Map<SphereName, Double> influences = event.getSpheres();
 		for (SphereName sphere : influences.keySet()) {
 			double extraSphereTime = influences.get(sphere) * additionalEventTime;
@@ -153,7 +186,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 
 	/* Work out which sphere is most out of line with target.
 	 * Return all spheres out of target is full optimisation */
-	public List<SphereName> hasDeficit(boolean optimize) {
+	public List<SphereName> getDeficitSpheres(boolean optimize) {
 		List<SphereName> deficits = new LinkedList<SphereName>();
 		if (optimize) {
 			for(SphereName name : SphereName.values()) {
@@ -165,12 +198,13 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 			double max = -1;
 			SphereName currentMajor = null;
 			for(SphereName name : SphereName.values()) {
-				if(sphereResults.get(name).getRatioDifference() > max){
+				if(!sphereResults.get(name).isWithinConfidenceInterval() && sphereResults.get(name).getRatioDifference() > max){
 					currentMajor = name;
 					max = sphereResults.get(currentMajor).getRatioDifference();
 				}
 			}
-			deficits.add(currentMajor);
+			if(currentMajor != null)
+				deficits.add(currentMajor);
 		}
 		return deficits;
 	}

@@ -12,128 +12,152 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.PersistenceManager;
+
 import junit.framework.TestCase;
 
 import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
+import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
+import com.google.gdata.data.PlainTextConstruct;
+import com.google.gdata.data.TextConstruct;
 
 @RunWith(Enclosed.class)
 public class Analyser {
 
 	public static final double CONFIDENCE = 0.1;
 	private static final double ALTERNATIVE = 0.3;
-	static final int TRIES = 10;
+	static final int TRIES = 20;
 	private int maxDepth = 3;
 	private int maxSuggestions = 3;
-	private Map<SphereName, List<? extends IEvent>> proposals;
+	private Map<SphereName, List<Proposal>> proposals;
+	private List<IEvent> events;
 
 	public Analyser() {
-		proposals = new HashMap<SphereName, List<? extends IEvent>>();
+		proposals = new HashMap<SphereName, List<Proposal>>();
 	}
 
 	public List<List<Suggestion>> getSuggestions(List<? extends IEvent> events, String currentUserId) throws IOException {
 		UserProfile profile = UserProfileStore.getUserProfile(currentUserId);
-		return convertToSuggestions(this.getSuggestions(events, currentUserId, profile.getSpherePreferences(), profile.isFullyOptimized()));
+		this.events = (List<IEvent>) events;
+		return convertToSuggestions(this.getSuggestions(currentUserId, profile.getSpherePreferences(), profile.isFullyOptimized()));
 	}
-
 	@SuppressWarnings("unchecked")
-	private List<List<CalendarStatus>> getSuggestions(List<? extends IEvent> externalEvents, String userID,
-			Map<SphereName, Double> spherePreferences, boolean optimizeFull) throws IOException {
-		if (externalEvents.size() == 0)
+	private List<List<CalendarStatus>> getSuggestions(String userID, Map<SphereName, Double> spherePreferences, boolean optimizeFull) throws IOException {
+		if (events.size() == 0)
 			return null;
-		List<IEvent> events = (List<IEvent>) externalEvents;
-		List<BaseCalendarSlot>[] freeSlots = getFreeSlots(events);
-		removeStaticEvents(events);
 		LinkedList<List<CalendarStatus>> result = new LinkedList<List<CalendarStatus>>();
 		CalendarStatus start = checkGoals(events, spherePreferences);
 		if (isCloseEnough(start, optimizeFull))
 			return null;
-		List<CalendarStatus> statuses = getSortedStatuses(events, start);
-		//proposals
-		/* 	1. Dodac freesloty do calendarStatus i zmiany na poziomie nowych linkedlistow
-		 * 	2. wyciagnac proposale po majorSphere
-		 * 	3  idac po proposalach, szukac freslotow z bucketow in startTime + duration
-		 * 	4. build calendarStatuses around picked proposals
-		 * 	5. (statuses) union (result from 4) 
-		 * 	6. if nextMin is proposal, store currentfreeslots somewhere and update currentStatus na nowe freesloty
-		 */
-
-
-		for (int i = 0; i < maxSuggestions || i < statuses.size(); i++) {
+		removeStaticEvents(events);
+		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, start), getProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true) );
+		for (int i = 0; result.size() < maxSuggestions && i < statuses.size(); i++) {
 			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();			
 			CalendarStatus nextMin = statuses.get(i);
+			CalendarStatus nextStatus = nextMin;
 			// best event can't improve the status
 			if (nextMin.compareTo(start) >= 0)
 				break;
-			//check neighbours for possible alternatives - run loop which won't modify i (we want i sets of proposals) - proposals
-			while(i < statuses.size()){
-				CalendarStatus next = statuses.get(i);
-				if(next.compareTo(start) < 0 || next.getCoefficient() <= nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE))
+			list.add(nextMin);
+			removeEvent(nextMin);
+			//check neighbours for possible alternatives
+			while((i+1) < statuses.size()){
+				CalendarStatus next = statuses.get(i+1);
+				if(next.compareTo(start) > 0 || next.getCoefficient() > nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE))
 					break;
 				nextMin.addAlternative(next);
-				events.remove(next.getEvent());
+				removeEvent(next);
+				//take freeSlots from first proposal
+				if(!nextStatus.containsProposal() && next.containsProposal())
+					nextStatus = next;
 				++i;
-			}
-			list.add(nextMin);
-			events.remove(nextMin.getEvent());
-			List<CalendarStatus> rest = getSuggestions(events, nextMin, optimizeFull, maxDepth);
+			}		
+			List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, maxDepth);
 			if (rest != null)
 				list.addAll(rest);
 			result.add(list);
-			events.add(nextMin.getEvent());
-			if (nextMin.hasAlternatives()) {
-				for (CalendarStatus status : nextMin.getAlternatives()) {
-					events.add(status.getEvent());
-				}
-			}
-
+			restoreEvents(nextMin);
 		}
 		return result;
 	}
 
-	private List<CalendarStatus> getSuggestions(List<IEvent> events, CalendarStatus currentStatus, boolean optimizeFull, int depth)
+	private List<CalendarStatus> getSuggestions(CalendarStatus currentStatus, boolean optimizeFull, int depth)
 	throws IOException {
-		if (isCloseEnough(currentStatus, optimizeFull) || events.size() == 0 || depth <= 0)
+		if (isCloseEnough(currentStatus, optimizeFull) || (events.size() == 0 && !haveAnyProposals()) || depth <= 0)
 			return null;
-		List<CalendarStatus> statuses = getSortedStatuses(events, currentStatus);
+		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, currentStatus), 
+				                         getProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false) );
 		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
 		CalendarStatus minimum = statuses.get(0);
+		CalendarStatus nextStatus = minimum;
 		if (minimum.compareTo(currentStatus) >= 0)
 			return null;
+		list.add(minimum);
+		removeEvent(minimum);
 		//check for alternatives again - run proposals??
 		//check neighbours for possible alternatives - run loop which won't modify i (we want i sets of proposals) - proposals
 		int i  = 1;
 		while(i < statuses.size()){
 			CalendarStatus next = statuses.get(i);
-			if(next.compareTo(currentStatus) < 0 || next.getCoefficient() <= minimum.getCoefficient()*(1+Analyser.ALTERNATIVE))
+			if(next.compareTo(currentStatus) > 0 || next.getCoefficient() > minimum.getCoefficient()*(1+Analyser.ALTERNATIVE))
 				break;
 			minimum.addAlternative(next);
-			events.remove(next.getEvent());
-			++i;
+			removeEvent(next);
+			//take freeSlots from first proposal
+			if(!nextStatus.containsProposal() && next.containsProposal())
+				nextStatus = next;
+			++i;			
 		}
-		list.add(minimum);
-		events.remove(minimum.getEvent());
-		List<CalendarStatus> rest = getSuggestions(events, minimum, optimizeFull, depth - 1);
+		List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, depth - 1);
 		if (rest != null)
 			list.addAll(rest);
-		events.add(minimum.getEvent());
-		if (minimum.hasAlternatives()) {
-			for (CalendarStatus status : minimum.getAlternatives()) {
-				events.add(status.getEvent());
-			}
-		}
+		restoreEvents(minimum);
 		return list;
 	}
+	
+	private void removeEvent(CalendarStatus status){
+		if(status.containsProposal())
+			proposals.get( ((Proposal) status.getEvent()).getMajorSphere()).remove(status.getEvent());
+		else
+			events.remove(status.getEvent());
+	}
+	
+	private void restoreEvents(CalendarStatus status){
+		if(status.containsProposal())
+			proposals.get( ((Proposal) status.getEvent()).getMajorSphere()).add((Proposal)status.getEvent());
+		else
+			events.add(status.getEvent());
+		if (status.hasAlternatives()) {
+			for (CalendarStatus alternative : status.getAlternatives()) {
+				if(alternative.containsProposal())
+					proposals.get( ((Proposal) alternative.getEvent()).getMajorSphere()).add((Proposal)alternative.getEvent());
+				else
+					events.add(alternative.getEvent());
+			}
+		}
+	}
 
+	private boolean haveAnyProposals(){
+		List<Proposal> next;
+		for(SphereName sphere : SphereName.values()){
+			next = proposals.get(sphere);
+			if(next != null && !next.isEmpty())
+				return true;
+		}
+		return false;
+	}
+	
+	
 	/* Find slots of free time in between events */
-	private List<BaseCalendarSlot>[] getFreeSlots(List<? extends IEvent> events) {
-		LinkedList<BaseCalendarSlot>[] ret = (LinkedList<BaseCalendarSlot>[]) new LinkedList[24];
+	private List<BaseCalendarSlot> getFreeSlots(List<? extends IEvent> events) {
+		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
 		Collections.sort(events);
 		System.out.println("-Free slots generation-");
 		Iterator<? extends IEvent> it = events.iterator();
@@ -144,12 +168,7 @@ public class Analyser {
 			IEvent next = it.next();
 			if (curr.getEndDate().compareTo(next.getStartDate()) < 0) {
 				BaseCalendarSlot newSlot = new BaseCalendarSlot("Free Slot", null, curr.getEndDate(), next.getStartDate());
-				int index = newSlot.getStartDate().get(Calendar.HOUR_OF_DAY);
-				LinkedList<BaseCalendarSlot> updatedList = ret[index];
-				if (updatedList == null)
-					updatedList = new LinkedList<BaseCalendarSlot>();
-				updatedList.add(newSlot);
-				ret[index] = updatedList;
+				ret.add(newSlot);
 				Pair<Double, Double> durationInterval = curr.getDurationInterval();
 				durationInterval.setSecond(Math.min(durationInterval.getSecond(), curr.getDuration() + newSlot.getDuration()));
 				curr = next;
@@ -171,15 +190,43 @@ public class Analyser {
 		return currentStatus.getCoefficient() < Math.pow(Analyser.CONFIDENCE, 2) 
 			|| (!optimizeFull && currentStatus.isWithinConfidenceInterval());
 	}
-
+	
+	private List<CalendarStatus> getProposalStatuses(List<SphereName> spheres, CalendarStatus currentStatus, boolean truncateProposals){
+		List<CalendarStatus> result = new LinkedList<CalendarStatus>();
+		PersistenceManager pmf = PMF.get().getPersistenceManager();
+		List<Proposal> cache;
+		for(SphereName sphere : spheres){
+			cache = proposals.get(sphere);
+			if(cache == null){
+				cache = new LinkedList<Proposal>();
+				Collection<Proposal> res = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute();
+				for(Proposal p : res){
+					cache.add(p);
+				}
+				
+				proposals.put(sphere, cache);
+			}
+			CalendarStatus next;
+			Iterator<Proposal> it = cache.iterator();
+			while(it.hasNext()){
+				next = currentStatus.checkProposal(it.next());
+				if(next != null)
+					result.add(next);
+				else if(truncateProposals)
+					it.remove();
+			}
+			Collections.sort(result);
+		}
+		return result;
+	}
+	
 	/* Create calendar statuses for all events, order them in terms of 
 	 * how well they match to targets for spheres (the coefficient of accuracy) */
-	private List<CalendarStatus> getSortedStatuses(List<? extends IEvent> events, CalendarStatus currentStatus) {
+	private List<CalendarStatus> generateEventStatuses(List<? extends IEvent> events, CalendarStatus currentStatus) {
 		List<CalendarStatus> result = new LinkedList<CalendarStatus>();
 		CalendarStatus newStatus;
 		for (IEvent event : events) {
 			newStatus = new CalendarStatus(event, currentStatus);
-			newStatus.analyse();
 			result.add(newStatus);
 		}
 		Collections.sort(result);
@@ -231,7 +278,8 @@ public class Analyser {
 
 	/* Work out overall sphere levels considering current events. 
 	 * Create calendar status for each event */
-	public CalendarStatus checkGoals(Collection<? extends IEvent> events, Map<SphereName, Double> choices) throws IOException {
+	public CalendarStatus checkGoals(List<? extends IEvent> events, Map<SphereName, Double> choices) throws IOException {
+		List<BaseCalendarSlot> freeSlots = getFreeSlots(events);
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
 		initializeTimes(times, choices.keySet());
 		Map<SphereName, Double> currentRatios = new HashMap<SphereName, Double>();
@@ -254,7 +302,7 @@ public class Analyser {
 			SphereInfo info = new SphereInfo(currentRatios.get(key), choices.get(key), times.get(key));
 			sphereResults.put(key, info);
 		}
-		return new CalendarStatus(sum, sphereResults);
+		return new CalendarStatus(sum, sphereResults, freeSlots);
 	}
 
 //	private void printEvents(Collection<? extends ICalendarSlot> events) {
