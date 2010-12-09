@@ -12,6 +12,7 @@ import com.google.gdata.data.calendar.CalendarEventEntry;
 import com.google.gdata.util.ServiceException;
 
 public class DeleteSuggestion extends Suggestion {
+	
 	private CalendarEventEntry event;
 
 	public DeleteSuggestion(BaseCalendarSlot slot) {
@@ -22,7 +23,6 @@ public class DeleteSuggestion extends Suggestion {
 		super(e);
 		event = e.getCalendarEvent();
 	}
-
 
 	public DeleteSuggestion(String title, String description,
 			Calendar startDate, Calendar endDate, double minDuration,
@@ -37,11 +37,11 @@ public class DeleteSuggestion extends Suggestion {
 		super(title, description, startDate, endDate);
 	}
 
- 	public String getType() {
- 		return "Remove";
- 	}
- 	
- 	protected void makePersistentInternal() {
+	public String getType() {
+		return "Remove";
+	}
+
+	protected void makePersistentInternal() {
 		try {
 			CalendarService clientCopy = CalendarUtils.client;
 			clientCopy.getRequestFactory().setHeader("If-Match", "*");
@@ -57,5 +57,4 @@ public class DeleteSuggestion extends Suggestion {
 	public CalendarEventEntry getCalendarEvent() {
 		return null;
 	}
-
 }

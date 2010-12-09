@@ -12,7 +12,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import com.appspot.analyser.Analyzer;
+import com.appspot.analyser.Analyser;
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Suggestion;
@@ -48,7 +48,7 @@ public class SuggestionServlet extends HttpServlet {
 		eventStore.initizalize();
 		List<Event> events = eventStore.getEvents();
 		// ------------------- Dummy data
-		Analyzer analyser = new Analyzer();
+		Analyser analyser = new Analyser();
 
 		//List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
 		List<List<Suggestion>> suggestions = new ArrayList<List<Suggestion>>();
@@ -58,12 +58,12 @@ public class SuggestionServlet extends HttpServlet {
 		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 
 		
-		IEvent event1 = (IEvent)events.get(0);
-		IEvent event2 = (IEvent)events.get(1);
-		IEvent event3 = (IEvent)events.get(2);
-		IEvent event4 = (IEvent)events.get(3);
-		IEvent event5 = (IEvent)events.get(4);
-		IEvent event6 = (IEvent)events.get(5);
+		IEvent event1 = (IEvent)events.get(1);
+		IEvent event2 = (IEvent)events.get(2);
+		IEvent event3 = (IEvent)events.get(3);
+		IEvent event4 = (IEvent)events.get(4);
+		IEvent event5 = (IEvent)events.get(5);
+		IEvent event6 = (IEvent)events.get(6);
 
 		Suggestion sug = new DeleteSuggestion(event1);
 		List<Suggestion> alternatives = new ArrayList<Suggestion>();
@@ -164,7 +164,6 @@ public class SuggestionServlet extends HttpServlet {
 		JSONObject suggestionsJSON = null;
 
 		try {
-			//System.out.println(request.getReader().readLine());
 			suggestionsJSON = new JSONObject(request.getReader().readLine());
 			String userID = suggestionsJSON.getString("userID");
 			int list = suggestionsJSON.getInt("setID");

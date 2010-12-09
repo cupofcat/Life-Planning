@@ -32,10 +32,8 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public Event(long startTime, long endTime) {
-		this.startDate = new GregorianCalendar();
-		startDate.setTimeInMillis(startTime);
-		this.endDate = new GregorianCalendar();
-		endDate.setTimeInMillis(endTime);
+		this.startDate = startTime;
+		this.endDate = endTime;
 	}
 
 	public String getId() {
@@ -75,7 +73,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	private boolean isKeyword(String string) {
 		return true;
 	}
-//zobaczyc czy dziala
+
 	public Map<SphereName, Double> getSpheres() {
 		Map<String, Double> tmp = UClasifier.analyse(title);
 		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
@@ -99,12 +97,12 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double minDuration() {
-		double minDuration = (endDate.getTimeInMillis() - startDate.getTimeInMillis()) / 1000 / 60;
+		double minDuration = (endDate - startDate) / 1000 / 60;
 		return minDuration;
 	}
 
 	public double maxDuration() {
-		double maxDuration = (endDate.getTimeInMillis() - startDate.getTimeInMillis()) / 1000 / 60;
+		double maxDuration = (endDate - startDate) / 1000 / 60;
 		return maxDuration;
 	}
 

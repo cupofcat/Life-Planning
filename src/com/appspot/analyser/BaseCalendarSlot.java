@@ -3,7 +3,11 @@ package com.appspot.analyser;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 
-import javax.jdo.annotations.*;
+import javax.jdo.annotations.Inheritance;
+import javax.jdo.annotations.InheritanceStrategy;
+import javax.jdo.annotations.PersistenceCapable;
+import javax.jdo.annotations.Persistent;
+import javax.jdo.annotations.PrimaryKey;
 
 import com.appspot.datastore.BaseDataObject;
 import com.google.appengine.api.datastore.Key;
@@ -14,47 +18,45 @@ import com.google.gdata.data.calendar.CalendarEventEntry;
 @PersistenceCapable
 @Inheritance(strategy = InheritanceStrategy.SUBCLASS_TABLE)
 public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
-	
+
 	@PrimaryKey
-    @Persistent
-    protected Key key;
+	@Persistent
+	protected Key key;
 	@Persistent
 	protected String title;
 	@Persistent
 	protected String description;
-	@Persistent
-	protected Calendar startDate;
-	@Persistent
-	protected Calendar endDate;
+	protected Long startDate;
+	protected Long endDate;
 	@Persistent
 	protected User user;
-	
+
 	protected BaseCalendarSlot(){
 	}
-	
+
 	public BaseCalendarSlot(CalendarEventEntry calendarEventEntry) {
-		Calendar start, end;
-		start = new GregorianCalendar();
-		end = new GregorianCalendar();
-		start.setTimeInMillis(calendarEventEntry.getTimes().get(0).getStartTime().getValue() + 60*60*1000);
-		end.setTimeInMillis(calendarEventEntry.getTimes().get(0).getEndTime().getValue() + 60*60*1000);
-		startDate = start;
-		endDate= end;
+		startDate = calendarEventEntry.getTimes().get(0).getStartTime().getValue() + 60*60*1000;
+		endDate = calendarEventEntry.getTimes().get(0).getEndTime().getValue() + 60*60*1000;
 		description = calendarEventEntry.getPlainTextContent();
 		title = calendarEventEntry.getTitle().getPlainText();
 	}
-	
+
 	public BaseCalendarSlot(Calendar startDate, Calendar endDate) {
-		this.user = user;
-		this.startDate = startDate;
-		this.endDate = endDate;
+		this.startDate = startDate.getTimeInMillis();
+		this.endDate = endDate.getTimeInMillis();
 	}
-	
+
 	public BaseCalendarSlot(String title, String description, Calendar startDate,
 			Calendar endDate) {
 		this(startDate, endDate);
 		this.title = title;
 		this.description = description;
+	}
+	
+	public BaseCalendarSlot(String title, String description, Calendar startDate,
+			Calendar endDate, User user) {
+		this(title, description, startDate, endDate);
+		this.user = user;
 	}
 
 	public String getTitle() {
@@ -74,32 +76,65 @@ public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
 	}
 
 	public Calendar getStartDate() {
-		return startDate;
+		if(startDate == null)
+			return null;
+		Calendar c = new GregorianCalendar();
+		c.setTimeInMillis(startDate);
+		return c;
 	}
 
 	public void setStartDate(Calendar startDate) {
-		this.startDate = startDate;
+		this.startDate = startDate.getTimeInMillis();
 	}
 
 	public Calendar getEndDate() {
-		return endDate;
+		if(endDate == null)
+			return null;
+		Calendar c = new GregorianCalendar();
+		c.setTimeInMillis(endDate);
+		return c;	
 	}
 
 	public void setEndDate(Calendar endDate) {
-		this.endDate = endDate;
+		this.endDate = endDate.getTimeInMillis();
 	}
 
 	public double getDuration() {
-		return (endDate.get(Calendar.DAY_OF_MONTH) - startDate.get(Calendar.DAY_OF_MONTH)) * 1440
-		+ (endDate.get(Calendar.HOUR_OF_DAY) - startDate.get(Calendar.HOUR_OF_DAY)) * 60
-		+ (endDate.get(Calendar.MINUTE) - startDate.get(Calendar.MINUTE));
+		Calendar start = getStartDate();
+		Calendar end = getEndDate();
+		return Utilities.getDuration(start, end);
 	}
 	
-	public int compareTo(ICalendarSlot slot){
-		return startDate.compareTo(slot.getStartDate());
+	public void setDuration(double minutes){
+		Calendar end = new GregorianCalendar();
+		end.setTimeInMillis(startDate + (long) minutes * 60000);
+		setEndDate(end);
 	}
-	
+
+	public int compareTo(ICalendarSlot slot) {
+		if(slot.getTitle() != null && slot.getTitle().equals("Best fit")){
+			double duration = slot.getDuration();
+			if(getDuration() < duration)
+				return -1;
+			else if (getDuration() == duration)
+				return 0;
+			return 1;
+		}
+		else{
+			Calendar start = getStartDate();
+			return start.compareTo(slot.getStartDate());
+		}
+	}
+
 	public boolean equals(Object o){
 		return ((ICalendarSlot) o).compareTo(this) == 0;
+	}
+	
+	public String toString(){
+		String ret = "";
+		ret = "Title: " + title + "  Descr: " + description + "  ";
+		if(startDate != null && endDate != null)
+			ret = ret.concat(getStartDate() + "  -  " + getEndDate());
+		return ret;
 	}
 }

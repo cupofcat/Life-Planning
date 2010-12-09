@@ -65,7 +65,11 @@ public class EventStore {
 		Event event;
 		List<CalendarEventEntry> allCalendarEvents;
 
-        for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
+		// temporary default values. Should really be set by user through UI
+		long now = System.currentTimeMillis();
+		long future = now + (long)30*24*60*60*1000;//2592000000l; // month in miliseconds
+        
+		for (int i = 0; i < calendarResultFeed.getEntries().size(); i++) {
           calendarEntry = calendarResultFeed.getEntries().get(i);
 	  	  eventFeedLink = calendarEntry.getLink( "http://schemas.google.com/gCal/2005#eventFeed", null);
 		  eventFeedUrl = new URL(eventFeedLink.getHref());
@@ -88,11 +92,12 @@ public class EventStore {
 			  event = new Event(allCalendarEvents.get(j));
 			  events.add(event);
 		  }
-		  Event firstDummyEvent = new Event(now, now);
-		  Event lastDummyEvent = new Event(future, future);
-		  allEvents.add(0, firstDummyEvent);
-		  allEvents.add(lastDummyEvent);
         }
-		return events;
+		
+		Event firstDummyEvent = new Event(now, now);
+		Event lastDummyEvent = new Event(future, future);
+		allEvents.add(0, firstDummyEvent);
+		allEvents.add(lastDummyEvent);
+		return allEvents;	
 	}
 }
