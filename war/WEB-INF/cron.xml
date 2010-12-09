@@ -5,4 +5,9 @@
     <description>Send notifications to users every day</description>
     <schedule>every day 00:00</schedule>
   </cron>
+  <cron>
+    <url>/dashboard/chart-data</url>
+    <description>Create statistics about users every week</description>
+    <schedule>every sunday 00:00</schedule>
+  </cron>
 </cronentries>
