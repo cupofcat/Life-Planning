@@ -3,6 +3,7 @@ package com.appspot.iclifeplanning;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,9 +14,13 @@ import com.appspot.datastore.UserDesiredLifeBalance;
 import com.appspot.datastore.UserDesiredLifeBalanceStore;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
+import com.appspot.iclifeplanning.authentication.AuthService;
+import com.appspot.iclifeplanning.authentication.CalendarUtils;
+import com.appspot.iclifeplanning.events.EventStore;
 import com.google.appengine.repackaged.org.json.JSONArray;
 import com.google.appengine.repackaged.org.json.JSONException;
 import com.google.appengine.repackaged.org.json.JSONObject;
+import com.google.apphosting.api.UserServicePb.UserService;
 
 /**
  * Settings servlet. 
@@ -28,7 +33,26 @@ public class SettingsServlet extends HttpServlet {
 	
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-
+		JSONObject result = new JSONObject();
+		String userID = AuthService.getAuthServiceInstance().getCurrentUserId();
+		try {
+			UserProfile up = UserProfileStore.getUserProfile(userID);
+			HashMap<SphereName, Double> preferences = up.getSpherePreferences();
+			JSONArray preferencesArray = new JSONArray();
+			JSONObject pref;
+			for (Entry e : preferences.entrySet()) {
+				pref = new JSONObject();
+				pref.put("name",((String) e.getKey()).toLowerCase());
+				pref.put("value",(Double)e.getValue());
+				preferencesArray.put(pref);
+			}
+			result.put("userID", userID);
+			result.put("fullOpt", up.wantsFullOpt());
+			result.put("spheresSettings", preferencesArray);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		response.getWriter().print(result);
 	}
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -46,7 +70,7 @@ public class SettingsServlet extends HttpServlet {
 			for (int i = 0 ; i < spheres.length(); i++) {
 				preference = spheres.getJSONObject(i);
 				sphere = preference.getString("name");
-				spherePreferences.put(SphereName.getSphereName(sphere), preference.getDouble("value"));
+				spherePreferences.put(SphereName.getSphereName(sphere), (preference.getDouble("value"))/100);
 			}
 
 			UserProfile userProfile = UserProfileStore.getUserProfile(userID);

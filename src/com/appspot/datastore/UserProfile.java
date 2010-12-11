@@ -80,4 +80,8 @@ public class UserProfile extends BaseDataObject {
 	public void setSpherePreferences(HashMap<SphereName, Double> spherePreferences2) {
 		spherePreferences = spherePreferences2;
 	}
+
+	public boolean wantsFullOpt(){
+		return fullyOptimized;
+	}
 }
