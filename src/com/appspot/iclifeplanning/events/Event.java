@@ -102,7 +102,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double maxDuration() {
-		double maxDuration = (endDate - startDate) / 1000 / 60;
+		double maxDuration = ((endDate - startDate) / 1000 / 60) + 60;
 		return maxDuration;
 	}
 

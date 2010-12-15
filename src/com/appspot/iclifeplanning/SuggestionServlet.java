@@ -50,7 +50,8 @@ public class SuggestionServlet extends HttpServlet {
 		// ------------------- Dummy data
 		Analyser analyser = new Analyser();
 
-		//List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId(), true);
+		List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
+		/*
 		List<List<Suggestion>> suggestions = new ArrayList<List<Suggestion>>();
 		suggestions.add(new ArrayList<Suggestion>());
 		suggestions.add(new ArrayList<Suggestion>());
@@ -91,7 +92,7 @@ public class SuggestionServlet extends HttpServlet {
 		suggestions.get(2).add(sug);
 
 		suggestions.get(2).add(new DeleteSuggestion(event5));
-		suggestions.get(2).add(new DeleteSuggestion(event6));
+		suggestions.get(2).add(new DeleteSuggestion(event6));*/
 		// ------------------- Dummy data
 		JSONArray suggestionArray = new JSONArray();
 		List<Suggestion> s;

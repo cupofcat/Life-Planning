@@ -96,9 +96,8 @@ public class EventStore {
 
 		Event firstDummyEvent = new Event(now, now);
 		Event lastDummyEvent = new Event(future, future);
-		allEvents.add(0, firstDummyEvent);
-		allEvents.add(lastDummyEvent);
-		
-		return allEvents;
+		events.add(0, firstDummyEvent);
+		events.add(lastDummyEvent);
+		return events;
 	}
 }

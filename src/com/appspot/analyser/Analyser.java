@@ -25,8 +25,6 @@ import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
-import com.google.gdata.data.PlainTextConstruct;
-import com.google.gdata.data.TextConstruct;
 
 @RunWith(Enclosed.class)
 public class Analyser {
@@ -240,6 +238,7 @@ public class Analyser {
 		while (it.hasNext()) {
 			listSuggestions.add(convert(it.next()));
 		}
+		System.out.println("Returning suggestions: " + listSuggestions.size());
 		return listSuggestions;
 	}
 
