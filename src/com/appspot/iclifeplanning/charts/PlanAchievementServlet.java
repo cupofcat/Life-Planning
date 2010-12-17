@@ -34,8 +34,18 @@ public class PlanAchievementServlet extends HttpServlet
 	{
 		String userID = request_.getParameter("userName");
 		UserProfile userProfile = UserProfileStore.getUserProfile(userID);
+		if(userProfile==null)
+		{
+			response_.getWriter().print("User profile unavailable");
+			return;
+		}
+		
 		// Get data for all weeks
 		List<WeeklyDataProfile> listOfAllWeeks = WeeklyDataProfileStore.getUserWeeklyDataProfiles(userID);
+		if(listOfAllWeeks==null)
+		{
+			return;
+		}
 		// Extract names of spheres from the first week entry
 		Set<SphereName> sphereNamesSet = listOfAllWeeks.get(0).getSphereResults().keySet();
 		int numberOfSpheres = sphereNamesSet.size();
