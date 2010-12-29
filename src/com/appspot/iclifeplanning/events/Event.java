@@ -1,6 +1,5 @@
 package com.appspot.iclifeplanning.events;
 
-import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -98,7 +97,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	public double minDuration() {
 		double minDuration = (endDate - startDate) / 1000 / 60;
-		return minDuration;
+		return 0;
 	}
 
 	public double maxDuration() {
@@ -111,7 +110,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public Pair<Double, Double> getDurationInterval() {
-		return new Pair(minDuration(), maxDuration());
+		return new Pair<Double, Double>(minDuration(), maxDuration());
 	}
 
 	public CalendarEventEntry getCalendarEvent() {

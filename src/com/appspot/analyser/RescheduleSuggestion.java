@@ -9,7 +9,6 @@ import java.util.Map;
 import com.appspot.datastore.SphereName;
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.google.gdata.data.DateTime;
-import com.google.gdata.data.PlainTextConstruct;
 import com.google.gdata.data.calendar.CalendarEventEntry;
 import com.google.gdata.util.ServiceException;
 
@@ -41,8 +40,18 @@ public class RescheduleSuggestion extends Suggestion {
 		event = e.getCalendarEvent();
 	}
 
+	public RescheduleSuggestion(IEvent e) {
+		super(e);
+		event = e.getCalendarEvent();
+		setNewDates(e.getStartDate().getTimeInMillis(), e.getEndDate().getTimeInMillis()+ (long)60*60*1000);
+	}
+
 	public void setNewDates(long newStart, long newEnd){
 		newDates = new Pair<Long, Long>(newStart, newEnd);
+	}
+
+	public Pair<Long, Long> getNewDates(){
+		return newDates;
 	}
 
 	public String getType() {
@@ -50,7 +59,6 @@ public class RescheduleSuggestion extends Suggestion {
 	}
 
 	protected void makePersistentInternal() {
-		event.setTitle(new PlainTextConstruct("Rescheduling!"));
 		event.getTimes().get(0).setStartTime(new DateTime(newDates.getFirst()));
 		event.getTimes().get(0).setEndTime(new DateTime(newDates.getSecond()));
 		URL editUrl;

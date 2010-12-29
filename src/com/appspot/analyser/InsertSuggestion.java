@@ -38,7 +38,7 @@ public class InsertSuggestion extends Suggestion {
 	}
 
 	public String getType() {
-		return "New Event";
+		return "NewEvent";
 	}
 
 	protected void makePersistentInternal() {

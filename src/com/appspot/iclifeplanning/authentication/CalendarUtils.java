@@ -146,20 +146,22 @@ public class CalendarUtils {
 	public static void setUpIfNewUser() {
 		UserService userService = UserServiceFactory.getUserService();
 		User user = userService.getCurrentUser();
-		String id = user.getUserId();
-		PersistenceManager pm = PMF.get().getPersistenceManager();
-		Query query = pm.newQuery("SELECT userID FROM " + UserProfile.class.getName());
-		List<String> userIDs = (List<String>) query.execute();
-		
-		if (!contains(userIDs, id)) {
-			HashMap<SphereName, Double> spherePreferences = new HashMap<SphereName, Double>();
-			for (SphereName s : SphereName.values()) {
-				spherePreferences.put(s, s.defaultValue());
+		if (user != null) {
+			String id = user.getUserId();
+			PersistenceManager pm = PMF.get().getPersistenceManager();
+			Query query = pm.newQuery("SELECT userID FROM " + UserProfile.class.getName());
+			List<String> userIDs = (List<String>) query.execute();
+			
+			if (!contains(userIDs, id)) {
+				HashMap<SphereName, Double> spherePreferences = new HashMap<SphereName, Double>();
+				for (SphereName s : SphereName.values()) {
+					spherePreferences.put(s, s.defaultValue());
+				}
+				UserProfile newProfile 
+				    = new UserProfile(id, user.getNickname(), user.getEmail(), 
+				    		spherePreferences, true, Calendar.getInstance().getTimeInMillis());
+				newProfile.makePersistent();
 			}
-			UserProfile newProfile 
-			    = new UserProfile(id, user.getNickname(), user.getEmail(), 
-			    		spherePreferences, true, Calendar.getInstance().getTimeInMillis());
-			newProfile.makePersistent();
 		}
 	}
 

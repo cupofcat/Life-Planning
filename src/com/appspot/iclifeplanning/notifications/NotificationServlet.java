@@ -12,12 +12,16 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.appspot.analyser.Analyser;
+import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.TokenStore;
+import com.appspot.datastore.UserProfile;
 import com.appspot.iclifeplanning.authentication.AuthService;
-import com.appspot.iclifeplanning.notifications.MailService.MessageType;
+import com.appspot.iclifeplanning.events.Event;
+import com.appspot.iclifeplanning.events.EventStore;
 import com.google.appengine.api.users.User;
 
 /**
@@ -33,33 +37,35 @@ public class NotificationServlet extends HttpServlet {
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
-		/*
+		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		// Does this work?
-	    Set<Email> emails = (Set<Email>) pm.getManagedObjects(Email.class);
+	    Set<UserProfile> profiles = (Set<UserProfile>) pm.getManagedObjects(UserProfile.class);
 	    MailService ms = new MailService();
 		
-		for (Email em : emails) {
-			String sessionToken = TokenStore.getToken(em.getID());
-			String emailAddress = em.getEmail();
-			
+		for (UserProfile profile : profiles) {
+			String sessionToken = TokenStore.getToken(profile.getUserID());
+			String emailAddress = profile.getEmail();
+			EmailContent content;
 		    if (sessionToken != null) {
 		      AuthService.getAuthServiceInstance().registerToken(sessionToken);
 		      
-		      // Set the session token as a field of the Service object. Since a new
-		      // Service object is created with each get call, we don't need to
-		      // worry about the anonymous token being used by other users.
+		      // Set the session token as a field of the Service object.
 		      AuthService.client.setAuthSubToken(sessionToken);
-		      
-		      // TODO(amadurska): Check for new events
-		      // TODO(amadurska): Send e-mail with notification
-		      ms.sendEmail(emailAddress, MessageType.NOTIFICATION);
+		      List<Event> events = EventStore.getInstance().getEvents();
+		      Analyser analyser = new Analyser();
+		      List<List<Suggestion>> suggestions 
+		          = analyser.getSuggestions(events, profile.getUserID());
+		      HashMap<SphereName, Double> desiredLifeBalance 
+		          = profile.getSpherePreferences();
+		      HashMap<SphereName, Double> currentLifeBalance 
+		          = Analyser.analyseEvents(events, desiredLifeBalance);
+		      content = new NotificationEmailContent(suggestions, 
+		    		  desiredLifeBalance, currentLifeBalance, profile.getName());
 		    } else {
-		      ms.sendEmail(emailAddress, MessageType.TOKEN_ERROR);
-		      // TODO(amadurska): Send e-mail to re-enable our application
+		    	content = new ErrorEmailContent(ErrorEmailContent.TOKEN_PROBLEM);
 		    }
-		}*/
-		MailService ms = new MailService();
-		ms.sendEmail("amadurska@gmail.com", MessageType.TOKEN_ERROR);
+		    ms.sendEmail(emailAddress, content);
+		}
 	}
 }

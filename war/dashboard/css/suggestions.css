@@ -30,7 +30,7 @@ display: none;
 		position: relative;
 	}
 		
-		div#calendar_suggestions .remove, div#calendar_suggestions .add, div#calendar_suggestions .change {
+		div#calendar_suggestions .remove, div#calendar_suggestions .newevent, div#calendar_suggestions .reschedule {
 			float: left;
 			margin-left: 5px;
 		}

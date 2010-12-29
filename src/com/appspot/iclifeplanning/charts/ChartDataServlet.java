@@ -13,6 +13,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.appspot.analyser.Analyser;
 import com.appspot.analyser.IEvent;
 import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereName;
@@ -60,7 +61,7 @@ public class ChartDataServlet extends HttpServlet {
 			List<Event> events = EventStore.getInstance().getEventsFromTimeRange(startTime, endTime);
 			if (events != null) {
 				System.out.println("Saving data");
-				HashMap<SphereName, Double> sphereResults = analyseEvents(userID, events, currentDesiredBalance);
+				HashMap<SphereName, Double> sphereResults = Analyser.analyseEvents(events, currentDesiredBalance);
 				WeeklyDataProfile profile = new WeeklyDataProfile(userID, weekNumber, sphereResults, currentDesiredBalance);
 				WeeklyDataProfileStore.addWeeklyDataProfile(profile);
 			}
@@ -68,6 +69,7 @@ public class ChartDataServlet extends HttpServlet {
 		weekNumber++;
 	}
 
+	/*
 	private HashMap<SphereName, Double> analyseEvents(String userID,
 			    List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
@@ -90,7 +92,7 @@ public class ChartDataServlet extends HttpServlet {
 		}
 
 		return result;
-	}
+	}*/
 
 	private void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
 		for (SphereName key : keys)

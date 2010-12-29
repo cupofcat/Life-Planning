@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.appspot.analyser.Analyser;
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
+import com.appspot.analyser.RescheduleSuggestion;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.TokenStore;
@@ -51,6 +52,7 @@ public class SuggestionServlet extends HttpServlet {
 		Analyser analyser = new Analyser();
 
 		List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
+		//System.out.println("Returning suggestions for list 1: " +  suggestions.get(0).size());
 		/*
 		List<List<Suggestion>> suggestions = new ArrayList<List<Suggestion>>();
 		suggestions.add(new ArrayList<Suggestion>());
@@ -66,7 +68,7 @@ public class SuggestionServlet extends HttpServlet {
 		IEvent event5 = (IEvent)events.get(5);
 		IEvent event6 = (IEvent)events.get(6);
 
-		Suggestion sug = new DeleteSuggestion(event1);
+		Suggestion sug = new RescheduleSuggestion(event1);
 		List<Suggestion> alternatives = new ArrayList<Suggestion>();
 		alternatives.add(new DeleteSuggestion(event4));
 		alternatives.add(new DeleteSuggestion(event5));
@@ -125,6 +127,7 @@ public class SuggestionServlet extends HttpServlet {
 		JSONArray suggestionArray = new JSONArray();
 		Suggestion alternativeSuggestion;
 		List<Suggestion> alternativeSuggestions = suggestion.getAlternativeSuggestions();
+		SimpleDateFormat date = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
 		suggestionArray.put(suggestionToJSONObject(suggestion));
 		for (int j = 0; j < alternativeSuggestions.size(); j++) {
 			alternativeSuggestion = alternativeSuggestions.get(j);
@@ -180,7 +183,9 @@ public class SuggestionServlet extends HttpServlet {
 				suggestionJSON = acceptedSuggestions.getJSONArray(i);
 				suggestion = (Integer) suggestionJSON.get(0);
 				alternative = (Integer) suggestionJSON.get(1);
-				suggestions.get(list).get(suggestion).makePersistent(alternative);
+				List<Suggestion> l = suggestions.get(list);
+				Suggestion s = l.get(suggestion);
+				s.makePersistent(alternative);
 			}
 		} catch (JSONException e) {
 			System.out.println("Badly formatted JSON!");

@@ -25,6 +25,7 @@ import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
+import com.appspot.iclifeplanning.events.Event;
 
 @RunWith(Enclosed.class)
 public class Analyser {
@@ -238,7 +239,6 @@ public class Analyser {
 		while (it.hasNext()) {
 			listSuggestions.add(convert(it.next()));
 		}
-		System.out.println("Returning suggestions: " + listSuggestions.size());
 		return listSuggestions;
 	}
 
@@ -314,7 +314,7 @@ public class Analyser {
 //		+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
 //	}
 
-	private void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
+	private static void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
 		for (SphereName key : keys)
 			times.put(key, 0.0);
 	}
@@ -414,4 +414,29 @@ public class Analyser {
 			return list;
 		}
 	}
+
+	public static HashMap<SphereName, Double> analyseEvents(
+		    List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
+		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
+		initializeTimes(times, currentDesiredBalance.keySet());
+		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
+		int sum = 0;
+	
+		for (IEvent event : events) {
+			double durationInMins = event.getDuration();
+			Map<SphereName, Double> sphereResults = event.getSpheres();
+			Set<SphereName> keys = sphereResults.keySet();
+			for (SphereName key : keys) {
+				double time = Math.round(sphereResults.get(key) * durationInMins);
+				times.put(key, times.get(key) + time);
+			}
+			sum += durationInMins;
+		}
+
+		for (SphereName key : times.keySet()) {
+			result.put(key, times.get(key) / sum);
+		}
+	
+		return result;
+    }
 }

@@ -4,13 +4,13 @@ public enum SphereName {
 	HEALTH {
 		@Override
 		public Double defaultValue() {
-			return 0.2;
+			return 0.25;
 		}
 	}, 
 	WORK {
 		@Override
 		public Double defaultValue() {
-			return 0.4;
+			return 0.25;
 		}
 	}, 
 	FAMILY {
@@ -22,7 +22,7 @@ public enum SphereName {
 	RECREATION {
 		@Override
 		public Double defaultValue() {
-			return 0.15;
+			return 0.25;
 		}
 	};
 

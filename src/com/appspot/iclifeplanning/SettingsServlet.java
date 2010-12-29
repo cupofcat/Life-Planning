@@ -15,12 +15,9 @@ import com.appspot.datastore.UserDesiredLifeBalanceStore;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
 import com.appspot.iclifeplanning.authentication.AuthService;
-import com.appspot.iclifeplanning.authentication.CalendarUtils;
-import com.appspot.iclifeplanning.events.EventStore;
 import com.google.appengine.repackaged.org.json.JSONArray;
 import com.google.appengine.repackaged.org.json.JSONException;
 import com.google.appengine.repackaged.org.json.JSONObject;
-import com.google.apphosting.api.UserServicePb.UserService;
 
 /**
  * Settings servlet. 
