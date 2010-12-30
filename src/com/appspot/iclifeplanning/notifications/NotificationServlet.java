@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import javax.jdo.Query;
 import javax.jdo.PersistenceManager;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -40,7 +41,8 @@ public class NotificationServlet extends HttpServlet {
 		
 		PersistenceManager pm = PMF.get().getPersistenceManager();
 		// Does this work?
-	    Set<UserProfile> profiles = (Set<UserProfile>) pm.getManagedObjects(UserProfile.class);
+	    Query query = pm.newQuery("SELECT FROM " + UserProfile.class.getName());
+	    Collection<UserProfile> profiles = (Collection<UserProfile>) query.execute();
 	    MailService ms = new MailService();
 		
 		for (UserProfile profile : profiles) {
