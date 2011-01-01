@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.jdo.PersistenceManager;
 
@@ -37,7 +38,8 @@ public class Analyser {
 	private int maxSuggestions = 3;
 	private Map<SphereName, List<Proposal>> proposals;
 	private List<IEvent> events;
-
+	private static final Logger log = Logger.getLogger("EventStore");
+	
 	public Analyser() {
 		proposals = new HashMap<SphereName, List<Proposal>>();
 	}
@@ -418,7 +420,8 @@ public class Analyser {
 	public static HashMap<SphereName, Double> analyseEvents(
 		    List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
-		initializeTimes(times, currentDesiredBalance.keySet());
+		for (SphereName key : currentDesiredBalance.keySet())
+			times.put(key, 0.0);
 		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
 		int sum = 0;
 	
@@ -429,6 +432,7 @@ public class Analyser {
 			for (SphereName key : keys) {
 				double time = Math.round(sphereResults.get(key) * durationInMins);
 				times.put(key, times.get(key) + time);
+				log.severe(key.name() + ": " + (times.get(key) + time));
 			}
 			sum += durationInMins;
 		}

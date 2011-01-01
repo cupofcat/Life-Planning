@@ -8,8 +8,9 @@ import com.appspot.datastore.SphereName;
 public class Utilities {
 
 	public static double getDuration(Calendar start, Calendar end) {
-		return (end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH)) * 1440
-				+ (end.get(Calendar.HOUR_OF_DAY) - start.get(Calendar.HOUR_OF_DAY)) * 60 + (end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE));
+		return (end.getTimeInMillis() - start.getTimeInMillis()) / 1000 / 60;
+		//return (end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH)) * 1440
+			//	+ (end.get(Calendar.HOUR_OF_DAY) - start.get(Calendar.HOUR_OF_DAY)) * 60 + (end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE));
 	}
 
 	public static Calendar min(Calendar c1, Calendar c2) {

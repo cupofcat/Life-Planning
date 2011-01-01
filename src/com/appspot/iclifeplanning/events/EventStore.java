@@ -54,6 +54,7 @@ public class EventStore {
 		try {
 			calendarResultFeed = CalendarUtils.client.getFeed(calendarFeedUrl, CalendarFeed.class);
 		} catch (ServiceException e) {
+			log.severe("SERVICE EXCEPTION: " + e.getStackTrace());
 			return null;
 		}
 

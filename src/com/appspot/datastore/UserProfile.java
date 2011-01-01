@@ -24,11 +24,11 @@ public class UserProfile extends BaseDataObject {
 	@Persistent
 	private Long joinTime;
 
-	public UserProfile(String userID, String nickname, String email, 
+	public UserProfile(String userID, String name, String email, 
 			HashMap<SphereName, Double> spherePreferences, boolean fullyOptimized, long joinTime) {
 		super();
 		this.userID = userID;
-		this.nickname = nickname;
+		this.nickname = name;
 		this.email = email;
 		this.spherePreferences = spherePreferences;
 		this.fullyOptimized = fullyOptimized;

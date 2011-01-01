@@ -21,9 +21,9 @@ import com.appspot.datastore.SphereName;
 import com.appspot.datastore.TokenStore;
 import com.appspot.datastore.UserProfile;
 import com.appspot.iclifeplanning.authentication.AuthService;
+import com.appspot.iclifeplanning.authentication.CalendarUtils;
 import com.appspot.iclifeplanning.events.Event;
 import com.appspot.iclifeplanning.events.EventStore;
-import com.google.appengine.api.users.User;
 
 /**
  * Notification servlet. Responsible for checking for new events in
@@ -53,15 +53,17 @@ public class NotificationServlet extends HttpServlet {
 		      AuthService.getAuthServiceInstance().registerToken(sessionToken);
 		      
 		      // Set the session token as a field of the Service object.
-		      AuthService.client.setAuthSubToken(sessionToken);
-		      List<Event> events = EventStore.getInstance().getEvents();
-		      Analyser analyser = new Analyser();
-		      List<List<Suggestion>> suggestions 
-		          = analyser.getSuggestions(events, profile.getUserID());
+		      CalendarUtils.client.setAuthSubToken(sessionToken);
+		      EventStore eventStore = EventStore.getInstance();
+		      eventStore.initizalize();
+		      List<Event> events = eventStore.getEvents();
+		      //Analyser analyser = new Analyser();
+		      List<List<Suggestion>> suggestions = null;
+		          //= analyser.getSuggestions(events, profile.getUserID());
 		      HashMap<SphereName, Double> desiredLifeBalance 
 		          = profile.getSpherePreferences();
 		      HashMap<SphereName, Double> currentLifeBalance 
-		          = Analyser.analyseEvents(events, desiredLifeBalance);
+		          = Analyser.analyseEvents(events.subList(1, events.size()-2), desiredLifeBalance);
 		      content = new NotificationEmailContent(suggestions, 
 		    		  desiredLifeBalance, currentLifeBalance, profile.getName());
 		    } else {

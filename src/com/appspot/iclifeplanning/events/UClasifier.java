@@ -7,7 +7,6 @@ import java.util.Map;
 
 import com.google.code.uclassify.client.UClassifyClient;
 import com.google.code.uclassify.client.UClassifyClientFactory;
-import com.google.gdata.data.TextConstruct;
 import com.uclassify.api._1.responseschema.Classification;
 import com.uclassify.api._1.responseschema.Class;
 

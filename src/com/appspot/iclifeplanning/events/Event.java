@@ -95,9 +95,13 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		return isRecurring;
 	}
 
+	public double getDurationInMinutes() {
+		return (endDate - startDate) / 1000 / 60;
+	}
+
 	public double minDuration() {
 		double minDuration = (endDate - startDate) / 1000 / 60;
-		return 0;
+		return minDuration;
 	}
 
 	public double maxDuration() {

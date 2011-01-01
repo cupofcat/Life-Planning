@@ -22,6 +22,7 @@ public class NotificationEmailContent implements EmailContent {
     	this.suggestions = suggestions;
     	this.desiredLifeBalance = desiredLifeBalance;
     	this.currentLifeBalance = currentLifeBalance;
+    	this.userName = userName;
     }
 
     public boolean isEmpty() {
@@ -29,29 +30,29 @@ public class NotificationEmailContent implements EmailContent {
     }
 
     public String toString() {
-    	String title = "Hi " + userName + "!\n";
+    	String title = "Hi " + userName + "!\n\n";
     	String openingLine = "This is a regular update from your Life Planning utility.";
-    	String headerCurrent = "Your current life balance is: \n";
+    	String headerCurrent = "Your current life balance is: \n\n";
     	String currentLifeBalanceDescription = "";
     	for (Entry<SphereName, Double> sphere : currentLifeBalance.entrySet()) {
     		currentLifeBalanceDescription += sphere.getKey().toString();
     		currentLifeBalanceDescription += ": ";
-    		currentLifeBalanceDescription += sphere.getValue().toString();
+    		currentLifeBalanceDescription += (int)(sphere.getValue() * 100);
     		currentLifeBalanceDescription += "%\n";
     	}
     	currentLifeBalanceDescription += "\n";
     	
-    	String headerDesired = "Your desired life balance is: \n";
+    	String headerDesired = "Your desired life balance is: \n\n";
     	String desiredLifeBalanceDescription = "";
     	for (Entry<SphereName, Double> sphere : desiredLifeBalance.entrySet()) {
     		desiredLifeBalanceDescription += sphere.getKey().toString();
     		desiredLifeBalanceDescription += ": ";
-    		desiredLifeBalanceDescription += sphere.getValue().toString();
+    		desiredLifeBalanceDescription += (int)(sphere.getValue() * 100);
     		desiredLifeBalanceDescription += "%\n";
     	}
     	desiredLifeBalanceDescription += "\n";
     	
-    	String headerSuggestions = "Here are some of our suggestions how to improve: \n";
+    	String headerSuggestions = "Here are some of our suggestions how to improve: \n\n";
     	//TODO(amadurska): Describe suggestions (should have toString implemented?
     	
     	String headerGreetings = "Have an optimized day!\n";
