@@ -45,7 +45,6 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	private void parseKeywords(String title) {
 		String[] words = title.split("[\\s]+");
-		
 		for(int i = 0; i < words.length; i++) {
 			if (isKeyword(words[i])) {
 				keywords.add(words[i]);
