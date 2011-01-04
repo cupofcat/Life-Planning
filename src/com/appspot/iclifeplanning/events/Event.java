@@ -74,6 +74,8 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public Map<SphereName, Double> getSpheres() {
+		if(title == null) return null;
+		System.out.println("title: " + title);
 		Map<String, Double> tmp = UClasifier.analyse(title);
 		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
 		for(String key : tmp.keySet()){		
@@ -101,7 +103,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	public double minDuration() {
 		double minDuration = (endDate - startDate) / 1000 / 60;
-		return minDuration;
+		return 0;
 	}
 
 	public double maxDuration() {
