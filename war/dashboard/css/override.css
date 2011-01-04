@@ -7,6 +7,11 @@ div#header-long {
 	height: 100px;
 }
 
+div#logo h1 {
+	margin-top: 22px;
+	font-size: 26px;
+}
+
 div#menu {
 	width: 430px;
 }
