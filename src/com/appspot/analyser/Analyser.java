@@ -159,7 +159,7 @@ public class Analyser {
 	/* Find slots of free time in between events */
 	private List<BaseCalendarSlot> getFreeSlots(List<? extends IEvent> events) {
 		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
-		Collections.sort(events);
+		//Collections.sort(events);
 		System.out.println("-Free slots generation-");
 		Iterator<? extends IEvent> it = events.iterator();
 		IEvent beginning = it.next();
@@ -182,7 +182,7 @@ public class Analyser {
 				}
 			}
 		}
-		it.remove();		
+		it.remove();	
 		return ret;
 	}
 
@@ -287,7 +287,8 @@ public class Analyser {
 		double sum = 0;
 		for (IEvent event : events) {
 			double durationInMins = event.getDuration();
-			Map<SphereName, Double> sphereResults = event.getSpheres();
+			System.out.println("Title1: " + event.getTitle());
+			Map<SphereName, Double> sphereResults = event.getSpheres();			
 			Set<SphereName> keys = sphereResults.keySet();
 			for (SphereName key : keys) {
 				double time = Math.round(sphereResults.get(key) * durationInMins);
