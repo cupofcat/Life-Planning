@@ -24,7 +24,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		setCurrentCoefficient();
 		slotsManager = new FreeSlotsManager(freeSlots, this);
 	}
-	
+
 	public CalendarStatus(Proposal proposal, CalendarStatus other, List<BaseCalendarSlot> freeSlots, List<BaseCalendarSlot> possibleSlots)  {
 		this.userBusyTime = other.getUserBusyTime();
 		sphereResults = new HashMap<SphereName, SphereInfo>();
@@ -36,7 +36,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		slotsManager = new FreeSlotsManager(freeSlots,possibleSlots, this);
 		containsProposal = true;
 	}
-	
+
 	public CalendarStatus(IEvent event, CalendarStatus other) {
 		this.userBusyTime = other.getUserBusyTime();
 		sphereResults = new HashMap<SphereName, SphereInfo>();
@@ -46,7 +46,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		slotsManager = new FreeSlotsManager(other.getFreeSlotsManager().getFreeSlots(), this);
 		analyse();
 	}
-	
+
 	private void recordProposal() {
 		additionalEventTime = event.getDuration();
 		saveSphereInfos();
@@ -119,7 +119,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	public CalendarStatus checkProposal(Proposal proposal){
 		return slotsManager.checkProposal(proposal);
 	}
-	
+
 	public boolean containsProposal() {
 		return containsProposal;
 	}
@@ -132,8 +132,8 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		double maxLengthening = eventDurationInterval.getSecond() - eventDuration;
 		double maxShortening = eventDuration - eventDurationInterval.getFirst();
 		/* Work out effects of making event longer/shorter 
-		 	* e.g. [(-maxShortening) / Analyser.TRIES] tells us at what 
-		 	* time intervals we should be decreasing the duration of event
+		 * e.g. [(-maxShortening) / Analyser.TRIES] tells us at what 
+		 * time intervals we should be decreasing the duration of event
 		 */
 		Pair<Double, Double> lenRes = getRatioStatus(maxLengthening / Analyser.TRIES, sphereResults, sphereInfluences);
 		Pair<Double, Double> shortRes = getRatioStatus((-maxShortening) / Analyser.TRIES, sphereResults, sphereInfluences);

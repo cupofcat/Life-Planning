@@ -45,7 +45,6 @@ public class Event extends BaseCalendarSlot implements IEvent {
 
 	private void parseKeywords(String title) {
 		String[] words = title.split("[\\s]+");
-		
 		for(int i = 0; i < words.length; i++) {
 			if (isKeyword(words[i])) {
 				keywords.add(words[i]);
@@ -73,6 +72,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		return true;
 	}
 
+	/* Obtain spheres the event influences and the coefficients */
 	public Map<SphereName, Double> getSpheres() {
 		if(title == null) return null;
 		Map<String, Double> tmp = UClasifier.analyse(title);

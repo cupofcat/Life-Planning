@@ -9,9 +9,9 @@
   String signupUrl = "";
 
   if (userService.isUserLoggedIn()) {
-    response.sendRedirect("/dashboard");
+    response.sendRedirect("/dashboard/index.jsp");
   } else {
-    signupUrl = userService.createLoginURL("/dashboard");
+    signupUrl = userService.createLoginURL("/dashboard/index.jsp");
   }
 %>
 
