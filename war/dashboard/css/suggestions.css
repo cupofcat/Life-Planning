@@ -39,12 +39,12 @@ display: none;
 			background-color: #440000;
 		}
 		
-		div#calendar_suggestions .add {
-			background-color: red;
+		div#calendar_suggestions .newevent {
+			background-color: #004400;
 		}
 		
-		div#calendar_suggestions .change {
-			background-color: red;
+		div#calendar_suggestions .reschedule {
+			background-color: #000044;
 		}
 		
 			div#calendar_suggestions div.selected, div#calendar_suggestions div.unselected {

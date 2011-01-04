@@ -82,7 +82,8 @@
           e.preventDefault();
           $("#calendar_div_toggle a").click();
           $("#calendar_suggestions").html('<img src="css/ajax-loader.gif" />');
-          $.getJSON("../suggestions", function(optimisation){
+          $.getJSON("../dummy-suggestions-ok.json", function(optimisation){
+          //$.getJSON("../suggestions", function(optimisation){
             $container = $("#calendar_suggestions");
             $container.html('');
             $.each(optimisation.lists, function(sugg_set_id, sugg_set) {
