@@ -63,11 +63,9 @@ public class Analyser {
 			}
 			sum += durationInMins;
 		}
-
 		for (SphereName key : times.keySet()) {
 			result.put(key, times.get(key) / sum);
 		}
-
 		return result;
 	}
 
@@ -76,6 +74,7 @@ public class Analyser {
 		this.events = (List<IEvent>) events;
 		return convertToSuggestions(this.getSuggestions(currentUserId, profile.getSpherePreferences(), profile.isFullyOptimized()));
 	}
+	
 	@SuppressWarnings("unchecked")
 	private List<List<CalendarStatus>> getSuggestions(String userID, Map<SphereName, Double> spherePreferences, boolean optimizeFull) throws IOException {
 		if (events.size() == 0)
@@ -233,7 +232,6 @@ public class Analyser {
 				for(Proposal p : res){
 					cache.add(p);
 				}
-
 				proposals.put(sphere, cache);
 			}
 			CalendarStatus next;
@@ -273,6 +271,7 @@ public class Analyser {
 		return listSuggestions;
 	}
 
+	/* Convert system's statuses into Suggestions */
 	public List<Suggestion> convert(List<CalendarStatus> statuses) {
 		List<Suggestion> suggestions = new LinkedList<Suggestion>();
 		Iterator<CalendarStatus> iterator = statuses.iterator();
@@ -289,6 +288,7 @@ public class Analyser {
 				result = new RescheduleSuggestion(event, event.getStartDate(), end);
 			}
 			if(status.hasAlternatives()) {
+				/* Convert any alternative statuses also */
 				result.setAlternativeSuggetions(convert(status.getAlternatives()));
 			}
 			suggestions.add(result);
@@ -306,20 +306,23 @@ public class Analyser {
 		}
 	}
 
-	/* Work out overall sphere levels considering current events. 
-	 * Create calendar status for each event */
+	/* Work out overall sphere coefficients considering current events.
+	 * Create SphereInfo's for each sphere 
+	 * Define initial calendar status */
 	public CalendarStatus checkGoals(List<? extends IEvent> events, Map<SphereName, Double> choices) throws IOException {
+		int size = events.size();
 		List<BaseCalendarSlot> freeSlots = getFreeSlots(events);
+		size = events.size();
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
 		initializeTimes(times, choices.keySet());
 		Map<SphereName, Double> currentRatios = new HashMap<SphereName, Double>();
 		double sum = 0;
 		for (IEvent event : events) {
 			double durationInMins = event.getDuration();
-			Map<SphereName, Double> sphereResults = event.getSpheres();
-			Set<SphereName> keys = sphereResults.keySet();
+			Map<SphereName, Double> sphereInfluences = event.getSpheres();
+			Set<SphereName> keys = sphereInfluences.keySet();
 			for (SphereName key : keys) {
-				double time = Math.round(sphereResults.get(key) * durationInMins);
+				double time = Math.round(sphereInfluences.get(key) * durationInMins);
 				times.put(key, times.get(key) + time);
 			}
 			sum += durationInMins;
@@ -493,8 +496,6 @@ public class Analyser {
 		@Test
 		public void testCheckGoals() {
 			events = sampleEvents();
-			events.remove(0);
-			events.remove(events.size()-1);
 			Map<SphereName, Double> times = new HashMap<SphereName, Double>();
 			times.put(SphereName.HEALTH, 11.0);
 			times.put(SphereName.WORK, 492.0);

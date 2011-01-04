@@ -72,6 +72,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 		return true;
 	}
 
+	/* Obtain spheres the event influences and the coefficients */
 	public Map<SphereName, Double> getSpheres() {
 		Map<String, Double> tmp = UClasifier.analyse(title);
 		Map<SphereName, Double> res = new HashMap<SphereName, Double>();
