@@ -142,7 +142,6 @@ div#calendar_suggestions div.sugg_set {
 						}
 			
 					div#calendar_suggestions div.right {
-						display:none;
 					}
 			
 						div#calendar_suggestions ul.spheres {
@@ -155,31 +154,32 @@ div#calendar_suggestions div.sugg_set {
 							display: inline;
 							float: left;
 							margin-right: 10px;
+							margin-bottom: 5px;
 						}
 
 						div#calendar_suggestions ul.spheres > li {
-							width: 48px;
-							height: 48px;
+							wi dth: 48px;
+							he ight: 48px;
 						}
 
 						div#calendar_suggestions ul.spheres > li span {
-							display: none;
+							d isplay: none;
 						}
 
 						div#calendar_suggestions ul.spheres > li.health  {
-							background-image: url("health-icon.png");
+							background-image: url("hea lth-icon.png");
 						}
 
 						div#calendar_suggestions ul.spheres > li.family  {
-							background-image: url("family-icon.png");
+							background-image: url("fami ly-icon.png");
 						}
 
 						div#calendar_suggestions ul.spheres > li.work  {
-							background-image: url("work-icon.png");
+							background-image: url("work- icon.png");
 						}
 
 						div#calendar_suggestions ul.spheres > li.recreation  {
-							background-image: url("recreation-icon.png");
+							background-image: url("recrea tion-icon.png");
 						}
 
 /* BUTTON */
