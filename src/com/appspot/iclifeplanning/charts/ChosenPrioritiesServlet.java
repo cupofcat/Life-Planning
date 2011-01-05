@@ -26,9 +26,14 @@ public class ChosenPrioritiesServlet extends HttpServlet
 		String userID = request_.getParameter("userName");
 		UserProfile userProfile = UserProfileStore.getUserProfile(userID);
 		
+		if(userProfile==null)
+		{
+			response_.getWriter().print("{\"error\": \"nullUser\"}");
+			return;
+		}
+		
 		// converts a map to two-dimensional array
 		JSONArray reply = DataToJSONConverter.convertSphereMapToArray(userProfile.getSpherePreferences());
-		
 		response_.getWriter().print(reply);
 	}
 }
