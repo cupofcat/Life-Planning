@@ -44,37 +44,12 @@ public class Analyser {
 		proposals = new HashMap<SphereName, List<Proposal>>();
 	}
 
-	public static HashMap<SphereName, Double> analyseEvents(
-			List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
-		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
-		for (SphereName key : currentDesiredBalance.keySet())
-			times.put(key, 0.0);
-		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
-		int sum = 0;
-
-		for (IEvent event : events) {
-			double durationInMins = event.getDuration();
-			Map<SphereName, Double> sphereResults = event.getSpheres();
-			Set<SphereName> keys = sphereResults.keySet();
-			for (SphereName key : keys) {
-				double time = Math.round(sphereResults.get(key) * durationInMins);
-				times.put(key, times.get(key) + time);
-				log.severe(key.name() + ": " + (times.get(key) + time));
-			}
-			sum += durationInMins;
-		}
-		for (SphereName key : times.keySet()) {
-			result.put(key, times.get(key) / sum);
-		}
-		return result;
-	}
-
 	public List<List<Suggestion>> getSuggestions(List<? extends IEvent> events, String currentUserId) throws IOException {
 		UserProfile profile = UserProfileStore.getUserProfile(currentUserId);
 		this.events = (List<IEvent>) events;
 		return convertToSuggestions(this.getSuggestions(currentUserId, profile.getSpherePreferences(), profile.isFullyOptimized()));
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	private List<List<CalendarStatus>> getSuggestions(String userID, Map<SphereName, Double> spherePreferences, boolean optimizeFull) throws IOException {
 		if (events.size() == 0)
@@ -149,6 +124,7 @@ public class Analyser {
 		return list;
 	}
 
+	/* If event is a proposal, remove from proposals, else from events */
 	private void removeEvent(CalendarStatus status){
 		if(status.containsProposal())
 			proposals.get( ((Proposal) status.getEvent()).getMajorSphere()).remove(status.getEvent());
@@ -156,6 +132,7 @@ public class Analyser {
 			events.remove(status.getEvent());
 	}
 
+	/* If event or its alternative is a proposal, add to proposals, else to events */
 	private void restoreEvents(CalendarStatus status){
 		if(status.containsProposal())
 			proposals.get( ((Proposal) status.getEvent()).getMajorSphere()).add((Proposal)status.getEvent());
@@ -185,12 +162,12 @@ public class Analyser {
 	/* Find slots of free time in between events */
 	private List<BaseCalendarSlot> getFreeSlots(List<? extends IEvent> events) {
 		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
-<<<<<<< HEAD
+		/*
+		 * 
+		 * HMM...
+		 * 
+		 */
 		//Collections.sort(events);
-		System.out.println("-Free slots generation-");
-=======
-		Collections.sort(events);
->>>>>>> f49ce6c666d24eed9766333942db4019d11ec16d
 		Iterator<? extends IEvent> it = events.iterator();
 		IEvent beginning = it.next();
 		/* Remove begin event */
@@ -315,9 +292,7 @@ public class Analyser {
 	 * Create SphereInfo's for each sphere 
 	 * Define initial calendar status */
 	public CalendarStatus checkGoals(List<? extends IEvent> events, Map<SphereName, Double> choices) throws IOException {
-		int size = events.size();
 		List<BaseCalendarSlot> freeSlots = getFreeSlots(events);
-		size = events.size();
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
 		initializeTimes(times, choices.keySet());
 		Map<SphereName, Double> currentRatios = new HashMap<SphereName, Double>();
@@ -337,6 +312,29 @@ public class Analyser {
 		}
 		Map<SphereName, SphereInfo> sphereResults = generateSphereResults(choices, currentRatios, times);
 		return new CalendarStatus(sum, sphereResults, freeSlots);
+	}
+
+	public static HashMap<SphereName, Double> analyseEvents(
+			List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
+		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
+		initializeTimes(times, currentDesiredBalance.keySet());
+		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
+		double sum = 0;
+		for (IEvent event : events) {
+			double durationInMins = event.getDuration();
+			Map<SphereName, Double> sphereInfluences = event.getSpheres();
+			Set<SphereName> keys = sphereInfluences.keySet();
+			for (SphereName key : keys) {
+				double time = Math.round(sphereInfluences.get(key) * durationInMins);
+				times.put(key, times.get(key) + time);
+				log.severe(key.name() + ": " + (times.get(key) + time));
+			}
+			sum += durationInMins;
+		}
+		for (SphereName key : times.keySet()) {
+			result.put(key, times.get(key) / sum);
+		}
+		return result;
 	}
 
 	private Map<SphereName, SphereInfo> generateSphereResults(Map<SphereName, Double> choices,
