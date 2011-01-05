@@ -5,7 +5,7 @@ import java.util.*;
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
 
-/* Keeps status of a calendar for some event */
+/* Keeps status of a calendar */
 public class CalendarStatus implements Comparable<CalendarStatus> {
 	private IEvent event;
 	private double additionalEventTime;

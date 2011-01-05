@@ -97,6 +97,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 		return this.spheres;
 	}
 
+	/* Set spheres, find the most influencing one */
 	public void setSpheres(Map<SphereName, Double> s) {
 		spheres = s;
 		double max = -1;
