@@ -13,14 +13,37 @@ div#calendar_suggestions div.id {
 
 div#calendar_suggestions div.sugg_set {
 	font-family: Futura;
-	disp lay: inline;
-	float: left;
+	di splay: inline;
+	fl oat: right;
 }
 
-div#sugg_set1, div#sugg_set2 {
-display: none;
-}
-
+	#sugg_nav {
+		margin: 0 auto 20px auto;
+		width: 195px;
+	}
+	
+	#sugg_nav a {
+		font-family: Futura;
+		font-size      : 20px;
+		text-align     : center;
+		text-decoration: none;
+		text-transform: uppercase;
+		line-height    : 35px;
+		height         : 35px;
+		margin: 0 2px 0 2px;
+		padding: 0 5px 0 5px;
+		background: #247da2;
+		color: #fff;
+	}
+	
+	#sugg_nav a.selected {
+		background: #247da2;
+	}
+	
+	#sugg_nav a.unselected {
+		background: #333;
+	}
+	
 	div#calendar_suggestions div.alter_set {
 		width: 960px;
 		margin-bottom: 10px;
@@ -30,26 +53,38 @@ display: none;
 		position: relative;
 	}
 		
-		div#calendar_suggestions .remove, div#calendar_suggestions .newevent, div#calendar_suggestions .reschedule {
+		div#calendar_suggestions div.selected, div#calendar_suggestions div.unselected {
 			float: left;
 			margin-left: 5px;
 		}
 		
-		div#calendar_suggestions .remove {
+		div#calendar_suggestions div.selected div.remove div.alter_back_strip {
+			background-color: #cc0000;
+		}
+		
+		div#calendar_suggestions div.unselected div.remove div.alter_back_strip {
 			background-color: #440000;
 		}
 		
-		div#calendar_suggestions .newevent {
+		div#calendar_suggestions div.selected div.newevent div.alter_back_strip {
+			background-color: #00cc00;
+		}
+		
+		div#calendar_suggestions div.unselected div.newevent div.alter_back_strip {
 			background-color: #004400;
 		}
 		
-		div#calendar_suggestions .reschedule {
+		div#calendar_suggestions div.selected div.reschedule div.alter_back_strip {
+			background-color: #0000cc;
+		}
+		
+		div#calendar_suggestions div.unselected div.reschedule div.alter_back_strip {
 			background-color: #000044;
 		}
 		
-			div#calendar_suggestions div.selected, div#calendar_suggestions div.unselected {
+			div#calendar_suggestions .remove, div#calendar_suggestions .newevent, div#calendar_suggestions .reschedule {
 				float: left;
-				margin-left: 20px;
+				margin-left: 0px;
 			}
 	
 				div#calendar_suggestions div.alter_back {
@@ -57,6 +92,15 @@ display: none;
 					top: 0;
 					bottom: 0;
 					z-index: 0;
+					margin-left:20px;
+				}
+				
+				div#calendar_suggestions div.alter_back_strip {
+					position: absolute;
+					top: 0;
+					bottom: 0;
+					z-index: 0;
+					width: 20px;
 				}
 				
 				div#calendar_suggestions div.selected div.alter_back {
@@ -70,7 +114,7 @@ display: none;
 				div#calendar_suggestions div.alter {
 					position: relative;
 					z-index: 1;
-					margin: 5px 5px 0 5px;
+					margin: 5px 5px 5px 25px;
 				}
 				
 				div#calendar_suggestions div.unselected div.alter {

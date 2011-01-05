@@ -44,7 +44,7 @@
 
     <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen">
     <link rel="stylesheet" href="../css/lavalamp3.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="css/cod a-slider.css" type="text/css" media="screen" title="no title" charset="utf-8">
+    <link rel="stylesheet" href="css/co da-slider.css" type="text/css" media="screen" title="no title" charset="utf-8">
     <link rel="stylesheet" href="css/override.css" type="text/css" media="screen">
     <link rel="stylesheet" href="css/suggestions.css" type="text/css" media="screen">
     
@@ -56,7 +56,7 @@
     <script src="../js/jquery.scrollTo-1.4.2-min.js" type="text/javascript"></script>
     <script src="../js/jquery.localscroll-1.2.7-min.js" type="text/javascript" charset="utf-8"></script>
     <script src="../js/jquery.serialScroll-1.2.2-min.js" type="text/javascript" charset="utf-8"></script>    
-    <script src="../js/co da-slider.js" type="text/javascript" charset="utf-8"></script>
+    <script src="../js/c oda-slider.js" type="text/javascript" charset="utf-8"></script>
 
     <script type="text/javascript">
 
@@ -86,6 +86,8 @@
           //$.getJSON("../suggestions", function(optimisation){
             $container = $("#calendar_suggestions");
             $container.html('');
+            $sugg_nav_div = $('<div id="sugg_nav"></div>').appendTo($container);
+            
             $.each(optimisation.lists, function(sugg_set_id, sugg_set) {
               $sugg_set_div = $('<div class="sugg_set" id="sugg_set' + sugg_set_id + '"></div>').appendTo($container);
               $sugg_set_div.append('<div class="id">' + sugg_set_id + '</div>');
@@ -93,12 +95,13 @@
                 $alter_set_div = $('<div class="alter_set"></div>').appendTo($sugg_set_div);
                 $alter_set_id_div = $('<div class="id">' + alter_set_id + '</div>').appendTo($alter_set_div);
                 $.each(alter_set, function(alter_id, alter) {
-                  $type_div = $('<div class="' + alter.type + '"></div>').appendTo($alter_set_div);
-                  $selection_div = $('<div></div>').appendTo($type_div);
-                  $alter_div = $('<div class="alter"></div>').appendTo($selection_div);
-                  $alter_back_div = $('<div class="alter_back"></div>').appendTo($selection_div);
+                  $selection_div = $('<div></div>').appendTo($alter_set_div);
+                  $type_div = $('<div class="' + alter.type + '"></div>').appendTo($selection_div);
+                  $alter_div = $('<div class="alter"></div>').appendTo($type_div);
+                  $alter_back_div = $('<div class="alter_back"></div>').appendTo($type_div);
+                  $alter_back_strip_div = $('<div class="alter_back_strip"></div>').appendTo($type_div);
                   $w = $alter_set_div.width() / alter_set.length - 5;
-                  $type_div.width($w);
+                  $selection_div.width($w);
                   if (alter_id == 0) {
                     $selection_div.addClass('selected');
                   } else {
@@ -106,12 +109,17 @@
                   }
                   $alter_back_div.width($w - 20);
                   $selection_div.click(function() {
-                    $('.selected', $(this).parent().parent()).each(function(i) {
+                    if ($(this).hasClass('selected')) {
                       $(this).removeClass('selected');
                       $(this).addClass('unselected');
-                    });
-                    $(this).removeClass('unselected');
-                    $(this).addClass('selected');
+                    } else {
+                      $('.selected', $(this).parent()).each(function(i) {
+                        $(this).removeClass('selected');
+                        $(this).addClass('unselected');
+                      });
+                      $(this).removeClass('unselected');
+                      $(this).addClass('selected');
+                    }
                   });
                   $alter_id_div = $('<div class="id">' + alter_id + '</div>').appendTo($alter_div);
                   $alter_div_left = $('<div class="left"></div>').appendTo($alter_div);
@@ -135,13 +143,34 @@
                     $choice += $('.id', this).text();
                   });
                   $choice += ']';
-                  $choices.push($choice);
+                  if ($choice != '[]') {
+                    $choices.push($choice);
+                  }
                 });
                 $answer = '{"userID":"' + optimisation.userID + '", "setID":"' + sugg_set_id + '", "suggestions":[' + $choices + ']}';
                 alert($answer);
-                $.post("../suggestions", $answer);
+                //$.post("../suggestions", $answer);
                 $container.html('');
               }); //apply_button.click()
+              
+              //Add navigation tab
+              $sugg_nav_a = $('<a href="#sugg_set' + sugg_set_id + '">Set ' + sugg_set_id + '</a>').appendTo($sugg_nav_div);
+              if (sugg_set_id == 0) {
+                $sugg_nav_a.addClass('selected');
+              } else {
+                $sugg_nav_a.addClass('unselected');
+                $sugg_set_div.hide();
+              }
+              $sugg_nav_a.click(function() {
+                $('#calendar_suggestions > div.sugg_set').hide();
+                $('.selected', $(this).parent()).each(function(i) {
+                  $(this).removeClass('selected');
+                  $(this).addClass('unselected');
+                })
+                $(this).removeClass('unselected');
+                $(this).addClass('selected');
+                $($(this).attr('href')).slideDown(300);
+              });
             }); //optimisation.lists
             
             $container.hide();
@@ -182,24 +211,8 @@
           </div>
         </div>
         <br /><br />
-        <div id="slider">
-          <!-- This is hidden in coda-slider.css 
-          <ul class="navigation">
-            <li><a href="#sugg_set0">Set1</a></li>
-            <li><a href="#sugg_set1">Set2</a></li>
-            <li><a href="#sugg_set2">Set3</a></li>
-          </ul>-->
-          <div class="scroll">
-            <div class="scrollContainer">
-              <div id="calendar_suggestions">
-              </div>
-            </div>
-          </div>
+        <div id="calendar_suggestions">
         </div>
-       <!-- <a href="#sugg_set0">Set 0</a>
-        <a href="#sugg_set1">Set 1</a>
-        <a href="#sugg_set2">Set 2</a>-->
-      <br /><br />
       </div>
       <div id="footer">
       </div>
