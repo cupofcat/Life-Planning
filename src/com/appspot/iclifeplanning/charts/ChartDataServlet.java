@@ -68,34 +68,4 @@ public class ChartDataServlet extends HttpServlet {
 		}
 		weekNumber++;
 	}
-
-	/*
-	private HashMap<SphereName, Double> analyseEvents(String userID,
-			    List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
-		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
-		initializeTimes(times, currentDesiredBalance.keySet());
-		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
-		int sum = 0;
-
-		for (IEvent event : events) {
-			double durationInMins = event.getDuration();
-			Map<SphereName, Double> sphereResults = event.getSpheres();
-			Set<SphereName> keys = sphereResults.keySet();
-			for (SphereName key : keys) {
-				double time = Math.round(sphereResults.get(key) * durationInMins);
-				times.put(key, times.get(key) + time);
-			}
-			sum += durationInMins;
-		}
-		for (SphereName key : times.keySet()) {
-			result.put(key, times.get(key) / sum);
-		}
-
-		return result;
-	}*/
-
-	private void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
-		for (SphereName key : keys)
-			times.put(key, 0.0);
-	}
 }
