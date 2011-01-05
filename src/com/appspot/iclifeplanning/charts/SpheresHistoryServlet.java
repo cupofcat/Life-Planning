@@ -38,7 +38,7 @@ public class SpheresHistoryServlet extends HttpServlet
 		}
 		// Get data for all weeks
 		List<WeeklyDataProfile> listOfAllWeeks = WeeklyDataProfileStore.getUserWeeklyDataProfiles(userID);
-		if(listOfAllWeeks == null)
+		if(listOfAllWeeks == null || listOfAllWeeks.size()==0)
 		{
 			return;
 		}

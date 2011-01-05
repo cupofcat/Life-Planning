@@ -51,8 +51,8 @@
 	
 	<script type="text/javascript">
 		// to be deleted and changed for a real name (below)
-		var parametersForServlet = {"userName": "mb1"};
-		//var parametersForServlet = {"userName": "<%= request.getUserPrincipal().getName() %>"};
+		//var parametersForServlet = {"userName": "kac08"};
+		var parametersForServlet = {"userName": "<%= request.getUserPrincipal().getName() %>"};
 	</script>
 	
 	<!-- Loads historic chart -->

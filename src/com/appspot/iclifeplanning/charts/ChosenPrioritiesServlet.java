@@ -28,7 +28,7 @@ public class ChosenPrioritiesServlet extends HttpServlet
 		
 		if(userProfile==null)
 		{
-			response_.getWriter().print("User profile unavailable");
+			response_.getWriter().print("{\"error\": \"nullUser\"}");
 			return;
 		}
 		

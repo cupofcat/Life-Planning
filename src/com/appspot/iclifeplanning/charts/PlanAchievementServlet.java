@@ -36,14 +36,14 @@ public class PlanAchievementServlet extends HttpServlet
 		UserProfile userProfile = UserProfileStore.getUserProfile(userID);
 		if(userProfile==null)
 		{
-			response_.getWriter().print("User profile unavailable");
 			return;
 		}
 		
 		// Get data for all weeks
 		List<WeeklyDataProfile> listOfAllWeeks = WeeklyDataProfileStore.getUserWeeklyDataProfiles(userID);
-		if(listOfAllWeeks==null)
+		if(listOfAllWeeks==null || listOfAllWeeks.size()==0)
 		{
+			response_.getWriter().print("{\"error\": \"nullData\"}");
 			return;
 		}
 		// Extract names of spheres from the first week entry
