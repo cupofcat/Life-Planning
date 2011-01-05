@@ -9,7 +9,7 @@ var masterChart,
 			
 
 $.getJSON("spheres-history", parametersForServlet, function(data){
-	
+		
 	seriesFromServer = data.series;
 		
 	serverDataHistory.masterCharts = seriesFromServer;
@@ -26,7 +26,7 @@ $.getJSON("spheres-history", parametersForServlet, function(data){
 		.css({ position: 'absolute', top: 300, height: 80, width: 800 })
 		.appendTo($historicChart);
 			
-	currentTime = Date.UTC(2011, 2, 14);
+	currentTime = Date.UTC(2011, 1, 14);
 	var	detailStart = currentTime - 180 * 24 * 3600 * 1000;
 			
 	// create the master chart
@@ -92,7 +92,7 @@ $.getJSON("spheres-history", parametersForServlet, function(data){
 		xAxis: {
 			type: 'datetime',
 			showLastTickLabel: true,
-			maxZoom: 7 * 24 * 3600000, // seven days
+			maxZoom: 21 * 24 * 3600000, // 21 days
 			minPadding: 0.01,
 			maxPadding: 0.01,
 			// set equal to the initial zoom on the detail chart
@@ -181,6 +181,7 @@ $.getJSON("spheres-history", parametersForServlet, function(data){
 			detailData.push(point.y);
 		}
 		});
+		//alert(detailData);
 				
 		tempSeries = {
 			type: 'area',
@@ -192,7 +193,7 @@ $.getJSON("spheres-history", parametersForServlet, function(data){
 		
 		initialDetailSeries.push(tempSeries);
 	}
-	
+	//alert(initialDetailSeries[1].data); 
 	
 	// create a detail chart referenced by a global variable
 	detailChart = new Highcharts.Chart({
