@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.appspot.analyser.BaseCalendarSlot;
+import com.appspot.analyser.ICalendarSlot;
 import com.appspot.analyser.IEvent;
 import com.appspot.analyser.Pair;
 import com.appspot.datastore.SphereName;
@@ -123,5 +124,14 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public void setDurationInterval(Pair<Double, Double> newInterval) {
+	}
+
+	public int compareTo(Event e) {
+		long result = e.getStartDate().getTimeInMillis() - startDate;
+		if (result > 0)
+			return 1;
+		if (result == 0)
+			return 0;
+		else return -1;
 	}
 }

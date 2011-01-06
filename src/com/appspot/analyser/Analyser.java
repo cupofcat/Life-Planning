@@ -165,12 +165,7 @@ public class Analyser {
 	/* Find slots of free time in between events */
 	private List<BaseCalendarSlot> getFreeSlots(List<? extends IEvent> events) {
 		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
-		/*
-		 * 
-		 * HMM...
-		 * 
-		 */
-		//Collections.sort(events);
+	    Collections.sort(events);
 		Iterator<? extends IEvent> it = events.iterator();
 		IEvent beginning = it.next();
 		/* Remove begin event */
