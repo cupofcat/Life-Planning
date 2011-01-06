@@ -22,6 +22,7 @@ import com.appspot.datastore.Token;
 import com.appspot.datastore.TokenStore;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
+import com.appspot.iclifeplanning.charts.utils.AddUserDataServlet;
 import com.google.appengine.api.users.User;
 import com.google.appengine.api.users.UserService;
 import com.google.appengine.api.users.UserServiceFactory;
@@ -161,6 +162,12 @@ public class CalendarUtils {
 				    = new UserProfile(id, user.getNickname(), user.getEmail(), 
 				    		spherePreferences, true, Calendar.getInstance().getTimeInMillis());
 				newProfile.makePersistent();
+				// generate dummy data for graphs
+				AddUserDataServlet.addData(id, 	SphereName.WORK.defaultValue(),
+																				SphereName.HEALTH.defaultValue(),
+																				SphereName.FAMILY.defaultValue(),
+																				80,  // number of weeks
+																				30); // number of weeks optimised
 			}
 		}
 	}

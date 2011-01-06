@@ -5,7 +5,6 @@ import java.util.Map;
 
 import javax.jdo.annotations.*;
 
-import com.appspot.analyser.Pair;
 import com.appspot.datastore.SphereName;
 
 @PersistenceCapable

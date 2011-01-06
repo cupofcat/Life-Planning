@@ -1,12 +1,10 @@
 package com.appspot.datastore;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.jdo.JDOObjectNotFoundException;
 import javax.jdo.PersistenceManager;
 
-import com.appspot.iclifeplanning.charts.utils.WeeklyDataProfile;
 import com.appspot.iclifeplanning.charts.utils.WeeklyDataProfileStore;
 
 

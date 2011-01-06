@@ -24,7 +24,7 @@ $.getJSON("chosen-priorities", parametersForServlet, function(data){
 		},
 		tooltip: {
 			formatter: function() {
-				return '<b>'+ this.point.name +'</b>: '+ 100*this.y +' %';
+				return '<b>'+ this.point.name +'</b>: '+ Highcharts.numberFormat(this.y*100, 0) +' %';
 			}
 		},
 		// hides the "highchats.com" credits

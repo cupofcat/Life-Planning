@@ -50,9 +50,10 @@
 	<script type="text/javascript" src="js/highcharts-options.js"></script>
 	
 	<script type="text/javascript">
-		// to be deleted and changed for a real name (below)
+		// the following 2 lines to be deleted
 		//var parametersForServlet = {"userName": "kac08"};
-		var parametersForServlet = {"userName": "<%= request.getUserPrincipal().getName() %>"};
+		//var parametersForServlet = {"userName": "<%= request.getUserPrincipal().getName() %>"};
+		var parametersForServlet = {"userName": "<%= userService.getCurrentUser().getUserId() %>"};
 	</script>
 	
 	<!-- Loads historic chart -->

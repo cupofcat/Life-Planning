@@ -16,11 +16,13 @@ import com.appspot.datastore.SphereName;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
 
-//import sun.reflect.ReflectionFactory.GetReflectionFactoryAction;
-
 @SuppressWarnings("serial")
 public class AddUserDataServlet extends HttpServlet
 {
+	// these parameters describe how far can the random spheres achievement be from the given values
+	static double UNOPTIMISED_DISPERSION = 0.06;
+	static double OPTIMISED_DISPERSION = 0.017;
+	
 	public void doGet(HttpServletRequest request_, HttpServletResponse response_) throws IOException
 	{
 		String p = request_.getParameter("action");
@@ -188,10 +190,6 @@ public class AddUserDataServlet extends HttpServlet
 		spheresAssignment.put(SphereName.FAMILY, family_);
 		spheresAssignment.put(SphereName.RECREATION, 1 - (work_ + health_ + family_));
 		
-		// these parameters describe how far can the random spheres achievement be from the given values
-		double unoptimised = 0.05;
-		double optimised = 0.02;
-		
 		double ranWork = work_;
 		double ranHealth = health_;
 		double ranFamily = family_;
@@ -199,9 +197,9 @@ public class AddUserDataServlet extends HttpServlet
 		
 		for(int i=0; i<weeks_-weeksOptimised_; i++)
 		{
-			ranWork =  getRandom(work_, unoptimised, ranWork);
-			ranHealth =  getRandom(health_, unoptimised, ranHealth);
-			ranFamily =  getRandom(family_, unoptimised, ranFamily);
+			ranWork =  getRandom(work_, UNOPTIMISED_DISPERSION, ranWork);
+			ranHealth =  getRandom(health_, UNOPTIMISED_DISPERSION, ranHealth);
+			ranFamily =  getRandom(family_, UNOPTIMISED_DISPERSION, ranFamily);
 			ranRecreation = 1 - ranWork - ranHealth - ranFamily;
 			
 			HashMap<SphereName, Double> spheresAchievement = new HashMap<SphereName, Double>(5);
@@ -215,18 +213,18 @@ public class AddUserDataServlet extends HttpServlet
 		
 		for(int i=weeks_-weeksOptimised_; i<weeks_; i++)
 		{
-			ranWork =  getRandom(work_, optimised, ranWork);
-			ranHealth =  getRandom(health_, optimised, ranHealth);
-			ranFamily =  getRandom(family_, optimised, ranFamily);
+			ranWork =  getRandom(work_, OPTIMISED_DISPERSION, ranWork);
+			ranHealth =  getRandom(health_, OPTIMISED_DISPERSION, ranHealth);
+			ranFamily =  getRandom(family_, OPTIMISED_DISPERSION, ranFamily);
 			ranRecreation = 1 - ranWork - ranHealth - ranFamily;
 			
 			HashMap<SphereName, Double> spheresAchievement = new HashMap<SphereName, Double>(5);
-			spheresAchievement.put(SphereName.WORK,ranWork);
+			spheresAchievement.put(SphereName.WORK, ranWork);
 			spheresAchievement.put(SphereName.HEALTH, ranHealth);
 			spheresAchievement.put(SphereName.FAMILY, ranFamily);
 			spheresAchievement.put(SphereName.RECREATION, ranRecreation);
 			
-			WeeklyDataProfileStore.addWeeklyDataProfile(new WeeklyDataProfile("kac08", i, spheresAchievement, spheresAssignment));
+			WeeklyDataProfileStore.addWeeklyDataProfile(new WeeklyDataProfile(userID_, i, spheresAchievement, spheresAssignment));
 		}
 	}
 	

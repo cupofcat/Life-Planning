@@ -273,7 +273,7 @@ $.getJSON("spheres-history", parametersForServlet, function(data){
 		series: initialDetailSeries,
 		
 		exporting: {
-			enabled: false
+			enabled: true
 		}
 
 	});
