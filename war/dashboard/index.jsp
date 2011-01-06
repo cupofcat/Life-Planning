@@ -82,8 +82,8 @@
           e.preventDefault();
           $("#calendar_div_toggle a").click();
           $("#calendar_suggestions").html('<img src="css/ajax-loader.gif" />');
-          $.getJSON("../dummy-suggestions-ok.json", function(optimisation){
-          //$.getJSON("../suggestions", function(optimisation){
+          //$.getJSON("../dummy-suggestions-ok.json", function(optimisation){
+          $.getJSON("../suggestions", function(optimisation){
             $container = $("#calendar_suggestions");
             $container.html('');
             $sugg_nav_div = $('<div id="sugg_nav"></div>').appendTo($container);
@@ -148,8 +148,8 @@
                   }
                 });
                 $answer = '{"userID":"' + optimisation.userID + '", "setID":"' + sugg_set_id + '", "suggestions":[' + $choices + ']}';
-                alert($answer);
-                //$.post("../suggestions", $answer);
+                //alert($answer);
+                $.post("../suggestions", $answer);
                 $container.html('');
               }); //apply_button.click()
               
