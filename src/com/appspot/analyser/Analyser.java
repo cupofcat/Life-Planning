@@ -43,15 +43,18 @@ public class Analyser {
 	public Analyser() {
 		proposals = new HashMap<SphereName, List<Proposal>>();
 	}
-
-	public List<List<Suggestion>> getSuggestions(List<? extends IEvent> events, String currentUserId) throws IOException {
+	
+	public List<List<Suggestion>> getSuggestions(List<? extends IEvent> events, 
+			String currentUserId) throws IOException {
 		UserProfile profile = UserProfileStore.getUserProfile(currentUserId);
 		this.events = (List<IEvent>) events;
-		return convertToSuggestions(this.getSuggestions(currentUserId, profile.getSpherePreferences(), profile.isFullyOptimized()));
+		return convertToSuggestions(this.getSuggestions(currentUserId, 
+				profile.getSpherePreferences(), profile.isFullyOptimized()));
 	}
 
 	@SuppressWarnings("unchecked")
-	private List<List<CalendarStatus>> getSuggestions(String userID, Map<SphereName, Double> spherePreferences, boolean optimizeFull) throws IOException {
+	private List<List<CalendarStatus>> getSuggestions(String userID, Map<SphereName, 
+			Double> spherePreferences, boolean optimizeFull) throws IOException {
 		if (events.size() == 0)
 			return null;
 		LinkedList<List<CalendarStatus>> result = new LinkedList<List<CalendarStatus>>();
@@ -59,24 +62,24 @@ public class Analyser {
 		if (isCloseEnough(start, optimizeFull))
 			return null;
 		removeStaticEvents(events);
-		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, start), getProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true) );
+		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, start), 
+				getProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true) );
 		for (int i = 0; result.size() < maxSuggestions && i < statuses.size(); i++) {
 			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();			
 			CalendarStatus nextMin = statuses.get(i);
 			CalendarStatus nextStatus = nextMin;
-			// best event can't improve the status
+			/* Even best event can't improve the status */
 			if (nextMin.compareTo(start) >= 0)
 				break;
 			list.add(nextMin);
 			removeEvent(nextMin);
-			//check neighbours for possible alternatives
+			/* Check neighbours if they can become alternative suggestions to nextMin */
 			while((i+1) < statuses.size()){
 				CalendarStatus next = statuses.get(i+1);
 				if(next.compareTo(start) > 0 || next.getCoefficient() > nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE))
 					break;
 				nextMin.addAlternative(next);
 				removeEvent(next);
-				//take freeSlots from first proposal
 				if(!nextStatus.containsProposal() && next.containsProposal())
 					nextStatus = next;
 				++i;
@@ -94,25 +97,25 @@ public class Analyser {
 	throws IOException {
 		if (isCloseEnough(currentStatus, optimizeFull) || (events.size() == 0 && !haveAnyProposals()) || depth <= 0)
 			return null;
+		/* For a single status from above, order statuses again
+		 * i.e. pivoting for single statuses from above */
 		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, currentStatus), 
 				getProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false) );
 		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
-		CalendarStatus minimum = statuses.get(0);
-		CalendarStatus nextStatus = minimum;
-		if (minimum.compareTo(currentStatus) >= 0)
+		CalendarStatus nextMin = statuses.get(0);
+		CalendarStatus nextStatus = nextMin;
+		if (nextMin.compareTo(currentStatus) >= 0)
 			return null;
-		list.add(minimum);
-		removeEvent(minimum);
-		//check for alternatives again - run proposals??
-		//check neighbours for possible alternatives - run loop which won't modify i (we want i sets of proposals) - proposals
+		list.add(nextMin);
+		removeEvent(nextMin);
+		/* Check neighbours if they can become alternative suggestions to nextMin */
 		int i  = 1;
 		while(i < statuses.size()){
 			CalendarStatus next = statuses.get(i);
-			if(next.compareTo(currentStatus) > 0 || next.getCoefficient() > minimum.getCoefficient()*(1+Analyser.ALTERNATIVE))
+			if(next.compareTo(currentStatus) > 0 || next.getCoefficient() > nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE))
 				break;
-			minimum.addAlternative(next);
+			nextMin.addAlternative(next);
 			removeEvent(next);
-			//take freeSlots from first proposal
 			if(!nextStatus.containsProposal() && next.containsProposal())
 				nextStatus = next;
 			++i;			
@@ -120,7 +123,7 @@ public class Analyser {
 		List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, depth - 1);
 		if (rest != null)
 			list.addAll(rest);
-		restoreEvents(minimum);
+		restoreEvents(nextMin);
 		return list;
 	}
 
@@ -176,12 +179,14 @@ public class Analyser {
 		while (it.hasNext()) {
 			IEvent next = it.next();
 			if (curr.getEndDate().compareTo(next.getStartDate()) < 0) {
-				BaseCalendarSlot newSlot = new BaseCalendarSlot("Free Slot", null, curr.getEndDate(), next.getStartDate());
+				BaseCalendarSlot newSlot = new BaseCalendarSlot("Free Slot", null, 
+						curr.getEndDate(), next.getStartDate());
 				ret.add(newSlot);
 				Pair<Double, Double> durationInterval = curr.getDurationInterval();
 				/* If the free slot is less than 1h long, adjust curr's 
 				 * duration interval to include this shorter time, not 1h */
-				durationInterval.setSecond(Math.min(durationInterval.getSecond(), curr.getDuration() + newSlot.getDuration()));
+				durationInterval.setSecond(Math.min(durationInterval.getSecond(), 
+						curr.getDuration() + newSlot.getDuration()));
 				curr = next;
 			}
 			else {
@@ -202,15 +207,19 @@ public class Analyser {
 		|| (!optimizeFull && currentStatus.isWithinConfidenceInterval());
 	}
 
-	private List<CalendarStatus> getProposalStatuses(List<SphereName> spheres, CalendarStatus currentStatus, boolean truncateProposals){
+	/* Get proposals for spheres which are not on target
+	 * Either from memory or pull from dataStore */
+	private List<CalendarStatus> getProposalStatuses(List<SphereName> deficitSpheres, 
+			CalendarStatus currentStatus, boolean truncateProposals){
 		List<CalendarStatus> result = new LinkedList<CalendarStatus>();
 		PersistenceManager pmf = PMF.get().getPersistenceManager();
 		List<Proposal> cache;
-		for(SphereName sphere : spheres){
+		for(SphereName sphere : deficitSpheres){
 			cache = proposals.get(sphere);
 			if(cache == null){
 				cache = new LinkedList<Proposal>();
-				Collection<Proposal> res = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute();
+				Collection<Proposal> res = (Collection<Proposal>) pmf.newQuery("select from " 
+						+ Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute();
 				for(Proposal p : res){
 					cache.add(p);
 				}
