@@ -88,3 +88,22 @@ div#optimize_button a, div#optimize_button a:visited {
 div#optimize_button a:hover, div#optimize_button a:active {
 	color: #000;
 }
+
+div#sphereButtonsHolder {
+	margin: 0 auto;
+	text-align: center;
+}
+
+div#sphereButtonsHolder button {
+	display: inline-block;
+	width: 120px;
+	margin-left: 5px;
+	margin-right: 5px;
+	border: 0;
+	background-color: #247da2;
+	font-family: Futura;
+	font-size      : 15px;
+	text-align     : center;
+	text-decoration: none;
+	text-transform: uppercase;
+}

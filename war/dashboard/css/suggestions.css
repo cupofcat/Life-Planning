@@ -19,10 +19,12 @@ div#calendar_suggestions div.sugg_set {
 
 	#sugg_nav {
 		margin: 0 auto 20px auto;
-		width: 195px;
+		wi dth: 195px;
+		text-align: center;
 	}
 	
 	#sugg_nav a {
+		display: inline-block;
 		font-family: Futura;
 		font-size      : 20px;
 		text-align     : center;
