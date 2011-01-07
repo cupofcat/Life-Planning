@@ -39,8 +39,8 @@ public class SettingsServlet extends HttpServlet {
 			JSONObject pref;
 			for (Entry e : preferences.entrySet()) {
 				pref = new JSONObject();
-				pref.put("name",((String) e.getKey()).toLowerCase());
-				pref.put("value",(Double)e.getValue());
+				pref.put("name",((SphereName) (e.getKey())).name().toLowerCase());
+				pref.put("value",(Double)e.getValue()*100);
 				preferencesArray.put(pref);
 			}
 			result.put("userID", userID);
@@ -54,7 +54,7 @@ public class SettingsServlet extends HttpServlet {
 
 	public void doPost(HttpServletRequest request, HttpServletResponse response)
 		throws IOException {
-
+		System.out.println("Posting");
 		try {
 			JSONObject settingsJSON = new JSONObject(request.getReader().readLine());
 			String userID = settingsJSON.getString("userID");
