@@ -22,15 +22,20 @@
     <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen">
     <link rel="stylesheet" href="../css/lavalamp3.css" type="text/css" media="screen">
     <link rel="stylesheet" href="css/override.css" type="text/css" media="screen">
-    <link rel="stylesheet" href="css/suggestions.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/settings.css" type="text/css" media="screen">
+    <link rel="stylesheet" href="css/datePicker.css" type="text/css" media="screen">
     
     <script src="../js/jquery-1.2.6.min.js" type="text/javascript"></script>
     
     <script type="text/javascript" src="../js/jquery.easing.1.3.js"></script>
     <script type="text/javascript" src="../js/jquery.lavalamp-1.3.4b2.js"></script> 
+    <script type="text/javascript" src="js/date.js"></script>
+    <script type="text/javascript" src="js/jquery.datePicker.js"></script>
 
     <script type="text/javascript">
       jQuery(document).ready(function($) {
+        jQuery('.date-pick').datePicker({startDate:'01/01/2007'});
+        
         $('button').click(function() {
           $answer = '{userID:"' + '<%= request.getUserPrincipal().getName() %>", ';
           $answer += 'fullOpt:"';
@@ -50,10 +55,10 @@
           });
           $answer += ']}';
           alert($answer);
-          $.post("settings", $answer);
+          //$.post("settings", $answer);
         })
         //Lavalamp
-        jQuery("#lavaLampMenu").lavaLamp({fx: "swing", speed: 200});
+        jQuery("#lavaLampMenu").lavaLamp({fx: "swing", speed: 200, startItem: 1});
       });
     </script>
     
@@ -77,12 +82,18 @@
         </div>
       </div>
       <div id="body">
-        Work: <input type="text" name="work" size="2" maxlength="2" />%<br />
-        Health: <input type="text" name="health" size="2" maxlength="2" />%<br />
-        Family: <input type="text" name="family" size="2" maxlength="2" />%<br />
-        Recreation: <input type="text" name="recreation" size="2" maxlength="2" />%<br />
-        Full optimisation: <input type="checkbox" name="gull" checked="checked">
-        <button>Submit</button>
+        <div id="settings">
+          Work: <input type="text" name="work" size="2" maxlength="2" />%<br />
+          Health: <input type="text" name="health" size="2" maxlength="2" />%<br />
+          Family: <input type="text" name="family" size="2" maxlength="2" />%<br />
+          Recreation: <input type="text" name="recreation" size="2" maxlength="2" />%<br />
+          <br />
+          From:<br /><input type="text" name="from" class="date-pick" />
+          <br /><br />
+          To:<br /><input type="text" name="to" class="date-pick"/>
+          <br /><br />Full optimisation: <input type="checkbox" name="gull" checked="checked">
+          <br /><button>Submit</button>
+        </div>
       </div>
       <div id="footer">
       </div>

@@ -103,7 +103,13 @@ div#sphereButtonsHolder button {
 	background-color: #247da2;
 	font-family: Futura;
 	font-size      : 15px;
+	height: 25px;
+	line-height: 25px;
 	text-align     : center;
 	text-decoration: none;
 	text-transform: uppercase;
+}
+
+div#sphereButtonsHolder button:hover {
+	color: white;
 }
