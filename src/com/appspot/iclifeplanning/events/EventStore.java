@@ -6,8 +6,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.appspot.datastore.UserProfile;
+import com.appspot.datastore.UserProfileStore;
 import com.appspot.iclifeplanning.authentication.AuthService;
 import com.appspot.iclifeplanning.authentication.CalendarUtils;
+import com.google.apphosting.api.UserServicePb.UserService;
 import com.google.gdata.client.Query.CustomParameter;
 import com.google.gdata.client.calendar.CalendarQuery;
 import com.google.gdata.data.DateTime;
@@ -33,11 +36,11 @@ public class EventStore {
 	}
 	
 	public void initizalize() throws IOException {
-	    long now = System.currentTimeMillis();
-	    System.out.println(now);
-	    long future = now + (long)30*24*60*60*1000;
-	    System.out.println(future);
-		allEvents = getEventsFromTimeRange(now, future);
+	    String userID = CalendarUtils.getCurrentUserId();
+	    UserProfile profile = UserProfileStore.getUserProfile(userID);
+	    long from = profile.getStartOptimizing();
+	    long to = profile.getFinishOptimizing();
+		allEvents = getEventsFromTimeRange(from, to);
 	}
 
 	public List<Event> getEvents() {

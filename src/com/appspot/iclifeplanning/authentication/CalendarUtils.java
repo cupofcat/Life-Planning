@@ -158,9 +158,11 @@ public class CalendarUtils {
 				for (SphereName s : SphereName.values()) {
 					spherePreferences.put(s, s.defaultValue());
 				}
+				long now = Calendar.getInstance().getTimeInMillis();
 				UserProfile newProfile 
 				    = new UserProfile(id, user.getNickname(), user.getEmail(), 
-				    		spherePreferences, true, Calendar.getInstance().getTimeInMillis());
+				    		spherePreferences, true, 
+				    		now, now, now + (long)30*24*60*60*1000);
 				newProfile.makePersistent();
 				// generate dummy data for graphs
 				AddUserDataServlet.addData(id, 	SphereName.WORK.defaultValue(),

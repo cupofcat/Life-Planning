@@ -36,8 +36,8 @@
       jQuery(document).ready(function($) {
         jQuery('.date-pick').datePicker({startDate:'01/01/2007'});
         
-        $.getJSON("../dummy-settings.json", function(settings){
-        //$.getJSON("/settings", function(optimisation){
+        //$.getJSON("../dummy-settings.json", function(settings){
+        $.getJSON("settings", function(settings){
           $('input[name="fromDate"]').val(settings.fromDate);
           $('input[name="toDate"]').val(settings.toDate);
           
@@ -71,7 +71,7 @@
             $answer += ', "' + dat.name + '":"' + $(this).val() + '"';
           });
           $answer += "}"
-          alert($answer);
+          //alert($answer);
           $.post("settings", $answer);
         })
         //Lavalamp
