@@ -23,9 +23,14 @@ public class UserProfile extends BaseDataObject {
 	private boolean fullyOptimized;
 	@Persistent
 	private Long joinTime;
+	@Persistent
+	private Long startOptimizing;
+	@Persistent
+	private Long finishOptimizing;
 
 	public UserProfile(String userID, String name, String email, 
-			HashMap<SphereName, Double> spherePreferences, boolean fullyOptimized, long joinTime) {
+			HashMap<SphereName, Double> spherePreferences, boolean fullyOptimized, 
+			long joinTime, long startOptimizing, long finishOptimizing) {
 		super();
 		this.userID = userID;
 		this.nickname = name;
@@ -33,6 +38,24 @@ public class UserProfile extends BaseDataObject {
 		this.spherePreferences = spherePreferences;
 		this.fullyOptimized = fullyOptimized;
 		this.joinTime = joinTime;
+		this.startOptimizing = startOptimizing;
+		this.finishOptimizing = finishOptimizing;
+	}
+
+	public Long getStartOptimizing() {
+		return startOptimizing;
+	}
+
+	public void setStartOptimizing(Long startOptimizing) {
+		this.startOptimizing = startOptimizing;
+	}
+
+	public Long getFinishOptimizing() {
+		return finishOptimizing;
+	}
+
+	public void setFinishOptimizing(Long finishOptimizing) {
+		this.finishOptimizing = finishOptimizing;
 	}
 
 	public String getEmail() {

@@ -177,7 +177,11 @@ public class AddUserDataServlet extends HttpServlet
 		spheresAssignment.put(SphereName.FAMILY, family_);
 		spheresAssignment.put(SphereName.RECREATION, 1 - (work_ + health_ + family_));
 		
-		UserProfile temp = new UserProfile(id_, name_, id_ + "@doc", spheresAssignment, true, new GregorianCalendar(year_, month_, day_).getTimeInMillis());
+		UserProfile temp 
+		    = new UserProfile(id_, name_, id_ + "@doc", spheresAssignment, true, 
+		    		new GregorianCalendar(year_, month_, day_).getTimeInMillis(),
+		    		new GregorianCalendar(year_, month_, day_).getTimeInMillis(),
+		    		new GregorianCalendar(year_, month_, day_).getTimeInMillis() + (long)30*24*60*60*1000);
 		
 		temp.makePersistent();
 	}
