@@ -36,9 +36,21 @@
       jQuery(document).ready(function($) {
         jQuery('.date-pick').datePicker({startDate:'01/01/2007'});
         
+        $.getJSON("../dummy-settings.json", function(settings){
+        //$.getJSON("/settings", function(optimisation){
+          $('input[name="fromDate"]').val(settings.fromDate);
+          $('input[name="toDate"]').val(settings.toDate);
+          
+          $.each(settings.spheresSettings, function(i, sphere) {
+            $('input[name="' + sphere.name + '"]').val(sphere.value);
+          })
+          
+          $('input:checkbox').attr('checked', settings.fullOpt == 'TRUE');
+        });
+        
         $('button').click(function() {
           $answer = '{"userID":"' + '<%= request.getUserPrincipal().getName() %>", ';
-          $answer += '"fullOpt"":"';
+          $answer += '"fullOpt":"';
           if ($('input:checkbox').get(0).value == 'on') {
             $answer += 'TRUE';
           } else {

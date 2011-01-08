@@ -1,0 +1,11 @@
+{
+  "fullOpt":"TRUE",
+  "spheresSettings":[
+    {"name":"work", "value":"20"},
+    {"name":"health", "value":"10"},
+    {"name":"family", "value":"30"},
+    {"name":"recreation", "value":"40"}
+  ],
+  "fromDate":"05/01/2011",
+  "toDate":"15/01/2015"
+}
