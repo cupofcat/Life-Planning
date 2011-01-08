@@ -37,25 +37,30 @@
         jQuery('.date-pick').datePicker({startDate:'01/01/2007'});
         
         $('button').click(function() {
-          $answer = '{userID:"' + '<%= request.getUserPrincipal().getName() %>", ';
-          $answer += 'fullOpt:"';
+          $answer = '{"userID":"' + '<%= request.getUserPrincipal().getName() %>", ';
+          $answer += '"fullOpt"":"';
           if ($('input:checkbox').get(0).value == 'on') {
             $answer += 'TRUE';
           } else {
             $answer += 'FALSE';
           }/**/
           $answer += '", ';
-          $answer += 'spheresSettings:[';
-          $texts = $('input:text');
+          $answer += '"spheresSettings":[';
+          $texts = $('input.sphere');
           $texts.each(function(i, inp){
-            $answer += '{name:"' + inp.name + '", value:"' + $(this).val() + '"}';
+            $answer += '{"name":"' + inp.name + '", "value":"' + $(this).val() + '"}';
             if (i != $texts.length - 1) {
               $answer += ',';
             }
           });
-          $answer += ']}';
+          $answer += ']';
+          $dates = $('input.date-pick');
+          $dates.each(function(i, dat) {
+            $answer += ', "' + dat.name + '":"' + $(this).val() + '"';
+          });
+          $answer += "}"
           alert($answer);
-          //$.post("settings", $answer);
+          $.post("settings", $answer);
         })
         //Lavalamp
         jQuery("#lavaLampMenu").lavaLamp({fx: "swing", speed: 200, startItem: 1});
@@ -83,14 +88,14 @@
       </div>
       <div id="body">
         <div id="settings">
-          Work: <input type="text" name="work" size="2" maxlength="2" />%<br />
-          Health: <input type="text" name="health" size="2" maxlength="2" />%<br />
-          Family: <input type="text" name="family" size="2" maxlength="2" />%<br />
-          Recreation: <input type="text" name="recreation" size="2" maxlength="2" />%<br />
+          Work: <input type="text" name="work" size="2" maxlength="2" class="sphere" />%<br />
+          Health: <input type="text" name="health" size="2" maxlength="2" class="sphere" />%<br />
+          Family: <input type="text" name="family" size="2" maxlength="2" class="sphere" />%<br />
+          Recreation: <input type="text" name="recreation" size="2" maxlength="2" class="sphere" />%<br />
           <br />
-          From:<br /><input type="text" name="from" class="date-pick" />
+          From:<br /><input type="text" name="fromDate" class="date-pick" />
           <br /><br />
-          To:<br /><input type="text" name="to" class="date-pick"/>
+          To:<br /><input type="text" name="toDate" class="date-pick"/>
           <br /><br />Full optimisation: <input type="checkbox" name="gull" checked="checked">
           <br /><button>Submit</button>
         </div>
