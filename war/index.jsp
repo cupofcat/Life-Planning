@@ -57,7 +57,7 @@
           </div>
           <div id="header-bottom">
             <div id="header-text">
-              The advent of mobile broadband and the "always connected" experience encourages the development of services offering persistent storage of personal data. Services could then use this data to provide intelligent, personalised and contextual support for all activities of an individual’s life. Such a service would combine aspects of planning, scheduling, calendar maintenance and consumer advice. The service would mediate between the user and all the complex information sources available on the Internet (e.g. transport feeds, product descriptions, third-party services) to provide contextualised and personalised decision support (c.f. price comparison sites such as confused.com). The business model is that the Life Planning service would always operate in the user’s best interest and have no other obligations.
+The development of mobile devices and e-mail has spread work into areas of time and space it did not previously occupy, to the detriment of family, domestic and social life (“the Blackberry curse”). The Life Planning counteracts this by allowing you to specify the balance you would like to achieve between all aspects of you life!
             </div>
             <div id="header-box">
               <div id="slogan">
@@ -93,7 +93,7 @@
                 <div class="panel" id="home">
                   <div id="signup-bar">
                     <div id="signup-text">
-                      The Life Planning service would counteract this by allowing individuals to specify the goals they would like to achieve across all aspects of their life and then combine the planning system with stochastic optimisation to help users plan their choices to ensure, over time, that their life goals would be met.
+To start using the service all you need is a Google account with Google Calendar. Simply sign in using the button on the right and authorise our application to access your data. We do not store your password! If you need assistance, please check the <a href="#step1">tour</a> section of the website.
                     </div>
                     <div id="signup">
                       <a href="<%= signupUrl %>">Sign up with your Google Account</a>
