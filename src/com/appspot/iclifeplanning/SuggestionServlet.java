@@ -152,7 +152,7 @@ public class SuggestionServlet extends HttpServlet {
 
 			List<String> spheres = new ArrayList<String>();
 			for (SphereName sphere : suggestion.getSpheres().keySet()) {
-				if (suggestion.getSpheres().get(sphere) > 0) {
+				if (suggestion.getSpheres().get(sphere) > 0.05) {
 					spheres.add(sphere.name());
 				}
 			}
@@ -177,15 +177,12 @@ public class SuggestionServlet extends HttpServlet {
 			JSONArray suggestionJSON;
 			int suggestion;
 			int alternative;
-			System.out.println(suggestionMap == null);
 			List<List<Suggestion>> suggestions = suggestionMap.get(userID);
 
 			for(int i = 0; i < lenght; i++) {
 				suggestionJSON = acceptedSuggestions.getJSONArray(i);
 				suggestion = (Integer) suggestionJSON.get(0);
 				alternative = (Integer) suggestionJSON.get(1);
-				System.out.println(list);
-				System.out.println(suggestions == null);
 				List<Suggestion> l = suggestions.get(list);
 				Suggestion s = l.get(suggestion);
 				s.makePersistent(alternative);
