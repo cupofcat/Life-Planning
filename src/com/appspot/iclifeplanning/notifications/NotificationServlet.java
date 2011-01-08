@@ -57,13 +57,13 @@ public class NotificationServlet extends HttpServlet {
 		      EventStore eventStore = EventStore.getInstance();
 		      eventStore.initizalize();
 		      List<Event> events = eventStore.getEvents();
-		      //Analyser analyser = new Analyser();
-		      List<List<Suggestion>> suggestions = null;
-		          //= analyser.getSuggestions(events, profile.getUserID());
+		      Analyser analyser = new Analyser();
+		      List<List<Suggestion>> suggestions
+		    	  = analyser.getSuggestions(events, profile.getUserID());
 		      HashMap<SphereName, Double> desiredLifeBalance 
 		          = profile.getSpherePreferences();
 		      HashMap<SphereName, Double> currentLifeBalance 
-		          = Analyser.analyseEvents(events.subList(1, events.size()-2), desiredLifeBalance);
+		          = Analyser.analyseEvents(events, desiredLifeBalance);
 		      content = new NotificationEmailContent(suggestions, 
 		    		  desiredLifeBalance, currentLifeBalance, profile.getName());
 		    } else {

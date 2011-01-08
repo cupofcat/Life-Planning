@@ -53,7 +53,12 @@ public class NotificationEmailContent implements EmailContent {
     	desiredLifeBalanceDescription += "\n";
     	
     	String headerSuggestions = "Here are some of our suggestions how to improve: \n\n";
-    	//TODO(amadurska): Describe suggestions (should have toString implemented?
+    	String suggestionsContent = "";
+    	int i = 0;
+    	while (i < 3 && i < suggestions.size()) {
+    		suggestionsContent 
+    		    += ((i+1) + ". " + suggestions.get(i).toString() + "\n");
+    	}
     	
     	String headerGreetings = "Have an optimized day!\n";
     	String signature = "Your Life Planning Team\n";

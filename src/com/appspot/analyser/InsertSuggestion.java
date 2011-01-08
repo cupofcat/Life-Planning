@@ -3,7 +3,9 @@ package com.appspot.analyser;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Map;
 
 import com.appspot.datastore.SphereName;
@@ -69,5 +71,12 @@ public class InsertSuggestion extends Suggestion {
 
 	public CalendarEventEntry getCalendarEvent() {
 		return null;
+	}
+
+	public String toString() {
+		SimpleDateFormat date = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
+		return "Schedule " + title 
+		    + " for "
+		    + date.format(new Date(startDate));
 	}
 }
