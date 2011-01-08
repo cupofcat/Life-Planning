@@ -1,0 +1,59 @@
+body {
+	text-align: center;
+}
+
+div#settings {
+	margin-top: 20px;
+	display: inline-block;
+	font-family: Futura;
+	font-size      : 15px;
+	line-height: 25px;
+	text-align: left;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+div#settings button {
+	display: inline-block;
+	width: 100%;
+	margin-top: 20px;
+	border: 0;
+	background-color: #247da2;
+	font-family: Futura;
+	font-size      : 15px;
+	height: 25px;
+	line-height: 25px;
+	text-align     : center;
+	text-decoration: none;
+	text-transform: uppercase;
+}
+
+div#settings button:hover {
+	color: white;
+}
+
+/* located in demo.css and creates a little calendar icon
+ * instead of a text link for "Choose date"
+ */
+a.dp-choose-date {
+	float: left;
+	width: 16px;
+	height: 16px;
+	padding: 0;
+	margin: 5px 3px 0;
+	display: block;
+	text-indent: -2000px;
+	overflow: hidden;
+	background: url(calendar.png) no-repeat; 
+}
+a.dp-choose-date.dp-disabled {
+	background-position: 0 -20px;
+	cursor: default;
+}
+/* makes the input field shorter once the date picker code
+ * has run (to allow space for the calendar icon
+ */
+input.dp-applied {
+	width: 140px;
+	float: left;
+}
