@@ -52,6 +52,7 @@ public class SuggestionServlet extends HttpServlet {
 		Analyser analyser = new Analyser();
 
 		List<List<Suggestion>> suggestions = analyser.getSuggestions(events, CalendarUtils.getCurrentUserId());
+		suggestionMap.put(CalendarUtils.getCurrentUserId(), suggestions);
 		//System.out.println("Returning suggestions for list 1: " +  suggestions.get(0).size());
 		/*
 		List<List<Suggestion>> suggestions = new ArrayList<List<Suggestion>>();
@@ -169,20 +170,22 @@ public class SuggestionServlet extends HttpServlet {
 
 		try {
 			suggestionsJSON = new JSONObject(request.getReader().readLine());
-			String userID = suggestionsJSON.getString("userID");
+			String userID = CalendarUtils.getCurrentUserId();//suggestionsJSON.getString("userID");
 			int list = suggestionsJSON.getInt("setID");
 			JSONArray acceptedSuggestions = suggestionsJSON.getJSONArray("suggestions");
 			int lenght = acceptedSuggestions.length();
 			JSONArray suggestionJSON;
 			int suggestion;
 			int alternative;
-
+			System.out.println(suggestionMap == null);
 			List<List<Suggestion>> suggestions = suggestionMap.get(userID);
 
 			for(int i = 0; i < lenght; i++) {
 				suggestionJSON = acceptedSuggestions.getJSONArray(i);
 				suggestion = (Integer) suggestionJSON.get(0);
 				alternative = (Integer) suggestionJSON.get(1);
+				System.out.println(list);
+				System.out.println(suggestions == null);
 				List<Suggestion> l = suggestions.get(list);
 				Suggestion s = l.get(suggestion);
 				s.makePersistent(alternative);
