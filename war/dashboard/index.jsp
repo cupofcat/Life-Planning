@@ -126,7 +126,7 @@
                   $alter_div_right = $('<div class="right"></div>').appendTo($alter_div);
                   $alter_div_left.append('<div class="title">' + alter.title + '</div>');
                   $alter_div_left.append('<div class="datetimes">' + alter.startDateTime + ' - ' + alter.endDateTime + '</div>');
-                  $alter_div_left.append('<div class="description">' + alter.description + 'Lorem ipsum dolor sit amet, consectetur.' + '</div>');
+                  $alter_div_left.append('<div class="description">' + alter.description + '</div>');
                   $spheres_ul = $('<ul class="spheres"></ul>').appendTo($alter_div_right);
                   $.each(alter.spheres, function(sphere_id, sphere) {
                     $spheres_ul.append('<li class="' + sphere.toLowerCase() + '"><span>' + sphere + '</span></li>');
