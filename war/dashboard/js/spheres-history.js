@@ -167,9 +167,6 @@ $.getJSON("spheres-history", parametersForServlet, function(data){
 		}
 	}); 
 	
-	
-	//Date.UTC(2008, 7, 1);
-	
 			
 	// declares initial data series for the detail graph
 	initialDetailSeries = [];
@@ -193,7 +190,6 @@ $.getJSON("spheres-history", parametersForServlet, function(data){
 		
 		initialDetailSeries.push(tempSeries);
 	}
-	//alert(initialDetailSeries[1].data); 
 	
 	// create a detail chart referenced by a global variable
 	detailChart = new Highcharts.Chart({

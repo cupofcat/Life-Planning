@@ -85,10 +85,10 @@
 			<div id="body">
 				<br /><br />
 				
-				<div id="priorities-chart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
-				<div id="historicChart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
+				<div id="priorities-chart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br /><br /><br />
+				<div id="historicChart" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br /><br /><br /><br /><br />
 				<!-- Buttons for holding spheres are kept in here -->
-				<div id="sphereButtonsHolder"></div><br />
+				<div id="sphereButtonsHolder"></div><br /><br />
 				<div id="plan-achievement" style="width: 800px; height: 400px; margin: 0 auto"></div><br /><br />
 			   
 			</div>
