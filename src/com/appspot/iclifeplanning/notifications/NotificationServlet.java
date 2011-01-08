@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.appspot.analyser.Analyser;
 import com.appspot.analyser.Suggestion;
+import com.appspot.analyser.Utilities;
 import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
@@ -63,7 +64,7 @@ public class NotificationServlet extends HttpServlet {
 		      HashMap<SphereName, Double> desiredLifeBalance 
 		          = profile.getSpherePreferences();
 		      HashMap<SphereName, Double> currentLifeBalance 
-		          = Analyser.analyseEvents(events, desiredLifeBalance);
+		          = Utilities.analyseEvents(events, desiredLifeBalance);
 		      content = new NotificationEmailContent(suggestions, 
 		    		  desiredLifeBalance, currentLifeBalance, profile.getName());
 		    } else {

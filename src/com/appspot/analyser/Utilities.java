@@ -4,6 +4,7 @@ import java.util.*;
 
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
+import com.appspot.iclifeplanning.events.Event;
 
 public class Utilities {
 
@@ -107,5 +108,32 @@ public class Utilities {
 		return cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH) + "/" 
 		+ cal.get(Calendar.YEAR) + "  " + cal.get(Calendar.HOUR_OF_DAY)
 				+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
+	}
+	
+	public static HashMap<SphereName, Double> analyseEvents(
+			List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
+		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
+		initializeTimes(times, currentDesiredBalance.keySet());
+		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
+		double sum = 0;
+		for (IEvent event : events) {
+			double durationInMins = event.getDuration();
+			Map<SphereName, Double> sphereInfluences = event.getSpheres();
+			Set<SphereName> keys = sphereInfluences.keySet();
+			for (SphereName key : keys) {
+				double time = Math.round(sphereInfluences.get(key) * durationInMins);
+				times.put(key, times.get(key) + time);
+			}
+			sum += durationInMins;
+		}
+		for (SphereName key : times.keySet()) {
+			result.put(key, times.get(key) / sum);
+		}
+		return result;
+	}
+
+	private static void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
+		for (SphereName key : keys)
+			times.put(key, 0.0);
 	}
 }

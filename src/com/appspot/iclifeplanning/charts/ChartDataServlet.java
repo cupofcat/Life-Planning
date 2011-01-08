@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.appspot.analyser.Analyser;
 import com.appspot.analyser.IEvent;
+import com.appspot.analyser.Utilities;
 import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.TokenStore;
@@ -61,7 +62,7 @@ public class ChartDataServlet extends HttpServlet {
 			List<Event> events = EventStore.getInstance().getEventsFromTimeRange(startTime, endTime);
 			if (events != null) {
 				System.out.println("Saving data");
-				HashMap<SphereName, Double> sphereResults = Analyser.analyseEvents(events, currentDesiredBalance);
+				HashMap<SphereName, Double> sphereResults = Utilities.analyseEvents(events, currentDesiredBalance);
 				WeeklyDataProfile profile = new WeeklyDataProfile(userID, weekNumber, sphereResults, currentDesiredBalance);
 				WeeklyDataProfileStore.addWeeklyDataProfile(profile);
 			}

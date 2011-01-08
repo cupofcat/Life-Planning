@@ -318,28 +318,6 @@ public class Analyser {
 		return new CalendarStatus(sum, sphereResults, freeSlots);
 	}
 
-	public static HashMap<SphereName, Double> analyseEvents(
-			List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
-		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
-		initializeTimes(times, currentDesiredBalance.keySet());
-		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
-		double sum = 0;
-		for (IEvent event : events) {
-			double durationInMins = event.getDuration();
-			Map<SphereName, Double> sphereInfluences = event.getSpheres();
-			Set<SphereName> keys = sphereInfluences.keySet();
-			for (SphereName key : keys) {
-				double time = Math.round(sphereInfluences.get(key) * durationInMins);
-				times.put(key, times.get(key) + time);
-				log.severe(key.name() + ": " + (times.get(key) + time));
-			}
-			sum += durationInMins;
-		}
-		for (SphereName key : times.keySet()) {
-			result.put(key, times.get(key) / sum);
-		}
-		return result;
-	}
 
 	private Map<SphereName, SphereInfo> generateSphereResults(Map<SphereName, Double> choices,
 			Map<SphereName, Double> currentRatios, Map<SphereName, Double> times) {
