@@ -196,3 +196,39 @@ div#signup-bar {
 	div#signup a:hover, div#signup a:active {
 		color: #000;
 	}
+	
+.panel {
+	position: relative;
+}
+
+.panel img {
+	display: block;
+	width: 400px;
+}
+
+.panel a {
+	color: black;
+}
+
+.tour-step {
+	font-family: Futura;
+	font-size: 20px;
+	position: absolute;
+	left: 410px;
+}
+
+.tour-next {
+	font-family: Futura;
+	font-size: 14px;
+	position: absolute;
+	left: 450px;
+	top: 25px;
+}
+
+.tour-prev {
+	font-family: Futura;
+	font-size: 14px;
+	position: absolute;
+	left: 410px;
+	top: 25px;
+}

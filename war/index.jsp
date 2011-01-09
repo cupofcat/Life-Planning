@@ -84,6 +84,9 @@ The development of mobile devices and e-mail has spread work into areas of time 
               <li><a href="#home">Home</a></li>
               <li><a href="#step1">Step 1</a></li>
               <li><a href="#step2">Step 2</a></li>
+              <li><a href="#step2">Step 3</a></li>
+              <li><a href="#step2">Step 4</a></li>
+              <li><a href="#step2">Step 5</a></li>
             </ul>
 
             <div class="scroll">
@@ -102,9 +105,40 @@ To start using the service all you need is a Google account with Google Calendar
                 </div>
                 
                 <!-- Steps of the Tour -->
-                <div class="panel" id="step1">Step 1 of the tour.<br /><a href="#step2">Go to step2</a></div>
+                <div class="panel" id="step1">
+                  <span class="tour-step">1. Sign up with your Google Account</span>
+                  <img src="img/tour/01-sign.png" />
+                  <a href="#step2" class="tour-next">Next</a>
+                  <a href="#home" class="tour-prev">Prev</a>
+                </div>
                 
-                <div class="panel" id="step2">Step 2 of the tour.<br /><a href="#step1">Go to step1</a></div>
+                <div class="panel" id="step2">
+                  <span class="tour-step">2. Authorise our application to access your calendar</span>
+                  <img src="img/tour/02-authorize.png" />
+                  <a href="#step3" class="tour-next">Next</a>
+                  <a href="#step1" class="tour-prev">Prev</a>
+                </div>
+                
+                <div class="panel" id="step3">
+                  <span class="tour-step">3. Set the desired life balance</span>
+                  <img src="img/tour/03-settings.png" />
+                  <a href="#step4" class="tour-next">Next</a>
+                  <a href="#step2" class="tour-prev">Prev</a>
+                </div>
+                
+                <div class="panel" id="step4">
+                  <span class="tour-step">4. Optimise your life</span>
+                  <img src="img/tour/04-optimise.png" />
+                  <a href="#step5" class="tour-next">Next</a>
+                  <a href="#step3" class="tour-prev">Prev</a>
+                </div>
+                
+                <div class="panel" id="step5">
+                  <span class="tour-step">5. See the results!</span>
+                  <img src="img/tour/05-stats.png" />
+                  <a href="#home" class="tour-next">Sign up!</a>
+                  <a href="#step4" class="tour-prev">Prev</a>
+                </div>
               </div>
             </div>
   
