@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.jdo.Query;
 import javax.jdo.PersistenceManager;
@@ -36,6 +37,7 @@ import com.appspot.iclifeplanning.events.EventStore;
 @SuppressWarnings("serial")
 public class NotificationServlet extends HttpServlet {
 	private static long timer = 0;
+	private static final Logger log = Logger.getLogger("EventStore");
 
 	public void doGet(HttpServletRequest request, HttpServletResponse response)
 			throws IOException {
@@ -56,8 +58,10 @@ public class NotificationServlet extends HttpServlet {
 		      // Set the session token as a field of the Service object.
 		      CalendarUtils.client.setAuthSubToken(sessionToken);
 		      EventStore eventStore = EventStore.getInstance();
-		      eventStore.initizalize();
-		      List<Event> events = eventStore.getEvents();
+		      //eventStore.initizalize();
+		      long startTime = profile.getStartOptimizing();
+		      long endTime = profile.getFinishOptimizing();
+		      List<Event> events = eventStore.getEventsFromTimeRange(startTime, endTime);
 		      Analyser analyser = new Analyser();
 		      List<List<Suggestion>> suggestions
 		    	  = analyser.getSuggestions(events, profile.getUserID());

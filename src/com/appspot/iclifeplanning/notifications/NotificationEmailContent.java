@@ -55,17 +55,20 @@ public class NotificationEmailContent implements EmailContent {
     	String headerSuggestions = "Here are some of our suggestions how to improve: \n\n";
     	String suggestionsContent = "";
     	int i = 0;
-    	while (i < 3 && i < suggestions.size()) {
-    		suggestionsContent 
-    		    += ((i+1) + ". " + suggestions.get(i).toString() + "\n");
+    	while (i < 3) {
+    		if(i < suggestions.get(0).size()) {
+	    		suggestionsContent 
+	    		    += ((i+1) + ". " + suggestions.get(0).get(i).toString() + "\n");
+    		}
+    		i++;
     	}
     	
-    	String headerGreetings = "Have an optimized day!\n";
+    	String headerGreetings = "\nHave an optimized day!\n";
     	String signature = "Your Life Planning Team\n";
     	String result = title + openingLine 
     	    + headerCurrent + currentLifeBalanceDescription 
     	    + headerDesired + desiredLifeBalanceDescription
-    	    + headerSuggestions + headerGreetings + signature;
+    	    + headerSuggestions + suggestionsContent + headerGreetings + signature;
     	return result;
     }
 }
