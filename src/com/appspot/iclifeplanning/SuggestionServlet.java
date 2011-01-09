@@ -146,8 +146,11 @@ public class SuggestionServlet extends HttpServlet {
 			
 			SimpleDateFormat date = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
 			suggestionObject.put("startDateTime", date.format(suggestion.getStartDate().getTime()));
-
 			suggestionObject.put("endDateTime", date.format(suggestion.getEndDate().getTime()));
+			if(suggestion instanceof RescheduleSuggestion) {
+				suggestionObject.put("newStartDateTime", date.format(((RescheduleSuggestion)suggestion).getNewDates().getFirst()));
+				suggestionObject.put("newEndDateTime", date.format(((RescheduleSuggestion)suggestion).getNewDates().getSecond()));
+			}
 			suggestionObject.put("type", suggestion.getType());
 
 			List<String> spheres = new ArrayList<String>();
