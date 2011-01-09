@@ -125,7 +125,11 @@
                   $alter_div_left = $('<div class="left"></div>').appendTo($alter_div);
                   $alter_div_right = $('<div class="right"></div>').appendTo($alter_div);
                   $alter_div_left.append('<div class="title">' + alter.title + '</div>');
-                  $alter_div_left.append('<div class="datetimes">' + alter.startDateTime + ' - ' + alter.endDateTime + '</div>');
+                  if (alter.type == 'Reschedule') {
+                    $alter_div_left.append('<div class="datetimes">From: ' + alter.startDateTime + ' - ' + alter.endDateTime + '<br />To: ' + alter.newStartDateTime + ' - ' + alter.newEndDateTime +'</div>');
+                  } else {
+                    $alter_div_left.append('<div class="datetimes">' + alter.startDateTime + ' - ' + alter.endDateTime + '</div>');
+                  }
                   $alter_div_left.append('<div class="description">' + alter.description + '</div>');
                   $spheres_ul = $('<ul class="spheres"></ul>').appendTo($type_div/*$alter_div_right*/);
                   $.each(alter.spheres, function(sphere_id, sphere) {
