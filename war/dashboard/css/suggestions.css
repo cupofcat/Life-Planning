@@ -144,12 +144,16 @@ div#calendar_suggestions div.sugg_set {
 						}
 			
 					div#calendar_suggestions div.right {
+						height: 60px;
 					}
 			
 						div#calendar_suggestions ul.spheres {
 							margin-top: 10px;
 							list-style-type: none;
 							font-size: 12px;
+							position: absolute;
+							bottom: 0;
+							margin-left: 25px;
 						}
 
 						div#calendar_suggestions ul.spheres > li {
@@ -160,28 +164,44 @@ div#calendar_suggestions div.sugg_set {
 						}
 
 						div#calendar_suggestions ul.spheres > li {
-							wi dth: 48px;
-							he ight: 48px;
+							width: 48px;
+							height: 48px;
 						}
 
 						div#calendar_suggestions ul.spheres > li span {
-							d isplay: none;
+							display: none;
 						}
 
-						div#calendar_suggestions ul.spheres > li.health  {
-							background-image: url("hea lth-icon.png");
+						div#calendar_suggestions div.selected ul.spheres > li.health  {
+							background-image: url("health-icon.png");
 						}
 
-						div#calendar_suggestions ul.spheres > li.family  {
-							background-image: url("fami ly-icon.png");
+						div#calendar_suggestions div.selected ul.spheres > li.family  {
+							background-image: url("family-icon.png");
 						}
 
-						div#calendar_suggestions ul.spheres > li.work  {
-							background-image: url("work- icon.png");
+						div#calendar_suggestions div.selected ul.spheres > li.work  {
+							background-image: url("work-icon.png");
 						}
 
-						div#calendar_suggestions ul.spheres > li.recreation  {
-							background-image: url("recrea tion-icon.png");
+						div#calendar_suggestions div.selected ul.spheres > li.recreation  {
+							background-image: url("recreation-icon.png");
+						}
+						
+						div#calendar_suggestions div.unselected ul.spheres > li.health  {
+							background-image: url("health-icon-grey.png");
+						}
+
+						div#calendar_suggestions div.unselected ul.spheres > li.family  {
+							background-image: url("family-icon-grey.png");
+						}
+
+						div#calendar_suggestions div.unselected ul.spheres > li.work  {
+							background-image: url("work-icon-grey.png");
+						}
+
+						div#calendar_suggestions div.unselected ul.spheres > li.recreation  {
+							background-image: url("recreation-icon-grey.png");
 						}
 
 /* BUTTON */
