@@ -8,6 +8,8 @@ import com.appspot.iclifeplanning.events.Event;
 
 public class Utilities {
 
+	public static final int DAYLENGTH = 1440;
+	
 	public static double getDuration(Calendar start, Calendar end) {
 		return (end.getTimeInMillis() - start.getTimeInMillis()) / 1000 / 60;
 		//return (end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH)) * 1440

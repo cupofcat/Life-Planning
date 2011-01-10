@@ -35,26 +35,45 @@ public class LifePlanningServlet extends HttpServlet {
 	throws IOException {
 		Suggestion beginning = new RescheduleSuggestion("Begin", null, new GregorianCalendar(2000, 3, 3, 0, 0, 0),new GregorianCalendar(2000, 3, 3, 0, 0, 0) );
 		beginning.setDeurationInterval(0, 0);
-		Suggestion end = new RescheduleSuggestion("End", null, new GregorianCalendar(2000, 3, 3, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
+		Suggestion end = new RescheduleSuggestion ("End", null, new GregorianCalendar(2000, 3, 6, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
 		end.setDeurationInterval(0, 0);
-		Suggestion s = new RescheduleSuggestion("Meeting Praca", null, new GregorianCalendar(2000, 3, 3, 15, 0, 0),new GregorianCalendar(2000, 3, 3, 17, 00, 0) );
-		s.setSpheres(generateSpheres(new double[]{0.7, 0.2}));
-		s.setDeurationInterval(30, 120);
-		s.setReschedule(true);
-		Suggestion s2 = new RescheduleSuggestion("Zdrowie", null, new GregorianCalendar(2000, 3, 3, 12, 0, 0),new GregorianCalendar(2000, 3, 3, 12, 30, 0) );
+		
+		Suggestion s1 = new RescheduleSuggestion("Zdrowie1", null, new GregorianCalendar(2000, 3, 3, 9, 0, 0),new GregorianCalendar(2000, 3, 3, 10, 0, 0) );
+		s1.setSpheres(generateSpheres(new double[]{1.0}));
+		s1.setDeurationInterval(0, 60);
+		s1.setReschedule(false);
+		
+		Suggestion s2 = new RescheduleSuggestion("Zdrowie2", null, new GregorianCalendar(2000, 3, 3, 12, 0, 0),new GregorianCalendar(2000, 3, 3, 13, 0, 0) );
 		s2.setSpheres(generateSpheres(new double[]{1.0}));
-		s2.setDeurationInterval(10, 40);
-		s2.setReschedule(true);
-		Suggestion s3 = new RescheduleSuggestion("Praca", null, new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 17, 30, 0) );
+		s2.setDeurationInterval(0, 60);
+		s2.setReschedule(false);
+		
+		Suggestion s3 = new RescheduleSuggestion("Work", null, new GregorianCalendar(2000, 3, 3, 12, 10, 0),new GregorianCalendar(2000, 3, 3, 16, 30, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
-		s3.setDeurationInterval(0, 30);
-		s3.setReschedule(true);
+		s3.setDeurationInterval(0, 120);
+		s3.setReschedule(false);
+		
+		Suggestion s4 = new RescheduleSuggestion("Work Small", null, new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 16, 31, 0) );
+		s4.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
+		s4.setDeurationInterval(0, 60);
+		s4.setReschedule(false);
+		
+		Suggestion s5 = new RescheduleSuggestion("Recreation", null, new GregorianCalendar(2000, 3, 6, 11, 0, 0),new GregorianCalendar(2000, 3, 6, 12, 0, 0) );
+		s5.setSpheres(generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
+		s5.setDeurationInterval(0, 60);
+		s5.setReschedule(false);
+		
+
+		
 		List<Suggestion> list = new LinkedList<Suggestion>();
 		//list.add(s);
 		list.add(end);
 		list.add(beginning);
-		list.add(s2);
+		list.add(s1);
+		list.add(s4);
 		list.add(s3);
+		list.add(s2);
+		list.add(s5);
 		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.7,0.3});
 		//    Collection<UserProfile> users = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + UserProfile.class.getName()).execute();
 		//   printProfiles(users);
@@ -68,7 +87,7 @@ public class LifePlanningServlet extends HttpServlet {
 		//p.makePersistent();
 		//////////////
 
-		PersistenceManager pmf = PMF.get().getPersistenceManager();
+	//	PersistenceManager pmf = PMF.get().getPersistenceManager();
 		//for(SphereName sphere : SphereName.values())
 		//pmf.deletePersistentAll((Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute());
 
@@ -78,7 +97,7 @@ public class LifePlanningServlet extends HttpServlet {
 
 		//PersistenceManager pmf = PMF.get().getPersistenceManager();
 
-		Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName()).execute();//+ " where majorSphere =='" + SphereName.WORK+"'").execute();
+	//	Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName()).execute();//+ " where majorSphere =='" + SphereName.WORK+"'").execute();
 		//pmf.deletePersistentAll(spheres);
 		//Utilities.printEvents(spheres);
 		//UserProfile profile = new UserProfile("rysio", "kaletnik", "ryszardKaleta@op.lp", generateSpheres(new double[]{0.5,0.5,}), false,310);

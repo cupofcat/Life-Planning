@@ -14,8 +14,8 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	private List<CalendarStatus> alternatives;
 	private FreeSlotsManager slotsManager;
 	private Map<SphereName, SphereInfo> sphereResults;	
-	private boolean containsProposal;
-
+	private boolean containsProposal;	
+	
 	public CalendarStatus(double userBusyTime, Map<SphereName, SphereInfo> currentSphereResults, List<BaseCalendarSlot> freeSlots)  {
 		event = null;
 		this.userBusyTime = userBusyTime;
@@ -124,6 +124,10 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		return containsProposal;
 	}
 
+	public boolean hasImproved(){
+		return this.additionalEventTime != 0;
+	}
+	
 	/* Update status of calendar after more optimal scheduling of the event */
 	private void analyse() {
 		Map<SphereName, Double> sphereInfluences = event.getSpheres();
