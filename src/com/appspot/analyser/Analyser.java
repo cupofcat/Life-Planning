@@ -45,9 +45,9 @@ public class Analyser {
 		
 		List<Proposal> health = new LinkedList<Proposal>();
 		Proposal p = new Proposal("TestProposal", "Health Small");
-		p.setDurationInterval(new Pair<Double, Double>(10.0, 30.0));
-		Calendar startDate = new GregorianCalendar(2000, 0, 3, 20, 0, 0);
-		Calendar endDate = new GregorianCalendar(2000, 0, 3, 1, 30, 0);
+		p.setDurationInterval(new Pair<Double, Double>(20.0, 40.0));
+		Calendar startDate = new GregorianCalendar(2000, 0, 3, 9, 0, 0);
+		Calendar endDate = new GregorianCalendar(2000, 0, 3, 10, 30, 0);
 		p.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate, endDate));
 		p.setSpheres(Utilities.generateSpheres(new double[]{1.0}));
 		health.add(p);
@@ -83,7 +83,7 @@ public class Analyser {
 			return null;
 		removeStaticEvents(events);
 		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, start), 
-				generateProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true) );
+				generateProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true));
 		for (int i = 0; result.size() < maxSuggestions && i < statuses.size(); i++) {
 			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();			
 			CalendarStatus nextMin = statuses.get(i);
@@ -91,17 +91,26 @@ public class Analyser {
 			/* Even best event can't improve the status */
 			list.add(nextMin);
 			removeEvent(nextMin);
+			
 			/* Check neighbours if they can become alternative suggestions to nextMin */
 			int count = 1;
-			while((i+1) < statuses.size() && count < 3){
-				CalendarStatus next = statuses.get(i+1);
+			int k = i+1;
+			while(k < statuses.size() && count < 3){
+				CalendarStatus next = statuses.get(k);
 				if(next.compareTo(start) > 0 || (next.getCoefficient() > 0.05 && next.getCoefficient() > nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE)))
 					break;
+				if(nextStatus.containsProposal()){
+					if(next.containsProposal() && 
+					 !( (Proposal)next.getEvent()).getMajorSphere().equals(( (Proposal) nextStatus.getEvent()).getMajorSphere())){
+						k++;
+						continue;
+					}
+				}
 				nextMin.addAlternative(next);
 				removeEvent(next);
+				statuses.remove(next);
 				if(!nextStatus.containsProposal() && next.containsProposal())
 					nextStatus = next;
-				++i;
 				count++;
 			}		
 			List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, maxDepth);
@@ -109,6 +118,9 @@ public class Analyser {
 				list.addAll(rest);
 			result.add(list);
 			restoreEvents(nextMin);
+			
+			Utilities.printEvents(nextMin.slotsManager.getFreeSlots());
+			
 		}
 		return result;
 	}
@@ -120,23 +132,35 @@ public class Analyser {
 		/* For a single status from above, order statuses again
 		 * i.e. pivoting for single statuses from above */
 		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, currentStatus), 
-				generateProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false) );
+				generateProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false));
 		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
 		CalendarStatus nextMin = statuses.get(0);
+		
+		Utilities.printEvents(nextMin.slotsManager.getFreeSlots());
+		
 		CalendarStatus nextStatus = nextMin;
 		list.add(nextMin);
 		removeEvent(nextMin);
 		/* Check neighbours if they can become alternative suggestions to nextMin */
 		int i  = 1;
-		while(i < statuses.size() && i <= 3){
+		int count = 1;
+		while(i < statuses.size() && count < 3){
 			CalendarStatus next = statuses.get(i);
 			if(next.compareTo(currentStatus) > 0 || (next.getCoefficient() > 0.05 && next.getCoefficient() > nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE)))
 				break;
+			if(nextStatus.containsProposal()){
+				if(next.containsProposal() && 
+				 !( (Proposal)next.getEvent()).getMajorSphere().equals(( (Proposal) nextStatus.getEvent()).getMajorSphere())){
+					i++;
+					continue;
+				}
+			}
 			nextMin.addAlternative(next);
 			removeEvent(next);
+			statuses.remove(next);
 			if(!nextStatus.containsProposal() && next.containsProposal())
 				nextStatus = next;
-			++i;			
+			count++;			
 		}
 		List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, depth - 1);
 		if (rest != null)

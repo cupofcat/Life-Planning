@@ -35,7 +35,7 @@ public class LifePlanningServlet extends HttpServlet {
 	throws IOException {
 		Suggestion beginning = new RescheduleSuggestion("Begin", null, new GregorianCalendar(2000, 3, 3, 0, 0, 0),new GregorianCalendar(2000, 3, 3, 0, 0, 0) );
 		beginning.setDeurationInterval(0, 0);
-		Suggestion end = new RescheduleSuggestion ("End", null, new GregorianCalendar(2000, 3, 6, 23, 59, 59),new GregorianCalendar(2000, 3, 3, 23, 59, 59) );
+		Suggestion end = new RescheduleSuggestion ("End", null, new GregorianCalendar(2000, 3, 6, 23, 59, 59),new GregorianCalendar(2000, 3, 6, 23, 59, 59) );
 		end.setDeurationInterval(0, 0);
 		
 		Suggestion s1 = new RescheduleSuggestion("Zdrowie1", null, new GregorianCalendar(2000, 3, 3, 9, 0, 0),new GregorianCalendar(2000, 3, 3, 10, 0, 0) );
@@ -43,22 +43,22 @@ public class LifePlanningServlet extends HttpServlet {
 		s1.setDeurationInterval(0, 60);
 		s1.setReschedule(false);
 		
-		Suggestion s2 = new RescheduleSuggestion("Zdrowie2", null, new GregorianCalendar(2000, 3, 3, 12, 0, 0),new GregorianCalendar(2000, 3, 3, 13, 0, 0) );
+		Suggestion s2 = new RescheduleSuggestion("Zdrowie2", null, new GregorianCalendar(2000, 3, 3, 10, 30, 0),new GregorianCalendar(2000, 3, 3, 13, 0, 0) );
 		s2.setSpheres(generateSpheres(new double[]{1.0}));
 		s2.setDeurationInterval(0, 60);
 		s2.setReschedule(false);
 		
-		Suggestion s3 = new RescheduleSuggestion("Work", null, new GregorianCalendar(2000, 3, 3, 12, 10, 0),new GregorianCalendar(2000, 3, 3, 16, 30, 0) );
+		Suggestion s3 = new RescheduleSuggestion("Work", null, new GregorianCalendar(2000, 3, 3, 10, 30, 0),new GregorianCalendar(2000, 3, 3, 11, 30, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
 		s3.setDeurationInterval(0, 120);
 		s3.setReschedule(false);
 		
-		Suggestion s4 = new RescheduleSuggestion("Work Small", null, new GregorianCalendar(2000, 3, 3, 16, 30, 0),new GregorianCalendar(2000, 3, 3, 16, 31, 0) );
+		Suggestion s4 = new RescheduleSuggestion("Work Small", null, new GregorianCalendar(2000, 3, 6, 10, 25, 0),new GregorianCalendar(2000, 3, 6, 11, 05, 0) );
 		s4.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
-		s4.setDeurationInterval(0, 60);
-		s4.setReschedule(false);
+		s4.setDeurationInterval(30, 40);
+		s4.setReschedule(true);
 		
-		Suggestion s5 = new RescheduleSuggestion("Recreation", null, new GregorianCalendar(2000, 3, 6, 11, 0, 0),new GregorianCalendar(2000, 3, 6, 12, 0, 0) );
+		Suggestion s5 = new RescheduleSuggestion("Recreation", null, new GregorianCalendar(2000, 3, 6, 10, 25, 0),new GregorianCalendar(2000, 3, 6, 12, 0, 0) );
 		s5.setSpheres(generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
 		s5.setDeurationInterval(0, 60);
 		s5.setReschedule(false);
@@ -72,8 +72,8 @@ public class LifePlanningServlet extends HttpServlet {
 		list.add(s1);
 		list.add(s4);
 		list.add(s3);
-		list.add(s2);
-		list.add(s5);
+		//list.add(s2);
+		//list.add(s5);
 		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.7,0.3});
 		//    Collection<UserProfile> users = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + UserProfile.class.getName()).execute();
 		//   printProfiles(users);

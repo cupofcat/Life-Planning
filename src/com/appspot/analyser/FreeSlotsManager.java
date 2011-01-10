@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Random;
 
 public class FreeSlotsManager {
 
@@ -26,64 +27,57 @@ public class FreeSlotsManager {
 	public CalendarStatus checkProposal(Proposal proposal) {
 		List<BaseCalendarSlot> possibleSlots = getPossibleSlots(proposal);
 		if (possibleSlots != null) {
-			List<BaseCalendarSlot> freeSlotsCopy = new LinkedList<BaseCalendarSlot>();
-			freeSlotsCopy.addAll(freeSlots);
-			return new CalendarStatus(proposal, status, freeSlotsCopy, possibleSlots);
+			return new CalendarStatus(proposal, status, Utilities.copyFreeSlots(freeSlots), possibleSlots);
 		}
 		return null;
 	}
-
-	/*
-	 * Find suitable free slots for proposal Adjust proposal's max duration
-	 * considering slots found
-	 */
-
-	/*
-	 * end za pocz i pocz przed koncem free slota - condition 
-	 * 1. generate	 * starting skoczek - take possible time and generate it using start date
-	 * from free slot taking into account 2 cases : usual and across the day(hours 23 - 2:00) 
-	 * 2. compare hours usually to check - modify comparisons and generate length using Calendar.add 
-	 *3. add 24 hours to start/end date of skoczek and compare again until start date > freeSlot.endDate
-	 */
+	
 	public List<BaseCalendarSlot> getPossibleSlots(Proposal proposal) {
 		List<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
 		Pair<Calendar, Calendar> possibleTimeSlot = proposal.getPossibleTimeSlot();
 		Double minDuration = proposal.getDurationInterval().getFirst();
 		Double maxDuration = proposal.getDurationInterval().getSecond();
 		double nextDuration, currentMax = 0;
+		Calendar slotStartDate, slotEndDate;
 		for (BaseCalendarSlot freeSlot : freeSlots) {
 			BaseCalendarSlot hourSlot = generateStartingSlot(freeSlot.getStartDate(), possibleTimeSlot);
-			printSlot(hourSlot);
-			while (hourSlot.getStartDate().compareTo(freeSlot.getEndDate()) < 0) {
-				/* proposal fits inside the free slot */
-				
-				//Change comparisons here and check final output
-				
-				if (Utilities.compareHours(possibleTimeSlot.getSecond(), freeSlot.getStartDate()) > 0
-						&& Utilities.compareHours(possibleTimeSlot.getFirst(), freeSlot.getEndDate()) < 0) {
-					Calendar slotStartDate = freeSlot.getStartDate();
-					Calendar slotEndDate = freeSlot.getEndDate();
-					/* earliest possible start */
-					Calendar start = Utilities.max(possibleTimeSlot.getFirst(), slotStartDate);
-					start.set(slotStartDate.get(Calendar.YEAR), slotStartDate.get(Calendar.MONTH), slotStartDate.get(Calendar.DAY_OF_MONTH));
-					Calendar tmp = new GregorianCalendar();
-					tmp.setTimeInMillis(start.getTimeInMillis() + (long) (maxDuration * 60000));
-					Calendar endSlot = Utilities.min(possibleTimeSlot.getSecond(), slotEndDate);
-					/* latest possible end */
+			Calendar possibleStartDate = hourSlot.getStartDate();
+			Calendar possibleEndDate = hourSlot.getEndDate();
+			slotStartDate = freeSlot.getStartDate();
+			slotEndDate = freeSlot.getEndDate();
+			/* proposal fits inside the free slot */
+
+			// Change comparisons here and check final output
+			while (possibleStartDate.compareTo(slotEndDate) < 0) {
+				if (possibleEndDate.compareTo(slotStartDate) > 0 && possibleStartDate.compareTo(slotEndDate) < 0) {
+
+					Calendar start = Utilities.max(possibleStartDate, slotStartDate);
+					//System.out.println(Utilities.printDate(start) + " - new start");
+
+					Calendar tmp = new GregorianCalendar(start.get(Calendar.YEAR), start.get(Calendar.MONTH), start.get(Calendar.DAY_OF_MONTH), 
+							start.get(Calendar.HOUR_OF_DAY), start.get(Calendar.MINUTE), 0);
+					tmp.add(Calendar.MINUTE, (int) ((double) maxDuration));
+					//System.out.println(Utilities.printDate(tmp) + " - new tmp");
+
+					Calendar endSlot = Utilities.min(possibleEndDate, slotEndDate);
+					//System.out.println(Utilities.printDate(endSlot) + " - new endSlot");
+
 					Calendar end = Utilities.min(tmp, endSlot);
-					end.set(slotEndDate.get(Calendar.YEAR), slotEndDate.get(Calendar.MONTH), slotEndDate.get(Calendar.DAY_OF_MONTH));
-					nextDuration = Utilities.getDuration(start, end);
+					//System.out.println(Utilities.printDate(end) + " - new end");
+
+					BaseCalendarSlot candidate = new BaseCalendarSlot("Best fit", null, start, end);
+					nextDuration = candidate.getDuration();
 					if (nextDuration > minDuration) {
-						ret.add(new BaseCalendarSlot("Best fit", null, start, end));
+						ret.add(candidate);
 						if (nextDuration > currentMax)
 							currentMax = nextDuration;
 					}
 				}
-				hourSlot.getStartDate().add(Calendar.DAY_OF_MONTH, 1);
-				hourSlot.getEndDate().add(Calendar.DAY_OF_MONTH, 1);
+				possibleStartDate.add(Calendar.DAY_OF_MONTH, 1);
+				possibleEndDate.add(Calendar.DAY_OF_MONTH, 1);
+				//System.out.println(Utilities.printDate(possibleStartDate) + " - " + Utilities.printDate(possibleEndDate));
 			}
 		}
-		Utilities.printEvents(ret);
 		if (!ret.isEmpty()) {
 			if (currentMax > 0) {
 				proposal.getDurationInterval().setSecond(currentMax);
@@ -119,14 +113,26 @@ public class FreeSlotsManager {
 		/* possibleSlots = when an event can be scheduled */
 		IEvent event = status.getEvent();
 		BaseCalendarSlot chosenSlot = null;
+		double eventDuration = status.getEvent().getDuration() + status.getAdditionalEventTime();
+		int start = 0, end = 0;
 		for (BaseCalendarSlot slot : possibleSlots) {
-			double eventDuration = status.getEvent().getDuration() + status.getAdditionalEventTime();
-			if (slot.getDuration() >= eventDuration) {
-				chosenSlot = slot;
-				chosenSlot.setDuration(eventDuration);
-				break;
+			if (chosenSlot == null){
+				if(slot.getDuration() >= eventDuration){
+					end = start + 1;
+					chosenSlot = slot;
+				}
+				else
+					start++;
+					
 			}
+			else if(slot.compareTo(chosenSlot) == 0)
+				end++;
+			else
+				break;
 		}
+		Random rand = new Random();
+		chosenSlot = possibleSlots.get(rand.nextInt(end - start) + start);
+		chosenSlot.setDuration(eventDuration);
 		int index = 0;
 		BaseCalendarSlot currentSlot = freeSlots.get(index);
 		while (!(currentSlot.getStartDate().compareTo(chosenSlot.getStartDate()) <= 0 && currentSlot.getEndDate().compareTo(chosenSlot.getEndDate()) >= 0)) {
@@ -143,10 +149,10 @@ public class FreeSlotsManager {
 
 	private void splitSlot(BaseCalendarSlot removedSlot, BaseCalendarSlot chosenSlot) {
 		if (removedSlot.getStartDate().before(chosenSlot.getStartDate())) {
-			freeSlots.add(new BaseCalendarSlot(removedSlot.getStartDate(), chosenSlot.getStartDate()));
+			freeSlots.add(new BaseCalendarSlot("Free Slot", null, removedSlot.getStartDate(), chosenSlot.getStartDate()));
 		}
 		if (removedSlot.getEndDate().after(chosenSlot.getEndDate())) {
-			freeSlots.add(new BaseCalendarSlot(chosenSlot.getEndDate(), removedSlot.getEndDate()));
+			freeSlots.add(new BaseCalendarSlot("Free Slot", null, chosenSlot.getEndDate(), removedSlot.getEndDate()));
 		}
 	}
 

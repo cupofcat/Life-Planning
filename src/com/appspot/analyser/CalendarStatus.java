@@ -7,14 +7,14 @@ import com.appspot.datastore.SphereName;
 
 /* Keeps status of a calendar */
 public class CalendarStatus implements Comparable<CalendarStatus> {
-	private IEvent event;
+	public IEvent event;
 	private double additionalEventTime;
 	private double coefficient;
 	private double userBusyTime;
 	private List<CalendarStatus> alternatives;
-	private FreeSlotsManager slotsManager;
+	public FreeSlotsManager slotsManager;
 	private Map<SphereName, SphereInfo> sphereResults;	
-	private boolean containsProposal;	
+	public boolean containsProposal;	
 	
 	public CalendarStatus(double userBusyTime, Map<SphereName, SphereInfo> currentSphereResults, List<BaseCalendarSlot> freeSlots)  {
 		event = null;
@@ -32,7 +32,9 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		coefficient = other.getCoefficient();
 		this.event = proposal;
 		recordProposal();
-		analyse();
+		//after recording minimum duration we improved our status and it is worth analysing
+		if(this.compareTo(other) < 0)
+			analyse();
 		slotsManager = new FreeSlotsManager(freeSlots,possibleSlots, this);
 		containsProposal = true;
 	}
@@ -45,6 +47,10 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		this.event = event;
 		slotsManager = new FreeSlotsManager(other.getFreeSlotsManager().getFreeSlots(), this);
 		analyse();
+	}
+
+	public CalendarStatus() {
+		// TODO Auto-generated constructor stub
 	}
 
 	private void recordProposal() {
@@ -182,10 +188,10 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 			currentExtraTime = i * timeStep;
 			currentStatus = getCurrentRatioStatus(sphereResults, influences, currentExtraTime);
 			if (prevStatus <= currentStatus)
-				return new Pair<Double, Double>(prevStatus, currentExtraTime - timeStep);
+				return new Pair<Double, Double>(prevStatus, (double) Math.round(currentExtraTime - timeStep));
 			prevStatus = currentStatus;
 		}
-		return new Pair<Double, Double>(prevStatus, currentExtraTime);
+		return new Pair<Double, Double>(prevStatus, (double) Math.round(currentExtraTime));
 	}
 
 	/* Work out which sphere is most out of line with target.

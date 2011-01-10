@@ -17,17 +17,17 @@ public class Utilities {
 	}
 
 	public static Calendar min(Calendar c1, Calendar c2) {
-		if (compareHours(c1, c2) <= 0)
-			return c1;
-		else
+		if (c1.compareTo(c2) >= 0)
 			return c2;
+		else
+			return c1;
 	}
 
 	public static Calendar max(Calendar c1, Calendar c2) {
-		if (compareHours(c1, c2) <= 0)
-			return c2;
-		else
+		if (c1.compareTo(c2) >= 0)
 			return c1;
+		else
+			return c2;
 	}
 
 	public static int compareHours(Calendar c1, Calendar c2) {
@@ -100,7 +100,7 @@ public class Utilities {
 	public static void printEvents(Collection<? extends ICalendarSlot> events) {
 		for (ICalendarSlot event : events)
 			System.out.println(event.getTitle() + "  " + event.getDescription() + "  " 
-					+ printDate(event.getStartDate()) + "  " + printDate(event.getEndDate()));
+					+ printDate(event.getStartDate()) + "  -  " + printDate(event.getEndDate()));
 		System.out.println("--------------------------------");
 	}
 
@@ -137,5 +137,11 @@ public class Utilities {
 	private static void initializeTimes(Map<SphereName, Double> times, Set<SphereName> keys) {
 		for (SphereName key : keys)
 			times.put(key, 0.0);
+	}
+	
+	public static List<BaseCalendarSlot> copyFreeSlots(List<BaseCalendarSlot> freeSlots){
+		List<BaseCalendarSlot> freeSlotsCopy = new LinkedList<BaseCalendarSlot>();
+		freeSlotsCopy.addAll(freeSlots);
+		return freeSlotsCopy;
 	}
 }
