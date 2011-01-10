@@ -232,3 +232,20 @@ div#signup-bar {
 	left: 410px;
 	top: 25px;
 }
+
+#help .question {
+	font-family: Futura;
+	font-size: 14px;
+	text-transform: uppercase;
+	display:block;
+	margin-bottom: 3px;
+}
+
+#help .answer {
+	font-family: Futura;
+	font-size: 12px;
+	margin-bottom: 10px;
+	padding-bottom: 10px;
+	display: block;
+	border-bottom: 1px solid black;
+}
