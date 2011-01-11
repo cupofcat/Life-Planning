@@ -50,19 +50,24 @@ public class LifePlanningServlet extends HttpServlet {
 		
 		Suggestion s3 = new RescheduleSuggestion("Work", null, new GregorianCalendar(2000, 3, 4, 13, 30, 0),new GregorianCalendar(2000, 3, 4, 14, 30, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
-		s3.setDeurationInterval(0, 120);
+		s3.setDeurationInterval(0, 60);
 		s3.setReschedule(false);
 		
 		Suggestion s4 = new RescheduleSuggestion("Family", null, new GregorianCalendar(2000, 3, 6, 10, 25, 0),new GregorianCalendar(2000, 3, 6, 11, 25, 0) );
 		s4.setSpheres(generateSpheres(new double[]{0.0, 0.0, 1.0}));
-		s4.setDeurationInterval(30, 40);
+		s4.setDeurationInterval(0, 60);
 		s4.setReschedule(false);
 		
 		Suggestion s5 = new RescheduleSuggestion("Recreation", null, new GregorianCalendar(2000, 3, 5, 16, 00, 0),new GregorianCalendar(2000, 3, 5, 17, 0, 0) );
 		s5.setSpheres(generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
 		s5.setDeurationInterval(0, 60);
-		s5.setReschedule(false);
+		s5.setReschedule(true);
 		
+		
+		Suggestion s6 = new RescheduleSuggestion("Recreation2", null, new GregorianCalendar(2000, 3, 5, 23, 30, 0),new GregorianCalendar(2000, 3, 6, 0, 30, 0) );
+		s6.setSpheres(generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
+		s6.setDeurationInterval(0, 60);
+		s6.setReschedule(true);
 
 		
 		List<Suggestion> list = new LinkedList<Suggestion>();
@@ -74,13 +79,20 @@ public class LifePlanningServlet extends HttpServlet {
 		list.add(s3);
 		list.add(s2);
 		list.add(s5);
+		list.add(s6);
 		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.7,0.3});
 		//    Collection<UserProfile> users = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + UserProfile.class.getName()).execute();
 		//   printProfiles(users);
 		////////////
 
 
-	
+		Proposal p2 = new Proposal("TestProposal - work2", "Work2");
+		p2.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
+		Calendar startDate2 = new GregorianCalendar(2000, 0, 3, 7, 0, 0);
+		Calendar endDate2 = new GregorianCalendar(2000, 0, 3, 8, 30, 0);
+		p2.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate2, endDate2));
+		p2.setSpheres(Utilities.generateSpheres(new double[]{0.0, 1.0}));
+		p2.makePersistent();
 		
 		PersistenceManager pmf = PMF.get().getPersistenceManager();
 		//for(SphereName sphere : SphereName.values())
@@ -92,7 +104,7 @@ public class LifePlanningServlet extends HttpServlet {
 
 		//PersistenceManager pmf = PMF.get().getPersistenceManager();
 
-		//Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName()).execute();//+ " where majorSphere =='" + SphereName.WORK+"'").execute();
+		Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName()).execute();//+ " where majorSphere =='" + SphereName.WORK+"'").execute();
 		//pmf.deletePersistentAll(spheres);
 		//Utilities.printEvents(spheres);
 		//UserProfile profile = new UserProfile("rysio", "kaletnik", "ryszardKaleta@op.lp", generateSpheres(new double[]{0.5,0.5,}), false,310);

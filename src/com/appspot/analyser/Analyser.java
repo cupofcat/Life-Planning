@@ -33,7 +33,7 @@ public class Analyser {
 	public static final double CONFIDENCE = 0.1;
 	private static final double ALTERNATIVE = 0.3;
 	static final int TRIES = 20;
-	private int maxDepth = 3;
+	private int maxDepth = 2;
 	private int maxSuggestions = 3;
 	private Map<SphereName, List<Proposal>> proposals;
 	private List<IEvent> events;
@@ -78,14 +78,15 @@ public class Analyser {
 			CalendarStatus nextMin = statuses.get(i);
 			CalendarStatus nextStatus = nextMin;
 			/* Even best event can't improve the status */
-			list.add(nextMin);
 			removeEvent(nextMin);
-			
 			/* Check neighbours if they can become alternative suggestions to nextMin */
 			int count = 1;
 			int k = i+1;
+			List<CalendarStatus> alternatives = new LinkedList<CalendarStatus>();
+			alternatives.add(nextStatus);
 			while(k < statuses.size() && count < 3){
 				CalendarStatus next = statuses.get(k);
+				double whatIsThis = nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE);
 				if(next.compareTo(start) > 0 || (next.getCoefficient() > 0.05 && next.getCoefficient() > nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE)))
 					break;
 				if(nextStatus.containsProposal()){
@@ -95,16 +96,34 @@ public class Analyser {
 						continue;
 					}
 				}
-				nextMin.addAlternative(next);
+				//nextMin.addAlternative(next);
 				removeEvent(next);
 				statuses.remove(next);
+				alternatives.add(next);
 				if(!nextStatus.containsProposal() && next.containsProposal())
 					nextStatus = next;
 				count++;
-			}		
+			}
+			alternatives.remove(nextStatus);
+			nextStatus.addAlternatives(alternatives);
+			nextStatus.updateSlots();
+			list.add(nextStatus);
+			System.out.println("Chosen Event : " + nextStatus.getEvent() + " At depth " + maxDepth);
+			Utilities.printEvents(nextStatus.slotsManager.getFreeSlots());
 			List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, maxDepth);
-			if (rest != null)
+			if (rest != null){
 				list.addAll(rest);
+				
+				//UPDATE LATER ///
+//				CalendarStatus toChange = nextMin;
+//				CalendarStatus changed = rest.get(0);
+//				do{
+//					toChange.recalculate(changed);
+//					CalendarStatus tmp = toChange;
+//					toChange = changed;
+//					changed = tmp;
+//				} while(changed.hasImproved());
+			}
 			result.add(list);
 			restoreEvents(nextMin);
 			
@@ -125,13 +144,13 @@ public class Analyser {
 		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
 		CalendarStatus nextMin = statuses.get(0);
 		
-		
 		CalendarStatus nextStatus = nextMin;
-		list.add(nextMin);
 		removeEvent(nextMin);
 		/* Check neighbours if they can become alternative suggestions to nextMin */
 		int i  = 1;
 		int count = 1;
+		List<CalendarStatus> alternatives = new LinkedList<CalendarStatus>();
+		alternatives.add(nextStatus);
 		while(i < statuses.size() && count < 3){
 			CalendarStatus next = statuses.get(i);
 			if(next.compareTo(currentStatus) > 0 || (next.getCoefficient() > 0.05 && next.getCoefficient() > nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE)))
@@ -143,19 +162,36 @@ public class Analyser {
 					continue;
 				}
 			}
-			nextMin.addAlternative(next);
 			removeEvent(next);
 			statuses.remove(next);
+			alternatives.add(next);
 			if(!nextStatus.containsProposal() && next.containsProposal())
 				nextStatus = next;
 			count++;			
 		}
+		alternatives.remove(nextStatus);
+		nextStatus.addAlternatives(alternatives);
+		nextStatus.updateSlots();
+		list.add(nextStatus);
+		System.out.println("Chosen Event : " + nextStatus.getEvent() + " At depth " + depth);
+		Utilities.printEvents(nextStatus.slotsManager.getFreeSlots());
 		List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, depth - 1);
-		if (rest != null)
+		if (rest != null){
 			list.addAll(rest);
+			
+			//UPDATE LATER ///
+//			CalendarStatus toChange = nextMin;
+//			CalendarStatus changed = rest.get(0);
+//			do{
+//				toChange.recalculate(changed);
+//				CalendarStatus tmp = toChange;
+//				toChange = changed;
+//				changed = tmp;
+//			} while(changed.hasImproved());
+		}
 		restoreEvents(nextMin);
 		System.out.println("Recursive call free slots");
-		Utilities.printEvents(nextMin.slotsManager.getFreeSlots());
+		
 		return list;
 	}
 
@@ -251,6 +287,7 @@ public class Analyser {
 				for(Proposal p : res){
 					cache.add(p);
 				}
+				permute(cache);
 				proposals.put(sphere, cache);
 			}
 			CalendarStatus next;
@@ -267,8 +304,8 @@ public class Analyser {
 		return result;
 	}
 	
-	private void permute(List<BaseCalendarSlot> list) {
-		List<BaseCalendarSlot> newList = new LinkedList<BaseCalendarSlot>();
+	private void permute(List<Proposal> list) {
+		List<Proposal> newList = new LinkedList<Proposal>();
 		Random rand = new Random();
 		while (!list.isEmpty()) {
 			newList.add(list.remove(rand.nextInt(list.size())));

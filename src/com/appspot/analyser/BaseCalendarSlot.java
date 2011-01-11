@@ -134,7 +134,15 @@ public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
 		String ret = "";
 		ret = "Title: " + title + "  Descr: " + description + "  ";
 		if(startDate != null && endDate != null)
-			ret = ret.concat(getStartDate() + "  -  " + getEndDate());
+			ret = ret.concat(printDate(getStartDate()) + " - " + printDate(getEndDate()));
 		return ret;
+	}
+
+	private String printDate(Calendar cal) {
+		if(cal == null)
+			return null;
+		return cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH) + "/" 
+		+ cal.get(Calendar.YEAR) + "  " + cal.get(Calendar.HOUR_OF_DAY)
+				+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
 	}
 }

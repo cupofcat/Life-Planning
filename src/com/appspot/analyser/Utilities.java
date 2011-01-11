@@ -99,17 +99,8 @@ public class Utilities {
 	
 	public static void printEvents(Collection<? extends ICalendarSlot> events) {
 		for (ICalendarSlot event : events)
-			System.out.println(event.getTitle() + "  " + event.getDescription() + "  " 
-					+ printDate(event.getStartDate()) + "  -  " + printDate(event.getEndDate()));
+			System.out.println(event);
 		System.out.println("--------------------------------");
-	}
-
-	public static String printDate(Calendar cal) {
-		if(cal == null)
-			return null;
-		return cal.get(Calendar.DAY_OF_MONTH) + "/" + cal.get(Calendar.MONTH) + "/" 
-		+ cal.get(Calendar.YEAR) + "  " + cal.get(Calendar.HOUR_OF_DAY)
-				+ ":" + cal.get(Calendar.MINUTE) + ":" + cal.get(Calendar.SECOND);
 	}
 	
 	public static HashMap<SphereName, Double> analyseEvents(
