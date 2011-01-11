@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 import java.util.logging.Logger;
 
@@ -21,11 +22,9 @@ import org.junit.Test;
 import org.junit.experimental.runners.Enclosed;
 import org.junit.runner.RunWith;
 
-//import com.appspot.datastore.PMF;
+import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
-import com.appspot.datastore.UserProfile;
-import com.appspot.datastore.UserProfileStore;
 import com.appspot.iclifeplanning.events.Event;
 
 @RunWith(Enclosed.class)
@@ -43,17 +42,9 @@ public class Analyser {
 	public Analyser() {
 		proposals = new HashMap<SphereName, List<Proposal>>();
 		
-		List<Proposal> health = new LinkedList<Proposal>();
-		Proposal p = new Proposal("TestProposal", "Health Small");
-		p.setDurationInterval(new Pair<Double, Double>(20.0, 40.0));
-		Calendar startDate = new GregorianCalendar(2000, 0, 3, 9, 0, 0);
-		Calendar endDate = new GregorianCalendar(2000, 0, 3, 10, 30, 0);
-		p.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate, endDate));
-		p.setSpheres(Utilities.generateSpheres(new double[]{1.0}));
-		health.add(p);
-		proposals.put(SphereName.HEALTH, health);
 	}
 	
+	@SuppressWarnings("unchecked")
 	public List<List<Suggestion>> getSuggestions(List<? extends IEvent> events, 
 			String currentUserId) throws IOException {
 		//UserProfile profile = UserProfileStore.getUserProfile(currentUserId);
@@ -64,15 +55,13 @@ public class Analyser {
 		//return convertToSuggestions(this.getSuggestions(profile.getSpherePreferences(), profile.isFullyOptimized()));
 	
 		LinkedList<List<Suggestion>> res = convertToSuggestions( getSuggestions(
-				Utilities.generateSpheres(new double[]{0.5,0.5}), true
+				Utilities.generateSpheres(new double[]{0.25,0.25, 0.25, 0.25}), true
 				));
-		int x = 5;
 		return res;
 	
 	}
 	
 
-	@SuppressWarnings("unchecked")
 	private List<List<CalendarStatus>> getSuggestions(Map<SphereName, 
 			Double> spherePreferences, boolean optimizeFull) throws IOException {
 		if (events.size() == 0)
@@ -136,7 +125,6 @@ public class Analyser {
 		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
 		CalendarStatus nextMin = statuses.get(0);
 		
-		Utilities.printEvents(nextMin.slotsManager.getFreeSlots());
 		
 		CalendarStatus nextStatus = nextMin;
 		list.add(nextMin);
@@ -166,6 +154,8 @@ public class Analyser {
 		if (rest != null)
 			list.addAll(rest);
 		restoreEvents(nextMin);
+		System.out.println("Recursive call free slots");
+		Utilities.printEvents(nextMin.slotsManager.getFreeSlots());
 		return list;
 	}
 
@@ -246,29 +236,23 @@ public class Analyser {
 
 	/* Get proposals for spheres which are not on target
 	 * Either from memory or pull from dataStore */
+	@SuppressWarnings("unchecked")
 	private List<CalendarStatus> generateProposalStatuses(List<SphereName> deficitSpheres, 
 			CalendarStatus currentStatus, boolean truncateProposals){
 		List<CalendarStatus> result = new LinkedList<CalendarStatus>();
-//		PersistenceManager pmf = PMF.get().getPersistenceManager();
+    	PersistenceManager pmf = PMF.get().getPersistenceManager();
 		List<Proposal> cache;
 		for(SphereName sphere : deficitSpheres){
-			cache = proposals.get(sphere);
-			
-			//UPDATE LATER////////////////////////////
-			
-			if(cache == null)
+			cache = proposals.get(sphere);			
+			if(cache == null){
 				cache = new LinkedList<Proposal>();
-			
-			
-//			if(cache == null){
-//				cache = new LinkedList<Proposal>();
-//				Collection<Proposal> res = (Collection<Proposal>) pmf.newQuery("select from " 
-//						+ Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute();
-//				for(Proposal p : res){
-//					cache.add(p);
-//				}
-//				proposals.put(sphere, cache);
-//			}
+				Collection<Proposal> res = (Collection<Proposal>) pmf.newQuery("select from " 
+						+ Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute();
+				for(Proposal p : res){
+					cache.add(p);
+				}
+				proposals.put(sphere, cache);
+			}
 			CalendarStatus next;
 			Iterator<Proposal> it = cache.iterator();
 			while(it.hasNext()){
@@ -281,6 +265,15 @@ public class Analyser {
 			Collections.sort(result);
 		}
 		return result;
+	}
+	
+	private void permute(List<BaseCalendarSlot> list) {
+		List<BaseCalendarSlot> newList = new LinkedList<BaseCalendarSlot>();
+		Random rand = new Random();
+		while (!list.isEmpty()) {
+			newList.add(list.remove(rand.nextInt(list.size())));
+		}
+		list.addAll(newList);
 	}
 
 	/* Create calendar statuses for all events, order them in terms of 
@@ -347,6 +340,7 @@ public class Analyser {
 	 * Define initial calendar status */
 	public CalendarStatus checkGoals(List<? extends IEvent> events, Map<SphereName, Double> choices) throws IOException {
 		List<BaseCalendarSlot> freeSlots = getFreeSlots(events);
+		System.out.println("///// INITIAL CALENDAR FREE SLOTS /////");
 		Utilities.printEvents(freeSlots);
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
 		initializeTimes(times, choices.keySet());

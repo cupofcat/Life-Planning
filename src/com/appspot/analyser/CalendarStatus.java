@@ -7,14 +7,15 @@ import com.appspot.datastore.SphereName;
 
 /* Keeps status of a calendar */
 public class CalendarStatus implements Comparable<CalendarStatus> {
-	public IEvent event;
+	private IEvent event;
 	private double additionalEventTime;
 	private double coefficient;
 	private double userBusyTime;
 	private List<CalendarStatus> alternatives;
 	public FreeSlotsManager slotsManager;
 	private Map<SphereName, SphereInfo> sphereResults;	
-	public boolean containsProposal;	
+	private boolean containsProposal;
+	private boolean successful;	
 	
 	public CalendarStatus(double userBusyTime, Map<SphereName, SphereInfo> currentSphereResults, List<BaseCalendarSlot> freeSlots)  {
 		event = null;
@@ -33,8 +34,10 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		this.event = proposal;
 		recordProposal();
 		//after recording minimum duration we improved our status and it is worth analysing
-		if(this.compareTo(other) < 0)
+		if(this.compareTo(other) < 0){
+			successful = true;
 			analyse();
+		}
 		slotsManager = new FreeSlotsManager(freeSlots,possibleSlots, this);
 		containsProposal = true;
 	}
@@ -54,8 +57,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	}
 
 	private void recordProposal() {
-		additionalEventTime = event.getDuration();
-		saveSphereInfos();
+		saveSphereInfos(event.getDuration());
 		setCurrentCoefficient();
 		additionalEventTime = 0;
 	}
@@ -131,7 +133,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	}
 
 	public boolean hasImproved(){
-		return this.additionalEventTime != 0;
+		return successful;
 	}
 	
 	/* Update status of calendar after more optimal scheduling of the event */
@@ -139,31 +141,36 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		Map<SphereName, Double> sphereInfluences = event.getSpheres();
 		Double eventDuration = event.getDuration();
 		Pair<Double, Double> eventDurationInterval = event.getDurationInterval();
-		double maxLengthening = eventDurationInterval.getSecond() - eventDuration;
-		double maxShortening = eventDuration - eventDurationInterval.getFirst();
+		double maxLengthening = eventDurationInterval.getSecond() - (eventDuration + additionalEventTime);
+		double maxShortening = (eventDuration + additionalEventTime) - eventDurationInterval.getFirst();
 		/* Work out effects of making event longer/shorter 
 		 * e.g. [(-maxShortening) / Analyser.TRIES] tells us at what 
 		 * time intervals we should be decreasing the duration of event
 		 */
 		Pair<Double, Double> lenRes = getRatioStatus(maxLengthening / Analyser.TRIES, sphereResults, sphereInfluences);
 		Pair<Double, Double> shortRes = getRatioStatus((-maxShortening) / Analyser.TRIES, sphereResults, sphereInfluences);
+		Double additionalTime;
 		if (lenRes.getFirst() < shortRes.getFirst()) {
 			coefficient = lenRes.getFirst();
-			additionalEventTime = lenRes.getSecond();
+			additionalTime = lenRes.getSecond();
 		} else {
 			coefficient = shortRes.getFirst();
-			additionalEventTime = shortRes.getSecond();
+			additionalTime = shortRes.getSecond();
 		}
-		saveSphereInfos();
+		if(additionalTime != 0){
+			successful = true;
+			saveSphereInfos(additionalTime);
+		}
 	}
 
-	private void saveSphereInfos() {
-		userBusyTime += additionalEventTime;
+	private void saveSphereInfos(double additionalTime) {
+		userBusyTime += additionalTime;
 		Map<SphereName, Double> influences = event.getSpheres();
 		for (SphereName sphere : influences.keySet()) {
-			double extraSphereTime = influences.get(sphere) * additionalEventTime;
+			double extraSphereTime = influences.get(sphere) * additionalTime;
 			sphereResults.get(sphere).saveResults(extraSphereTime, this.userBusyTime);
 		}
+		additionalEventTime += additionalTime;
 	}
 
 	/* Calculate coefficient of accuracy (how well overall 

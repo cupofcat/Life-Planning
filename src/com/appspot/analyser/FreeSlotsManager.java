@@ -103,7 +103,7 @@ public class FreeSlotsManager {
 		Calendar end = new GregorianCalendar(slotStart.get(Calendar.YEAR), slotStart.get(Calendar.MONTH), slotStart.get(Calendar.DAY_OF_MONTH),
 				possibleEnd.get(Calendar.HOUR_OF_DAY), possibleEnd.get(Calendar.MINUTE), 0);
 		if (possibleStart.get(Calendar.HOUR_OF_DAY) > possibleEnd.get(Calendar.HOUR_OF_DAY)) {
-			end.add(Calendar.DAY_OF_MONTH, 1);
+			start.add(Calendar.DAY_OF_MONTH, -1);
 		}
 		return new BaseCalendarSlot("Best fit", null, start, end);
 	}
@@ -142,6 +142,9 @@ public class FreeSlotsManager {
 		BaseCalendarSlot removedSlot = freeSlots.remove(index);
 		splitSlot(removedSlot, chosenSlot);
 		Collections.sort(freeSlots);
+		System.out.println("Proposal: " + event.getTitle());
+		System.out.print(" chosen slot: ");
+		this.printSlot(chosenSlot);
 		Utilities.printEvents(freeSlots);
 		event.setStartDate(chosenSlot.getStartDate());
 		event.setEndDate(chosenSlot.getEndDate());

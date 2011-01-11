@@ -41,24 +41,24 @@ public class LifePlanningServlet extends HttpServlet {
 		Suggestion s1 = new RescheduleSuggestion("Zdrowie1", null, new GregorianCalendar(2000, 3, 3, 9, 0, 0),new GregorianCalendar(2000, 3, 3, 10, 0, 0) );
 		s1.setSpheres(generateSpheres(new double[]{1.0}));
 		s1.setDeurationInterval(0, 60);
-		s1.setReschedule(false);
+		s1.setReschedule(true);
 		
-		Suggestion s2 = new RescheduleSuggestion("Zdrowie2", null, new GregorianCalendar(2000, 3, 3, 10, 30, 0),new GregorianCalendar(2000, 3, 3, 13, 0, 0) );
+		Suggestion s2 = new RescheduleSuggestion("Zdrowie2", null, new GregorianCalendar(2000, 3, 3, 10, 30, 0),new GregorianCalendar(2000, 3, 3, 11, 30, 0) );
 		s2.setSpheres(generateSpheres(new double[]{1.0}));
 		s2.setDeurationInterval(0, 60);
-		s2.setReschedule(false);
+		s2.setReschedule(true);
 		
-		Suggestion s3 = new RescheduleSuggestion("Work", null, new GregorianCalendar(2000, 3, 3, 10, 30, 0),new GregorianCalendar(2000, 3, 3, 11, 30, 0) );
+		Suggestion s3 = new RescheduleSuggestion("Work", null, new GregorianCalendar(2000, 3, 4, 13, 30, 0),new GregorianCalendar(2000, 3, 4, 14, 30, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
 		s3.setDeurationInterval(0, 120);
 		s3.setReschedule(false);
 		
-		Suggestion s4 = new RescheduleSuggestion("Work Small", null, new GregorianCalendar(2000, 3, 6, 10, 25, 0),new GregorianCalendar(2000, 3, 6, 11, 05, 0) );
-		s4.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
+		Suggestion s4 = new RescheduleSuggestion("Family", null, new GregorianCalendar(2000, 3, 6, 10, 25, 0),new GregorianCalendar(2000, 3, 6, 11, 25, 0) );
+		s4.setSpheres(generateSpheres(new double[]{0.0, 0.0, 1.0}));
 		s4.setDeurationInterval(30, 40);
-		s4.setReschedule(true);
+		s4.setReschedule(false);
 		
-		Suggestion s5 = new RescheduleSuggestion("Recreation", null, new GregorianCalendar(2000, 3, 6, 10, 25, 0),new GregorianCalendar(2000, 3, 6, 12, 0, 0) );
+		Suggestion s5 = new RescheduleSuggestion("Recreation", null, new GregorianCalendar(2000, 3, 5, 16, 00, 0),new GregorianCalendar(2000, 3, 5, 17, 0, 0) );
 		s5.setSpheres(generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
 		s5.setDeurationInterval(0, 60);
 		s5.setReschedule(false);
@@ -72,22 +72,17 @@ public class LifePlanningServlet extends HttpServlet {
 		list.add(s1);
 		list.add(s4);
 		list.add(s3);
-		//list.add(s2);
-		//list.add(s5);
+		list.add(s2);
+		list.add(s5);
 		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.7,0.3});
 		//    Collection<UserProfile> users = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + UserProfile.class.getName()).execute();
 		//   printProfiles(users);
 		////////////
-		Proposal p = new Proposal("TestProposal", "Health Small");
-		p.setDurationInterval(new Pair<Double, Double>(10.0, 30.0));
-		Calendar startDate = new GregorianCalendar(2000, 0, 3, 9, 0, 0);
-		Calendar endDate = new GregorianCalendar(2000, 0, 3, 10, 30, 0);
-		p.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate, endDate));
-		p.setSpheres(Utilities.generateSpheres(new double[]{1.0}));
-		//p.makePersistent();
-		//////////////
 
-	//	PersistenceManager pmf = PMF.get().getPersistenceManager();
+
+	
+		
+		PersistenceManager pmf = PMF.get().getPersistenceManager();
 		//for(SphereName sphere : SphereName.values())
 		//pmf.deletePersistentAll((Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute());
 
@@ -97,7 +92,7 @@ public class LifePlanningServlet extends HttpServlet {
 
 		//PersistenceManager pmf = PMF.get().getPersistenceManager();
 
-	//	Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName()).execute();//+ " where majorSphere =='" + SphereName.WORK+"'").execute();
+		//Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName()).execute();//+ " where majorSphere =='" + SphereName.WORK+"'").execute();
 		//pmf.deletePersistentAll(spheres);
 		//Utilities.printEvents(spheres);
 		//UserProfile profile = new UserProfile("rysio", "kaletnik", "ryszardKaleta@op.lp", generateSpheres(new double[]{0.5,0.5,}), false,310);

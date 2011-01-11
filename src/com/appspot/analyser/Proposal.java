@@ -26,7 +26,7 @@ public class Proposal extends BaseCalendarSlot implements IEvent  {
 	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Map<SphereName, Double> spheres;
 	@Persistent
-	public SphereName majorSphere;
+	private SphereName majorSphere;
 	@Persistent(serialized="true", defaultFetchGroup = "true")
 	private Pair<Double, Double> durationInterval;
 	@Persistent
