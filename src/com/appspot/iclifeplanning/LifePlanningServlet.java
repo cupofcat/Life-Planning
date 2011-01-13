@@ -98,7 +98,7 @@ public class LifePlanningServlet extends HttpServlet {
 
 		Collection<Proposal> spheres = (Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName()).execute();//+ " where majorSphere =='" + SphereName.WORK+"'").execute();
 		//pmf.deletePersistentAll(spheres);
-		//Utilities.printEvents(spheres);
+		Utilities.printEvents(spheres);
 		//UserProfile profile = new UserProfile("rysio", "kaletnik", "ryszardKaleta@op.lp", generateSpheres(new double[]{0.5,0.5,}), false,310);
 		//profile.makePersistent();
 		new Analyser().getSuggestions(list, "rysio");
