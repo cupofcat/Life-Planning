@@ -15,13 +15,17 @@ public class FreeSlotsManager {
 
 	public FreeSlotsManager(List<BaseCalendarSlot> freeSlots, CalendarStatus status) {
 		super();
-		this.freeSlots = freeSlots;
+		setFreeSlots(freeSlots);
 		this.status = status;
 	}
 
 	public FreeSlotsManager(List<BaseCalendarSlot> freeSlots, List<BaseCalendarSlot> possibleSlots, CalendarStatus status) {
 		this(freeSlots, status);
 		chooseSlot(possibleSlots);
+	}
+	
+	public void setFreeSlots(List<BaseCalendarSlot> slots){
+		freeSlots = slots;
 	}
 
 	public CalendarStatus checkProposal(Proposal proposal) {
@@ -92,6 +96,25 @@ public class FreeSlotsManager {
 			return ret;
 		}
 		return null;
+	}
+	
+	public void updateEventMaxDuration() {
+		IEvent event = status.getEvent();
+		Calendar endDate = event.getEndDate();
+		if (!status.containsProposal()) {
+			if (status.getAdditionalEventTime() > 0)
+				endDate.add(Calendar.MINUTE, (int) status.getAdditionalEventTime());
+			else
+				return;
+		}
+		for(BaseCalendarSlot freeSlot : freeSlots){
+			if(freeSlot.getStartDate().equals(endDate)){
+				Pair<Double,Double> possibleDuration = event.getDurationInterval();
+				possibleDuration.setSecond(Math.min(possibleDuration.getSecond(), 
+						event.getDuration() + freeSlot.getDuration()));
+				break;
+			}
+		}
 	}
 
 	public void updateCurrentSlots(CalendarStatus stat) {

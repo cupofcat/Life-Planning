@@ -48,26 +48,26 @@ public class LifePlanningServlet extends HttpServlet {
 		s2.setDeurationInterval(0, 60);
 		s2.setReschedule(true);
 		
-		Suggestion s3 = new RescheduleSuggestion("Work", null, new GregorianCalendar(2000, 3, 4, 13, 30, 0),new GregorianCalendar(2000, 3, 4, 14, 30, 0) );
+		Suggestion s3 = new RescheduleSuggestion("Work", null, new GregorianCalendar(2000, 3, 4, 1, 30, 0),new GregorianCalendar(2000, 3, 4, 2, 30, 0) );
 		s3.setSpheres(generateSpheres(new double[]{0.0, 1.0}));
-		s3.setDeurationInterval(0, 60);
-		s3.setReschedule(false);
+		s3.setDeurationInterval(0, 120);
+		s3.setReschedule(true);
 		
 		Suggestion s4 = new RescheduleSuggestion("Family", null, new GregorianCalendar(2000, 3, 6, 10, 25, 0),new GregorianCalendar(2000, 3, 6, 11, 25, 0) );
 		s4.setSpheres(generateSpheres(new double[]{0.0, 0.0, 1.0}));
 		s4.setDeurationInterval(0, 60);
 		s4.setReschedule(false);
 		
-		Suggestion s5 = new RescheduleSuggestion("Recreation", null, new GregorianCalendar(2000, 3, 5, 16, 00, 0),new GregorianCalendar(2000, 3, 5, 17, 0, 0) );
+		Suggestion s5 = new RescheduleSuggestion("Recreation", null, new GregorianCalendar(2000, 3, 5, 12, 00, 0),new GregorianCalendar(2000, 3, 5, 13, 0, 0) );
 		s5.setSpheres(generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
 		s5.setDeurationInterval(0, 60);
-		s5.setReschedule(true);
+		s5.setReschedule(false);
 		
 		
 		Suggestion s6 = new RescheduleSuggestion("Recreation2", null, new GregorianCalendar(2000, 3, 5, 23, 30, 0),new GregorianCalendar(2000, 3, 6, 0, 30, 0) );
 		s6.setSpheres(generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
 		s6.setDeurationInterval(0, 60);
-		s6.setReschedule(true);
+		s6.setReschedule(false);
 
 		
 		List<Suggestion> list = new LinkedList<Suggestion>();
@@ -79,20 +79,44 @@ public class LifePlanningServlet extends HttpServlet {
 		list.add(s3);
 		list.add(s2);
 		list.add(s5);
-		list.add(s6);
+		//list.add(s6);
 		HashMap<SphereName, Double> m = generateSpheres(new double[]{0.7,0.3});
 		//    Collection<UserProfile> users = (Collection<UserProfile>) PMF.get().getPersistenceManager().newQuery("select from " + UserProfile.class.getName()).execute();
 		//   printProfiles(users);
 		////////////
 
+		
+		Proposal p1 = new Proposal("TestProposal - Health", "Healthy");
+		p1.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
+		Calendar startDate = new GregorianCalendar(2000, 0, 3, 7, 0, 0);
+		Calendar endDate= new GregorianCalendar(2000, 0, 3, 8, 30, 0);
+		p1.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate, endDate));
+		p1.setSpheres(Utilities.generateSpheres(new double[]{1.0}));
+		//p1.makePersistent();
 
-		Proposal p2 = new Proposal("TestProposal - work2", "Work2");
+		Proposal p2 = new Proposal("TestProposal - work", "Working");
 		p2.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
-		Calendar startDate2 = new GregorianCalendar(2000, 0, 3, 7, 0, 0);
-		Calendar endDate2 = new GregorianCalendar(2000, 0, 3, 8, 30, 0);
+		Calendar startDate2 = new GregorianCalendar(2000, 0, 3, 17, 0, 0);
+		Calendar endDate2 = new GregorianCalendar(2000, 0, 3, 18, 30, 0);
 		p2.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate2, endDate2));
 		p2.setSpheres(Utilities.generateSpheres(new double[]{0.0, 1.0}));
-		p2.makePersistent();
+		//p2.makePersistent();
+		
+		Proposal p3 = new Proposal("TestProposal - Family", "Home...");
+		p3.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
+		Calendar startDate3 = new GregorianCalendar(2000, 0, 3, 15, 0, 0);
+		Calendar endDate3 = new GregorianCalendar(2000, 0, 3, 16, 0, 0);
+		p3.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate3, endDate3));
+		p3.setSpheres(Utilities.generateSpheres(new double[]{0.0, 0.0, 1.0}));
+		//p3.makePersistent();
+		
+		Proposal p4 = new Proposal("TestProposal - Recreation", "beer");
+		p4.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
+		Calendar startDate4 = new GregorianCalendar(2000, 0, 3, 22, 0, 0);
+		Calendar endDate4 = new GregorianCalendar(2000, 0, 3, 23, 30, 0);
+		p4.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate4, endDate4));
+		p4.setSpheres(Utilities.generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
+		//p4.makePersistent();
 		
 		PersistenceManager pmf = PMF.get().getPersistenceManager();
 		//for(SphereName sphere : SphereName.values())

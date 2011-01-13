@@ -79,12 +79,4 @@ public class RescheduleSuggestion extends Suggestion {
 	public CalendarEventEntry getCalendarEvent() {
 		return null;
 	}
-
-	public String toString() {
-		SimpleDateFormat date = new SimpleDateFormat("EEE, d MMM yyyy HH:mm");
-		return getType() + " " + title 
-		    + " (currently scheduled for "
-		    + date.format(new Date(startDate)) + ") for "
-		    + date.format(new Date(newDates.getFirst()));
-	}
 }

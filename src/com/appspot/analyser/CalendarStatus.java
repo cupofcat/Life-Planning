@@ -65,16 +65,103 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	}
 
 	// /UPDATE LATER /////
+	/////////////////////////////
+	/////////////////////////////#
+	
+	private void deleteOtherInfluence(Map<SphereName, Double> influences, double additionalTime){
+		userBusyTime += additionalTime;
+		double oldTime = additionalEventTime;
+		for (SphereName sphere : influences.keySet()) {
+			double extraSphereTime = influences.get(sphere) * additionalTime;
+			sphereResults.get(sphere).saveResults(extraSphereTime, this.userBusyTime);
+		}
+		if(this.containsProposal){
+			recordProposal();
+		}
+		additionalEventTime = 0;
+		this.saveSphereInfos(oldTime);
+		setCurrentCoefficient();
+	}
+	
 
-	public void recalculate(CalendarStatus other) {
+	private void checkMaxDuration(){
+		slotsManager.updateEventMaxDuration();
+		if(this.hasAlternatives()){
+			for(CalendarStatus alternative : alternatives)
+				alternative.checkMaxDuration();
+		}
+	}
+	
+	private void reAnalyse(){
 		successful = false;
-		copyOtherCalendar(other);
 		analyse();
+	}
+	
+	public Pair<List<CalendarStatus>, List<CalendarStatus>> recalculate(CalendarStatus other) {
+		List<CalendarStatus> successes = new LinkedList<CalendarStatus>();
+		List<CalendarStatus> fails = new LinkedList<CalendarStatus>();
+		if(!slotsManager.getFreeSlots().equals(other.getFreeSlots())){
+			setFreeSlots(other.getFreeSlots());
+			if(this.hasAlternatives()){
+				for(CalendarStatus alternative : alternatives)
+					alternative.setFreeSlots(this.getFreeSlots());
+			}
+			checkMaxDuration();
+			//other.checkMaxDuration();
+		}
+		double eventDuration = additionalEventTime;
+		if(this.containsProposal)
+			eventDuration += event.getDuration();
+		copyOtherCalendar(other);
+		reAnalyse();
+		if(successful)
+			successes.add(this);
+		else
+			fails.add(this);
+		if(this.hasAlternatives()){
+			for(CalendarStatus alternative : alternatives){
+				alternative.copyOtherCalendar(other);
+				alternative.deleteOtherInfluence(event.getSpheres(), -eventDuration);
+				alternative.reAnalyse();
+				if(alternative.hasImproved())
+					successes.add(alternative);
+				else
+					fails.add(alternative);
+			}
+		}
+		//clearing alternatives - to be rebuilt
+		clearAlternatives();
+		List<CalendarStatus> removed = new LinkedList<CalendarStatus>();
+		if(!successes.isEmpty()){
+			Collections.sort(successes);
+			CalendarStatus best = successes.get(0);
+			for(CalendarStatus failure : fails){
+				if(failure.getCoefficient() > 0.05 && failure.getCoefficient() > best.getCoefficient()*(1+Analyser.ALTERNATIVE))
+					removed.add(failure);
+				else
+					successes.add(failure);
+			}
+		}
+		else
+			successes.addAll(fails);
+		return new Pair<List<CalendarStatus>, List<CalendarStatus>>(successes, removed); 
+	}
+
+
+	private void clearAlternatives() {
+		if(alternatives != null)
+			alternatives.clear();
+	}
+
+	private void setFreeSlots(List<BaseCalendarSlot> freeSlots) {
+		slotsManager.setFreeSlots(freeSlots);		
 	}
 
 	private FreeSlotsManager getFreeSlotsManager() {
 		return slotsManager;
 	}
+	
+	////////////////////
 
 	private void copySphereResults(Map<SphereName, SphereInfo> currentSphereResults) {
 		for (SphereName name : currentSphereResults.keySet()) {
@@ -106,6 +193,10 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	public double getUserBusyTime() {
 		return userBusyTime;
 	}
+	
+	public List<BaseCalendarSlot> getFreeSlots(){
+		return slotsManager.getFreeSlots();
+	}
 
 	private void setCurrentCoefficient() {
 		double res = 0;
@@ -117,6 +208,8 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	}
 
 	public void updateSlots() {
+		if(!this.containsProposal)
+			slotsManager.updateCurrentSlots(this);
 		for (CalendarStatus alternative : alternatives)
 			slotsManager.updateCurrentSlots(alternative);
 		slotsManager.sortFreeSlots();
@@ -133,7 +226,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	}
 
 	public boolean hasAlternatives() {
-		return alternatives != null;
+		return alternatives != null && alternatives.size() > 0;
 	}
 
 	public List<CalendarStatus> getAlternatives() {
@@ -204,11 +297,17 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		return res;
 	}
 
-	private Pair<Double, Double> getRatioStatus(double timeStep, Map<SphereName, SphereInfo> sphereResults, Map<SphereName, Double> influences) {
+	private Pair<Double, Double> getRatioStatus(double step, Map<SphereName, SphereInfo> sphereResults, Map<SphereName, Double> influences) {
 		double currentExtraTime = 0;
 		double currentStatus = getCurrentRatioStatus(sphereResults, influences, 0.0);
 		double prevStatus = currentStatus;
-		for (int i = 1; i <= Analyser.TRIES; i++) {
+		int max = Analyser.TRIES;
+		double timeStep = step;
+		if(timeStep > 0 && timeStep < 1){
+			timeStep = 1;
+			max = (int) Math.round(step*Analyser.TRIES);
+		}
+		for (int i = 1; i <= max; i++) {
 			currentExtraTime = i * timeStep;
 			currentStatus = getCurrentRatioStatus(sphereResults, influences, currentExtraTime);
 			if (prevStatus <= currentStatus)

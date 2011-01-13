@@ -31,7 +31,7 @@ import com.appspot.iclifeplanning.events.Event;
 public class Analyser {
 
 	public static final double CONFIDENCE = 0.1;
-	private static final double ALTERNATIVE = 0.3;
+	static final double ALTERNATIVE = 0.3;
 	static final int TRIES = 20;
 	private int maxDepth = 2;
 	private int maxSuggestions = 3;
@@ -71,8 +71,8 @@ public class Analyser {
 		if (isCloseEnough(start, optimizeFull))
 			return null;
 		removeStaticEvents(events);
-		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, start), 
-				generateProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true));
+		List<CalendarStatus> statuses = Utilities.merge(generateProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true), 
+				generateEventStatuses(events, start));
 		for (int i = 0; result.size() < maxSuggestions && i < statuses.size(); i++) {
 			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();			
 			CalendarStatus nextMin = statuses.get(i);
@@ -81,12 +81,11 @@ public class Analyser {
 			removeEvent(nextMin);
 			/* Check neighbours if they can become alternative suggestions to nextMin */
 			int count = 1;
-			int k = i+1;
+			int k = i + 1;
 			List<CalendarStatus> alternatives = new LinkedList<CalendarStatus>();
 			alternatives.add(nextStatus);
 			while(k < statuses.size() && count < 3){
 				CalendarStatus next = statuses.get(k);
-				double whatIsThis = nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE);
 				if(next.compareTo(start) > 0 || (next.getCoefficient() > 0.05 && next.getCoefficient() > nextMin.getCoefficient()*(1+Analyser.ALTERNATIVE)))
 					break;
 				if(nextStatus.containsProposal()){
@@ -96,7 +95,6 @@ public class Analyser {
 						continue;
 					}
 				}
-				//nextMin.addAlternative(next);
 				removeEvent(next);
 				statuses.remove(next);
 				alternatives.add(next);
@@ -115,17 +113,24 @@ public class Analyser {
 				list.addAll(rest);
 				
 				//UPDATE LATER ///
-//				CalendarStatus toChange = nextMin;
-//				CalendarStatus changed = rest.get(0);
-//				do{
-//					toChange.recalculate(changed);
-//					CalendarStatus tmp = toChange;
-//					toChange = changed;
-//					changed = tmp;
-//				} while(changed.hasImproved());
+				CalendarStatus toChange = nextStatus;
+				CalendarStatus changed = rest.get(0);
+				List<CalendarStatus> removed = new LinkedList<CalendarStatus>();
+				do{
+					Pair<List<CalendarStatus>, List<CalendarStatus>> res = toChange.recalculate(changed);
+					List<CalendarStatus> successes = res.getFirst();
+					CalendarStatus best = successes.remove(0);
+					best.addAlternatives(successes);
+					toChange = best;
+					//Removed - restore them ?					
+					CalendarStatus tmp = toChange;
+					toChange = changed;
+					changed = tmp;
+				} while(changed.hasImproved());
 			}
 			result.add(list);
-			restoreEvents(nextMin);
+			if(i!=0)
+				restoreEvents(nextStatus);
 			
 			Utilities.printEvents(nextMin.slotsManager.getFreeSlots());
 			
@@ -139,8 +144,8 @@ public class Analyser {
 			return null;
 		/* For a single status from above, order statuses again
 		 * i.e. pivoting for single statuses from above */
-		List<CalendarStatus> statuses = Utilities.merge(generateEventStatuses(events, currentStatus), 
-				generateProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false));
+		List<CalendarStatus> statuses = Utilities.merge(generateProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false),
+				generateEventStatuses(events, currentStatus));
 		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
 		CalendarStatus nextMin = statuses.get(0);
 		
@@ -165,8 +170,8 @@ public class Analyser {
 			removeEvent(next);
 			statuses.remove(next);
 			alternatives.add(next);
-			if(!nextStatus.containsProposal() && next.containsProposal())
-				nextStatus = next;
+			//if(!nextStatus.containsProposal() && next.containsProposal())
+			//	nextStatus = next;
 			count++;			
 		}
 		alternatives.remove(nextStatus);
@@ -178,21 +183,42 @@ public class Analyser {
 		List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, depth - 1);
 		if (rest != null){
 			list.addAll(rest);
-			
 			//UPDATE LATER ///
-//			CalendarStatus toChange = nextMin;
-//			CalendarStatus changed = rest.get(0);
-//			do{
-//				toChange.recalculate(changed);
-//				CalendarStatus tmp = toChange;
-//				toChange = changed;
-//				changed = tmp;
-//			} while(changed.hasImproved());
+			CalendarStatus toChange = nextStatus;
+			CalendarStatus changed = rest.get(0);
+			
+			do{
+				Pair<List<CalendarStatus>, List<CalendarStatus>> res = toChange.recalculate(changed);
+				List<CalendarStatus> successes = res.getFirst();
+				CalendarStatus best = successes.remove(0);
+				best.addAlternatives(successes);
+				toChange = best;			
+				CalendarStatus tmp = toChange;
+				toChange = changed;
+				changed = tmp;
+			} while(changed.hasImproved());
+
 		}
-		restoreEvents(nextMin);
+		restoreEvents(nextStatus);
 		System.out.println("Recursive call free slots");
-		
+		Utilities.printEvents(nextStatus.getFreeSlots());
 		return list;
+	}
+	
+	/* Test if we have reached the confidence interval for spheres */
+	private boolean isCloseEnough(CalendarStatus currentStatus, boolean optimizeFull) {
+		return currentStatus.getCoefficient() < Math.pow(Analyser.CONFIDENCE, 2) 
+		|| (!optimizeFull && currentStatus.isWithinConfidenceInterval());
+	}
+	
+	private boolean haveAnyProposals(){
+		List<Proposal> next;
+		for(SphereName sphere : SphereName.values()){
+			next = proposals.get(sphere);
+			if(next != null && !next.isEmpty())
+				return true;
+		}
+		return false;
 	}
 
 	/* If event is a proposal, remove from proposals, else from events */
@@ -202,7 +228,7 @@ public class Analyser {
 		else
 			events.remove(status.getEvent());
 	}
-
+	
 	/* If event or its alternative is a proposal, add to proposals, else to events */
 	private void restoreEvents(CalendarStatus status){
 		if(status.containsProposal())
@@ -218,56 +244,20 @@ public class Analyser {
 			}
 		}
 	}
-
-	private boolean haveAnyProposals(){
-		List<Proposal> next;
-		for(SphereName sphere : SphereName.values()){
-			next = proposals.get(sphere);
-			if(next != null && !next.isEmpty())
-				return true;
+	
+	
+	/* Create calendar statuses for all events, order them in terms of 
+	 * how well they match to targets for spheres (the coefficient of accuracy) */
+	private List<CalendarStatus> generateEventStatuses(List<? extends IEvent> events, CalendarStatus currentStatus) {
+		List<CalendarStatus> result = new LinkedList<CalendarStatus>();
+		CalendarStatus newStatus;
+		for (IEvent event : events) {
+			newStatus = new CalendarStatus(event, currentStatus);
+			if(newStatus.hasImproved())
+				result.add(newStatus);
 		}
-		return false;
-	}
-
-
-	/* Find slots of free time in between events */
-	private List<BaseCalendarSlot> getFreeSlots(List<? extends IEvent> events) {
-		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
-	    Collections.sort(events);
-		Iterator<? extends IEvent> it = events.iterator();
-		IEvent beginning = it.next();
-		/* Remove begin event */
-		it.remove();
-		IEvent curr = beginning;
-		while (it.hasNext()) {
-			IEvent next = it.next();
-			if (curr.getEndDate().compareTo(next.getStartDate()) < 0) {
-				BaseCalendarSlot newSlot = new BaseCalendarSlot("Free Slot", null, 
-						curr.getEndDate(), next.getStartDate());
-				ret.add(newSlot);
-				Pair<Double, Double> durationInterval = curr.getDurationInterval();
-				/* If the free slot is less than 1h long, adjust curr's 
-				 * duration interval to include this shorter time, not 1h */
-				durationInterval.setSecond(Math.min(durationInterval.getSecond(), 
-						curr.getDuration() + newSlot.getDuration()));
-				curr = next;
-			}
-			else {
-				if (curr.getEndDate().compareTo(next.getEndDate()) <= 0) {
-					Pair<Double, Double> durationInterval = curr.getDurationInterval();
-					durationInterval.setSecond(curr.getDuration());
-					curr = next;
-				}
-			}
-		}
-		it.remove();	
-		return ret;
-	}
-
-	/* Test if we have reached the confidence interval for spheres */
-	private boolean isCloseEnough(CalendarStatus currentStatus, boolean optimizeFull) {
-		return currentStatus.getCoefficient() < Math.pow(Analyser.CONFIDENCE, 2) 
-		|| (!optimizeFull && currentStatus.isWithinConfidenceInterval());
+		Collections.sort(result);
+		return result;
 	}
 
 	/* Get proposals for spheres which are not on target
@@ -311,20 +301,6 @@ public class Analyser {
 			newList.add(list.remove(rand.nextInt(list.size())));
 		}
 		list.addAll(newList);
-	}
-
-	/* Create calendar statuses for all events, order them in terms of 
-	 * how well they match to targets for spheres (the coefficient of accuracy) */
-	private List<CalendarStatus> generateEventStatuses(List<? extends IEvent> events, CalendarStatus currentStatus) {
-		List<CalendarStatus> result = new LinkedList<CalendarStatus>();
-		CalendarStatus newStatus;
-		for (IEvent event : events) {
-			newStatus = new CalendarStatus(event, currentStatus);
-			if(newStatus.hasImproved())
-				result.add(newStatus);
-		}
-		Collections.sort(result);
-		return result;
 	}
 
 	/* Convert from calendar statuses to suggestions which will be passed to front end */
@@ -400,29 +376,40 @@ public class Analyser {
 		return new CalendarStatus(sum, sphereResults, freeSlots);
 	}
 
-	public static HashMap<SphereName, Double> analyseEvents(
-			List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
-		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
-		initializeTimes(times, currentDesiredBalance.keySet());
-		HashMap<SphereName, Double> result = new HashMap<SphereName, Double>();
-		double sum = 0;
-		for (IEvent event : events) {
-			double durationInMins = event.getDuration();
-			Map<SphereName, Double> sphereInfluences = event.getSpheres();
-			Set<SphereName> keys = sphereInfluences.keySet();
-			for (SphereName key : keys) {
-				double time = Math.round(sphereInfluences.get(key) * durationInMins);
-				times.put(key, times.get(key) + time);
-				log.severe(key.name() + ": " + (times.get(key) + time));
+	/* Find slots of free time in between events */
+	private List<BaseCalendarSlot> getFreeSlots(List<? extends IEvent> events) {
+		LinkedList<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
+	    Collections.sort(events);
+		Iterator<? extends IEvent> it = events.iterator();
+		IEvent beginning = it.next();
+		/* Remove begin event */
+		it.remove();
+		IEvent curr = beginning;
+		while (it.hasNext()) {
+			IEvent next = it.next();
+			if (curr.getEndDate().compareTo(next.getStartDate()) < 0) {
+				BaseCalendarSlot newSlot = new BaseCalendarSlot("Free Slot", null, 
+						curr.getEndDate(), next.getStartDate());
+				ret.add(newSlot);
+				Pair<Double, Double> durationInterval = curr.getDurationInterval();
+				/* If the free slot is less than 1h long, adjust curr's 
+				 * duration interval to include this shorter time, not 1h */
+				durationInterval.setSecond(Math.min(durationInterval.getSecond(), 
+						curr.getDuration() + newSlot.getDuration()));
+				curr = next;
 			}
-			sum += durationInMins;
+			else {
+				if (curr.getEndDate().compareTo(next.getEndDate()) <= 0) {
+					Pair<Double, Double> durationInterval = curr.getDurationInterval();
+					durationInterval.setSecond(curr.getDuration());
+					curr = next;
+				}
+			}
 		}
-		for (SphereName key : times.keySet()) {
-			result.put(key, times.get(key) / sum);
-		}
-		return result;
+		it.remove();	
+		return ret;
 	}
-
+	
 	private Map<SphereName, SphereInfo> generateSphereResults(Map<SphereName, Double> choices,
 			Map<SphereName, Double> currentRatios, Map<SphereName, Double> times) {
 		Map<SphereName, SphereInfo> sphereResults = new HashMap<SphereName, SphereInfo>();
