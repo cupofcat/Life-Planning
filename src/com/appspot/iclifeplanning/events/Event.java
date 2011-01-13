@@ -36,6 +36,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	public Event(long startTime, long endTime) {
 		this.startDate = startTime;
 		this.endDate = endTime;
+		durationInterval = new Pair<Double, Double>(minDuration(), maxDuration());
 	}
 
 	public String getId() {
@@ -104,12 +105,12 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double minDuration() {
-		double minDuration = (endDate - startDate) / 1000 / 60;
+		//double minDuration = (endDate - startDate) / 1000 / 60;
 		return 0;
 	}
 
 	public double maxDuration() {
-		double maxDuration = ((endDate - startDate) / 1000 / 60) + 60;
+		double maxDuration = ((endDate - startDate) / 1000 / 60);
 		return maxDuration;
 	}
 

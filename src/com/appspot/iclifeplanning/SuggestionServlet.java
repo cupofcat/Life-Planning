@@ -51,7 +51,7 @@ public class SuggestionServlet extends HttpServlet {
 		List<Event> events = eventStore.getEvents();
 		for(Event e : events) {
 			if (e.getTitle() != null && e.getTitle().equals("Video conference with MTV"))
-				events.get(0).setDurationInterval(new Pair(0.0,120.0));
+				e.setDurationInterval(new Pair(0.0,120.0));
 		}
 		
 		// ------------------- Dummy data

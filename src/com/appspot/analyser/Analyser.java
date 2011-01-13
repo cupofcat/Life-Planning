@@ -1,3 +1,4 @@
+
 package com.appspot.analyser;
 
 import java.io.IOException;
@@ -73,6 +74,8 @@ public class Analyser {
 		removeStaticEvents(events);
 		List<CalendarStatus> statuses = Utilities.merge(generateProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true), 
 				generateEventStatuses(events, start));
+		if (statuses.isEmpty())
+			return null;
 		for (int i = 0; result.size() < maxSuggestions && i < statuses.size(); i++) {
 			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();			
 			CalendarStatus nextMin = statuses.get(i);
@@ -146,6 +149,8 @@ public class Analyser {
 		 * i.e. pivoting for single statuses from above */
 		List<CalendarStatus> statuses = Utilities.merge(generateProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false),
 				generateEventStatuses(events, currentStatus));
+		if (statuses.isEmpty())
+			return null;
 		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
 		CalendarStatus nextMin = statuses.get(0);
 		
@@ -272,8 +277,9 @@ public class Analyser {
 			cache = proposals.get(sphere);			
 			if(cache == null){
 				cache = new LinkedList<Proposal>();
-				Collection<Proposal> res = (Collection<Proposal>) pmf.newQuery("select from " 
-						+ Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute();
+				Collection<Proposal> res = (Collection<Proposal>) pmf.detachCopyAll((Collection<Proposal>) pmf.newQuery("select from " 
+						+ Proposal.class.getName()/* + " where majorSphere =='" + sphere+ "'"*/).execute());
+				System.out.println("Res null " + res == null);
 				for(Proposal p : res){
 					cache.add(p);
 				}
