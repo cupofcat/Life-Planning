@@ -49,7 +49,7 @@
             <div id="menu">
               <ul class="lamp" id="lavaLampMenu">
                   <li><a href="#home">Home</a></li>
-                  <li><a href="#">Help</a></li>
+                  <li><a href="#help">Help</a></li>
                   <li><a href="#step1">Tour</a></li>
                   <li><a href="<%= signupUrl %>">Login</a></li>
               </ul>
@@ -87,6 +87,7 @@ The development of mobile devices and e-mail has spread work into areas of time 
               <li><a href="#step2">Step 3</a></li>
               <li><a href="#step2">Step 4</a></li>
               <li><a href="#step2">Step 5</a></li>
+              <li><a href="#help">Help</a></li>
             </ul>
 
             <div class="scroll">
@@ -138,6 +139,31 @@ To start using the service all you need is a Google account with Google Calendar
                   <img src="img/tour/05-stats.png" />
                   <a href="#home" class="tour-next">Sign up!</a>
                   <a href="#step4" class="tour-prev">Prev</a>
+                </div>
+                
+                <div class="panel" id="help">
+                  <ul>
+                    <li>
+                      <span class="question">Is my data safe?</span>
+                      <span class="answer">Yes! We do not store your Google login nor your password and do not copy any data from your calendar. The only data we store is the data directly connected to using our service.</span>
+                    </li>
+                    <li>
+                      <span class="question">How does it work?</span>
+                      <span class="answer">By using some fancy AI, a little bit of magic and lots of stochastic analysis.</span>
+                    </li>
+                    <li>
+                      <span class="question">Is it good?</span>
+                      <span class="answer">Yes, very!</span>
+                    </li>
+                    <li>
+                      <span class="question">Will it make me happy?</span>
+                      <span class="answer">There is only one way to find out. But for the money we charge ($0), it is definitely worth a shot!</span>
+                    </li>
+                    <li>
+                      <span class="question">Do I need to do everything you say?</span>
+                      <span class="answer">No, you can reject any number of suggestions, but you need to understand that this will keep you further away from your desired life balance...</span>
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
