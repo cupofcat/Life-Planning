@@ -42,8 +42,10 @@ public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
 	}
 
 	public BaseCalendarSlot(Calendar startDate, Calendar endDate) {
-		this.startDate = startDate.getTimeInMillis();
-		this.endDate = endDate.getTimeInMillis();
+		if(startDate != null && endDate != null){
+			this.startDate = startDate.getTimeInMillis();
+			this.endDate = endDate.getTimeInMillis();
+		}
 	}
 
 	public BaseCalendarSlot(String title, String description, Calendar startDate,

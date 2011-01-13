@@ -15,6 +15,7 @@ import javax.servlet.http.HttpServletResponse;
 import com.appspot.analyser.Analyser;
 import com.appspot.analyser.DeleteSuggestion;
 import com.appspot.analyser.IEvent;
+import com.appspot.analyser.Pair;
 import com.appspot.analyser.RescheduleSuggestion;
 import com.appspot.analyser.Suggestion;
 import com.appspot.datastore.SphereName;
@@ -48,6 +49,11 @@ public class SuggestionServlet extends HttpServlet {
 		EventStore eventStore = EventStore.getInstance();
 		eventStore.initizalize();
 		List<Event> events = eventStore.getEvents();
+		for(Event e : events) {
+			if (e.getTitle() != null && e.getTitle().equals("Video conference with MTV"))
+				events.get(0).setDurationInterval(new Pair(0.0,120.0));
+		}
+		
 		// ------------------- Dummy data
 		Analyser analyser = new Analyser();
 

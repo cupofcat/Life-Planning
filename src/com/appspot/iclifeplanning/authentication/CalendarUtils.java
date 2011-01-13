@@ -16,6 +16,7 @@ import javax.jdo.PersistenceManager;
 import javax.jdo.Query;
 import javax.servlet.http.HttpServletRequest;
 
+import com.appspot.analyser.Utilities;
 import com.appspot.datastore.PMF;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.Token;
@@ -170,6 +171,7 @@ public class CalendarUtils {
 																				SphereName.FAMILY.defaultValue(),
 																				80,  // number of weeks
 																				30); // number of weeks optimised
+				Utilities.addProposals();
 			}
 		}
 	}

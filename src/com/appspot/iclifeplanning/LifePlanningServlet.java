@@ -86,38 +86,6 @@ public class LifePlanningServlet extends HttpServlet {
 		////////////
 
 		
-		Proposal p1 = new Proposal("TestProposal - Health", "Healthy");
-		p1.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
-		Calendar startDate = new GregorianCalendar(2000, 0, 3, 7, 0, 0);
-		Calendar endDate= new GregorianCalendar(2000, 0, 3, 8, 30, 0);
-		p1.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate, endDate));
-		p1.setSpheres(Utilities.generateSpheres(new double[]{1.0}));
-		//p1.makePersistent();
-
-		Proposal p2 = new Proposal("TestProposal - work", "Working");
-		p2.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
-		Calendar startDate2 = new GregorianCalendar(2000, 0, 3, 17, 0, 0);
-		Calendar endDate2 = new GregorianCalendar(2000, 0, 3, 18, 30, 0);
-		p2.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate2, endDate2));
-		p2.setSpheres(Utilities.generateSpheres(new double[]{0.0, 1.0}));
-		//p2.makePersistent();
-		
-		Proposal p3 = new Proposal("TestProposal - Family", "Home...");
-		p3.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
-		Calendar startDate3 = new GregorianCalendar(2000, 0, 3, 15, 0, 0);
-		Calendar endDate3 = new GregorianCalendar(2000, 0, 3, 16, 0, 0);
-		p3.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate3, endDate3));
-		p3.setSpheres(Utilities.generateSpheres(new double[]{0.0, 0.0, 1.0}));
-		//p3.makePersistent();
-		
-		Proposal p4 = new Proposal("TestProposal - Recreation", "beer");
-		p4.setDurationInterval(new Pair<Double, Double>(20.0, 60.0));
-		Calendar startDate4 = new GregorianCalendar(2000, 0, 3, 22, 0, 0);
-		Calendar endDate4 = new GregorianCalendar(2000, 0, 3, 23, 30, 0);
-		p4.setPossibleTimeSlot(new Pair<Calendar, Calendar>(startDate4, endDate4));
-		p4.setSpheres(Utilities.generateSpheres(new double[]{0.0, 0.0, 0.0, 1.0}));
-		//p4.makePersistent();
-		
 		PersistenceManager pmf = PMF.get().getPersistenceManager();
 		//for(SphereName sphere : SphereName.values())
 		//pmf.deletePersistentAll((Collection<Proposal>) pmf.newQuery("select from " + Proposal.class.getName() + " where majorSphere =='" + sphere+ "'").execute());

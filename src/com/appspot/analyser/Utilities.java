@@ -135,4 +135,40 @@ public class Utilities {
 		freeSlotsCopy.addAll(freeSlots);
 		return freeSlotsCopy;
 	}
+	
+	public static void addProposals(){
+		Calendar startDate = new GregorianCalendar(2000, 0, 3, 7, 0, 0);
+		Calendar endDate= new GregorianCalendar(2000, 0, 3, 8, 30, 0);
+		Pair<Calendar, Calendar> possibleSlot = new Pair<Calendar, Calendar>(startDate, endDate);
+		Map<SphereName, Double> sphereInfluences = Utilities.generateSpheres(new double[]{1.0});
+		Proposal p1 = new Proposal("Gym", "Nie ma upierdalania sja", null, null, 20, 60 , false, true, sphereInfluences);
+		p1.setPossibleTimeSlot(possibleSlot);
+		p1.makePersistent();
+		
+		Calendar startDate2 = new GregorianCalendar(2000, 0, 3, 17, 0, 0);
+		Calendar endDate2= new GregorianCalendar(2000, 0, 3, 18, 30, 0);
+		Pair<Calendar, Calendar> possibleSlot2 = new Pair<Calendar, Calendar>(startDate, endDate);
+		Map<SphereName, Double> sphereInfluences2 = Utilities.generateSpheres(new double[]{0, 1.0});
+		Proposal p2 = new Proposal("Meeting at work", "Szanuj szefa swego bo mozesz miec gorszego", null, null, 20, 60 , false, true, sphereInfluences);
+		p2.setPossibleTimeSlot(possibleSlot);
+		p2.makePersistent();
+		
+		Calendar startDate3 = new GregorianCalendar(2000, 0, 3, 15, 0, 0);
+		Calendar endDate3= new GregorianCalendar(2000, 0, 3, 16, 0, 0);
+		Pair<Calendar, Calendar> possibleSlot3 = new Pair<Calendar, Calendar>(startDate, endDate);
+		Map<SphereName, Double> sphereInfluences3 = Utilities.generateSpheres(new double[]{0.0, 0.0, 1.0});
+		Proposal p3 = new Proposal("Family dinner", "Stejki - masa sie liczy", null, null, 20, 60 , false, true, sphereInfluences);
+		p3.setPossibleTimeSlot(possibleSlot);
+		p3.makePersistent();
+		
+		Calendar startDate4 = new GregorianCalendar(2000, 0, 3, 22, 0, 0);
+		Calendar endDate4 = new GregorianCalendar(2000, 0, 3, 23, 30, 0);
+		Pair<Calendar, Calendar> possibleSlot4 = new Pair<Calendar, Calendar>(startDate, endDate);
+		Map<SphereName, Double> sphereInfluences4 = Utilities.generateSpheres(new double[]{0.0, 0.0, 1.0});
+		Proposal p4 = new Proposal("Watching a movie", "Robert Burneika box set!", null, null, 20, 60 , false, true, sphereInfluences);
+		p4.setPossibleTimeSlot(possibleSlot);
+		p4.makePersistent();
+
+		
+	}
 }
