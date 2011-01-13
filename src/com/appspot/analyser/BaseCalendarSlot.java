@@ -42,7 +42,6 @@ public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
 	}
 
 	public BaseCalendarSlot(Calendar startDate, Calendar endDate) {
-		rob
 		this.startDate = startDate.getTimeInMillis();
 		this.endDate = endDate.getTimeInMillis();
 	}
