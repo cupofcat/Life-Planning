@@ -1,3 +1,4 @@
+
 package com.appspot.analyser;
 
 import java.io.IOException;
@@ -132,6 +133,7 @@ public class Analyser {
 		if (isCloseEnough(start, optimizeFull))
 			return result;
 		removeStaticEvents(events);
+
 		List<CalendarStatus> statuses = Utilities.merge( generateProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true) , 
 				generateEventStatuses(events, start)
 				);
@@ -232,12 +234,14 @@ public class Analyser {
 	private List<CalendarStatus> getSuggestions(CalendarStatus currentStatus, boolean optimizeFull, int depth) throws IOException {
 		if (isCloseEnough(currentStatus, optimizeFull) || (events.size() == 0 && !haveAnyProposals()) || depth <= 0)
 			return null;
+
 		/*
 		 * For a single status from above, order statuses again i.e. pivoting
 		 * for single statuses from above
 		 */
 		List<CalendarStatus> statuses = Utilities.merge(generateProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false) ,
 				generateEventStatuses(events,currentStatus) );
+
 		if (statuses.isEmpty())
 			return null;
 		LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
@@ -398,9 +402,11 @@ public class Analyser {
 			cache = proposals.get(sphere);
 			if (cache == null) {
 				cache = new LinkedList<Proposal>();
+
 				Collection<Proposal> res = (Collection<Proposal>) pmf.newQuery(
 						"select from " + Proposal.class.getName() + " where majorSphere =='" + sphere + "'").execute();
 				for (Proposal p : res) {
+
 					cache.add(p);
 				}
 				permute(cache);

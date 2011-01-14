@@ -105,7 +105,7 @@ public class Event extends BaseCalendarSlot implements IEvent {
 	}
 
 	public double minDuration() {
-		double minDuration = (endDate - startDate) / 1000 / 60;
+		//double minDuration = (endDate - startDate) / 1000 / 60;
 		return 0;
 	}
 
