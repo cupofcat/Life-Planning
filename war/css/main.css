@@ -233,6 +233,10 @@ div#signup-bar {
 	top: 25px;
 }
 
+#help li {
+	list-style-type: none;
+}
+
 #help .question {
 	font-family: Futura;
 	font-size: 14px;
