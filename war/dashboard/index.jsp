@@ -155,7 +155,12 @@
                 //alert($answer);
                 $.post("../suggestions", $answer);
                 $container.html('');
-                setTimeout(window.frames["calendar"].location.reload(), 2000);
+                //setTimeout(window.frames["calendar"].location.reload(), 2000);
+                setTimeout(function() {
+                  $('#iframecal').each(function() {
+                   this.contentWindow.location.reload(true);
+                  });
+                }, 2000);
               }); //apply_button.click()
               
               //Add navigation tab
@@ -210,7 +215,7 @@
       <div id="body">
         <%= noTokenDiv %>
         <div id="calendar_div" class="sample">
-        	<iframe name="calendar" class="calendar" src="https://www.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;height=500&amp;wkst=2&amp;bgcolor=%23ffffff<%= calendars %>" style=" border-width:0 "></iframe>
+        	<iframe id="iframecal" name="calendar" class="calendar" src="https://www.google.com/calendar/embed?showTitle=0&amp;showPrint=0&amp;height=500&amp;wkst=2&amp;bgcolor=%23ffffff<%= calendars %>" style=" border-width:0 "></iframe>
           <div id="optimize_button">
             <a href="#">Optimise my life!</a>
           </div>
