@@ -35,15 +35,17 @@ public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
 	}
 
 	public BaseCalendarSlot(CalendarEventEntry calendarEventEntry) {
-		startDate = calendarEventEntry.getTimes().get(0).getStartTime().getValue() + 60*60*1000;
-		endDate = calendarEventEntry.getTimes().get(0).getEndTime().getValue() + 60*60*1000;
+		startDate = calendarEventEntry.getTimes().get(0).getStartTime().getValue();
+		endDate = calendarEventEntry.getTimes().get(0).getEndTime().getValue();
 		description = calendarEventEntry.getPlainTextContent();
 		title = calendarEventEntry.getTitle().getPlainText();
 	}
 
 	public BaseCalendarSlot(Calendar startDate, Calendar endDate) {
+		if(startDate != null && endDate != null){
 		this.startDate = startDate.getTimeInMillis();
 		this.endDate = endDate.getTimeInMillis();
+		}
 	}
 
 	public BaseCalendarSlot(String title, String description, Calendar startDate,

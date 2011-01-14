@@ -56,22 +56,14 @@ public class FreeSlotsManager {
 				if (possibleEndDate.compareTo(slotStartDate) > 0 && possibleStartDate.compareTo(slotEndDate) < 0) {
 
 					Calendar start = Utilities.max(possibleStartDate, slotStartDate);
-					// System.out.println(Utilities.printDate(start) +
-					// " - new start");
 
 					Calendar tmp = new GregorianCalendar(start.get(Calendar.YEAR), start.get(Calendar.MONTH), start.get(Calendar.DAY_OF_MONTH), start
 							.get(Calendar.HOUR_OF_DAY), start.get(Calendar.MINUTE), 0);
 					tmp.add(Calendar.MINUTE, (int) ((double) maxDuration));
-					// System.out.println(Utilities.printDate(tmp) +
-					// " - new tmp");
 
 					Calendar endSlot = Utilities.min(possibleEndDate, slotEndDate);
-					// System.out.println(Utilities.printDate(endSlot) +
-					// " - new endSlot");
 
 					Calendar end = Utilities.min(tmp, endSlot);
-					// System.out.println(Utilities.printDate(end) +
-					// " - new end");
 
 					BaseCalendarSlot candidate = new BaseCalendarSlot("Best fit", null, start, end);
 					nextDuration = candidate.getDuration();
@@ -83,8 +75,6 @@ public class FreeSlotsManager {
 				}
 				possibleStartDate.add(Calendar.DAY_OF_MONTH, 1);
 				possibleEndDate.add(Calendar.DAY_OF_MONTH, 1);
-				// System.out.println(Utilities.printDate(possibleStartDate) +
-				// " - " + Utilities.printDate(possibleEndDate));
 			}
 		}
 		if (!ret.isEmpty()) {
@@ -92,7 +82,6 @@ public class FreeSlotsManager {
 				proposal.getDurationInterval().setSecond(currentMax);
 			}
 			Collections.sort(ret);
-			Utilities.printEvents(ret);
 			return ret;
 		}
 		return null;
@@ -152,7 +141,6 @@ public class FreeSlotsManager {
 	private void printSlot(BaseCalendarSlot hourSlot) {
 		List<BaseCalendarSlot> hourslots = new LinkedList<BaseCalendarSlot>();
 		hourslots.add(hourSlot);
-		Utilities.printEvents(hourslots);
 	}
 
 	private BaseCalendarSlot generateStartingSlot(Calendar slotStart, Pair<Calendar, Calendar> possibleTimeSlot) {
@@ -200,10 +188,6 @@ public class FreeSlotsManager {
 		BaseCalendarSlot removedSlot = freeSlots.remove(index);
 		splitSlot(removedSlot, chosenSlot);
 		sortFreeSlots();
-		System.out.println("Proposal: " + event.getTitle());
-		System.out.print(" chosen slot: ");
-		this.printSlot(chosenSlot);
-		Utilities.printEvents(freeSlots);
 		event.setStartDate(chosenSlot.getStartDate());
 		event.setEndDate(chosenSlot.getEndDate());
 	}

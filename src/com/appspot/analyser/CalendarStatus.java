@@ -135,6 +135,11 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		if(!successes.isEmpty()){
 			Collections.sort(successes);
 			CalendarStatus best = successes.get(0);
+			for(CalendarStatus success : successes){
+				if(success.getCoefficient() > 0.05 && success.getCoefficient() > best.getCoefficient()*(1+Analyser.ALTERNATIVE))
+					removed.add(success);
+			}
+			successes.removeAll(removed);
 			for(CalendarStatus failure : fails){
 				if(failure.getCoefficient() > 0.05 && failure.getCoefficient() > best.getCoefficient()*(1+Analyser.ALTERNATIVE))
 					removed.add(failure);

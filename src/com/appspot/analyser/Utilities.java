@@ -96,13 +96,6 @@ public class Utilities {
 		return result;
 	}
 	
-	
-	public static void printEvents(Collection<? extends ICalendarSlot> events) {
-		for (ICalendarSlot event : events)
-			System.out.println(event);
-		System.out.println("--------------------------------");
-	}
-	
 	public static HashMap<SphereName, Double> analyseEvents(
 			List<Event> events, Map<SphereName, Double> currentDesiredBalance) {
 		Map<SphereName, Double> times = new HashMap<SphereName, Double>();
@@ -134,6 +127,12 @@ public class Utilities {
 		List<BaseCalendarSlot> freeSlotsCopy = new LinkedList<BaseCalendarSlot>();
 		freeSlotsCopy.addAll(freeSlots);
 		return freeSlotsCopy;
+	}
+	
+	public static Calendar copyCalendar(Calendar base, int additionalMins){
+		Calendar ret = new GregorianCalendar();
+		ret.setTimeInMillis(base.getTimeInMillis() + (long) (additionalMins * 60000));
+		return ret;
 	}
 	
 	public static void addProposals(){
@@ -170,5 +169,18 @@ public class Utilities {
 		p4.makePersistent();
 
 		
+	}
+	
+	public static SphereName calculateMajorSphere(IEvent event) {
+		double max = -1;
+		Map<SphereName,Double> s = event.getSpheres();
+		SphereName currentMajor = null;
+		for(SphereName name : s.keySet()){
+			if(s.get(name) > max){
+				currentMajor = name;
+				max = s.get(currentMajor);
+			}
+		}
+		return currentMajor;
 	}
 }
