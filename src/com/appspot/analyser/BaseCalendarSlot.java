@@ -114,6 +114,7 @@ public class BaseCalendarSlot extends BaseDataObject implements ICalendarSlot {
 	}
 
 	public int compareTo(ICalendarSlot slot) {
+		//used for best fit algorithm - based on duration
 		if(slot.getTitle() != null && slot.getTitle().equals("Best fit")){
 			double duration = slot.getDuration();
 			if(getDuration() < duration)

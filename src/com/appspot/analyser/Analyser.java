@@ -28,11 +28,12 @@ import com.appspot.datastore.SphereInfo;
 import com.appspot.datastore.SphereName;
 import com.appspot.datastore.UserProfile;
 import com.appspot.datastore.UserProfileStore;
-import com.appspot.iclifeplanning.events.Event;
+
+//Main class returning suggestions based on user's google calendar
 
 @RunWith(Enclosed.class)
 public class Analyser {
-
+	//constants used in optimization process
 	public static final double CONFIDENCE = 0.1;
 	static final double ALTERNATIVE = 0.3;
 	static final int TRIES = 20;
@@ -43,8 +44,8 @@ public class Analyser {
 	private static final Logger log = Logger.getLogger("EventStore");
 
 	public Analyser() {
+		//certain proposals to populate our database
 		proposals = new HashMap<SphereName, List<Proposal>>();
-
 		Calendar startDate = new GregorianCalendar(2000, 0, 3, 7, 0, 0);
 		Calendar endDate = new GregorianCalendar(2000, 0, 3, 8, 30, 0);
 		Pair<Calendar, Calendar> possibleSlot = new Pair<Calendar, Calendar>(startDate, endDate);
@@ -143,23 +144,24 @@ public class Analyser {
 	public List<List<Suggestion>> getSuggestions(List<? extends IEvent> events, String currentUserId) throws IOException {
 		UserProfile profile = UserProfileStore.getUserProfile(currentUserId);
 		this.events = (List<IEvent>) events;
-
-		// UPDATE LATER///////
-
 		return
 		 convertToSuggestions(this.getSuggestions(profile.getSpherePreferences(),
 		 profile.isFullyOptimized()));
-
 	}
-
+	
+	//Method returning sets of sugestions to the user
 	private List<List<CalendarStatus>> getSuggestions(Map<SphereName, Double> spherePreferences, boolean optimizeFull) throws IOException {
+		//no events in calendar...
 		if (events.size() == 0)
 			return null;
 		LinkedList<List<CalendarStatus>> result = new LinkedList<List<CalendarStatus>>();
+		//Generate initial calendar status
 		CalendarStatus start = checkGoals(events, spherePreferences);
+		//Already within our goals...
 		if (isCloseEnough(start, optimizeFull))
 			return result;
 		removeStaticEvents(events);
+		//generate virtual calendars for each event and proposal in our database
 		List<CalendarStatus> statuses = Utilities.merge( generateProposalStatuses(start.getDeficitSpheres(optimizeFull), start, true) , 
 				generateEventStatuses(events, start)
 				);
@@ -169,16 +171,15 @@ public class Analyser {
 			LinkedList<CalendarStatus> list = new LinkedList<CalendarStatus>();
 			CalendarStatus nextMin = statuses.get(i);
 			CalendarStatus nextStatus = nextMin;
-			/* Even best event can't improve the status */
+			//remove event form our list, so that we won't schedule same thing twice
 			removeEvent(nextMin);
-			/*
-			 * Check neighbours if they can become alternative suggestions to
-			 * nextMin
-			 */
 			int count = 1;
 			int k = i + 1;
 			List<CalendarStatus> alternatives = new LinkedList<CalendarStatus>();
 			alternatives.add(nextStatus);
+			/* Check if any of the neighbours can become an alternative for our min event
+			 * It needs to have almost same influence on the calendar and belong to same sphere
+			 */
 			while (k < statuses.size() && count < 3) {
 				CalendarStatus next = statuses.get(k);
 				if (next.compareTo(start) > 0
@@ -186,6 +187,7 @@ public class Analyser {
 					break;
 				SphereName mine;
 				SphereName nextSphere;
+				//checking of major spheres
 				if (nextStatus.containsProposal())
 					mine = ((Proposal) nextStatus.getEvent()).getMajorSphere();
 				else
@@ -198,16 +200,10 @@ public class Analyser {
 					k++;
 					continue;
 				}
-//				{
-//					if (next.containsProposal()
-//							&& !((Proposal) next.getEvent()).getMajorSphere().equals(((Proposal) nextStatus.getEvent()).getMajorSphere())) {
-//						k++;
-//						continue;
-//					}
-//				}
 				removeEvent(next);
 				statuses.remove(next);
 				alternatives.add(next);
+				//Our next status to be passed down will contain proposal
 				if (!nextStatus.containsProposal() && next.containsProposal())
 					nextStatus = next;
 				count++;
@@ -217,27 +213,23 @@ public class Analyser {
 			nextStatus.updateSlots();
 			List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, maxDepth);
 			if (rest != null) {
-				// list.addAll(rest);
-				//if (i != 0)
-				// UPDATE LATER ///
+				//peroform recalculation to improve our calendar based on what we have just scheduled
 				CalendarStatus toChange = rest.remove(0);
 				CalendarStatus changed = rest.remove(0);
-				List<CalendarStatus> removed = new LinkedList<CalendarStatus>();
 				int reps = 0;
 				do {
-					// MAIN FUNCTION
 					Pair<List<CalendarStatus>, List<CalendarStatus>> res = toChange.recalculate(changed);
 					List<CalendarStatus> successes = res.getFirst();
 					CalendarStatus best = successes.remove(0);
 					best.addAlternatives(successes);
 					toChange = best;
-					// Removed - restore them ?
 					CalendarStatus tmp = toChange;
 					toChange = changed;
 					changed = tmp;
 					reps++;
 				} while (changed.hasImproved());
 				list.addAll(rest);
+				//return events in the correct order
 				if (reps % 2 == 1) {
 					list.addFirst(toChange);
 					list.addFirst(changed);
@@ -250,22 +242,18 @@ public class Analyser {
 			}
 			else {
 				list.add(nextStatus);
-				//if (i != 0)
-					restoreEvents(nextStatus);
+				restoreEvents(nextStatus);
 			}
 			result.add(list);
 		}
 		return result;
 	}
-
+	
+	//Recursive function generating new suggestion considering what we chose before
 	private List<CalendarStatus> getSuggestions(CalendarStatus currentStatus, boolean optimizeFull, int depth) throws IOException {
 		if (isCloseEnough(currentStatus, optimizeFull) || (events.size() == 0 && !haveAnyProposals()) || depth <= 0)
 			return null;
-
-		/*
-		 * For a single status from above, order statuses again i.e. pivoting
-		 * for single statuses from above
-		 */
+		//generate calendars with virtually scheduled events again, pick minimum and find its alternatives
 		List<CalendarStatus> statuses = Utilities.merge(generateProposalStatuses(currentStatus.getDeficitSpheres(optimizeFull), currentStatus, false) ,
 				generateEventStatuses(events,currentStatus) );
 
@@ -276,14 +264,11 @@ public class Analyser {
 
 		CalendarStatus nextStatus = nextMin;
 		removeEvent(nextMin);
-		/*
-		 * Check neighbours if they can become alternative suggestions to
-		 * nextMin
-		 */
 		int i = 1;
 		int count = 1;
 		List<CalendarStatus> alternatives = new LinkedList<CalendarStatus>();
 		alternatives.add(nextStatus);
+		//Find alternatives
 		while (i < statuses.size() && count < 3) {
 			CalendarStatus next = statuses.get(i);
 			if (next.compareTo(currentStatus) > 0
@@ -303,13 +288,6 @@ public class Analyser {
 				i++;
 				continue;
 			}
-//			if (nextStatus.containsProposal()) {
-//				if (next.containsProposal()
-//						&& !((Proposal) next.getEvent()).getMajorSphere().equals(((Proposal) nextStatus.getEvent()).getMajorSphere())) {
-//					i++;
-//					continue;
-//				}
-//			}
 			removeEvent(next);
 			statuses.remove(next);
 			alternatives.add(next);
@@ -326,14 +304,13 @@ public class Analyser {
 		List<CalendarStatus> removed = new LinkedList<CalendarStatus>();
 		int reps = 0;
 		CalendarStatus current;
+		//Perform recalculation based on what we scheduled BEFORE our current min
 		do {
-			// Recursive first
 			Pair<List<CalendarStatus>, List<CalendarStatus>> res = toChange.recalculate(changed);
 			List<CalendarStatus> successes = res.getFirst();
 			CalendarStatus best = successes.remove(0);
 			best.addAlternatives(successes);
 			toChange = best;
-			// Removed - restore them ?
 			CalendarStatus tmp = toChange;
 			toChange = changed;
 			changed = tmp;
@@ -349,19 +326,16 @@ public class Analyser {
 		removed.add(current);
 		List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, depth - 1);
 		if (rest != null) {
-			// list.addAll(rest);
-			// UPDATE LATER ///
 			toChange = rest.remove(0);
 			changed = rest.remove(0);
 			reps = 0;
+			//Another recalculation based on what we scheduled AFTER choosing our current min event
 			do {
-				// Recursive call
 				Pair<List<CalendarStatus>, List<CalendarStatus>> res = toChange.recalculate(changed);
 				List<CalendarStatus> successes = res.getFirst();
 				CalendarStatus best = successes.remove(0);
 				best.addAlternatives(successes);
 				toChange = best;
-				// Removed - restore them ?
 				CalendarStatus tmp = toChange;
 				toChange = changed;
 				changed = tmp;
@@ -390,7 +364,7 @@ public class Analyser {
 	private boolean isCloseEnough(CalendarStatus currentStatus, boolean optimizeFull) {
 		return currentStatus.getCoefficient() < Math.pow(Analyser.CONFIDENCE, 2) || (!optimizeFull && currentStatus.isWithinConfidenceInterval());
 	}
-
+	//Check if we have any proposals left
 	private boolean haveAnyProposals() {
 		List<Proposal> next;
 		for (SphereName sphere : SphereName.values()) {
@@ -480,7 +454,7 @@ public class Analyser {
 		}
 		return result;
 	}
-
+	//Permute list
 	private void permute(List<Proposal> list) {
 		List<Proposal> newList = new LinkedList<Proposal>();
 		Random rand = new Random();

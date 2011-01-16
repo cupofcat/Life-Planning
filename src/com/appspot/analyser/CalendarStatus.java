@@ -63,11 +63,9 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		setCurrentCoefficient();
 		additionalEventTime = 0;
 	}
-
-	// /UPDATE LATER /////
-	/////////////////////////////
-	/////////////////////////////#
 	
+	
+	//while analysing current event, remove influence of other event to the calendar
 	private void deleteOtherInfluence(Map<SphereName, Double> influences, double additionalTime){
 		userBusyTime += additionalTime;
 		double oldTime = additionalEventTime;
@@ -83,7 +81,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		setCurrentCoefficient();
 	}
 	
-
+	//set maximum duration for event based on current calendar
 	private void checkMaxDuration(){
 		slotsManager.updateEventMaxDuration();
 		if(this.hasAlternatives()){
@@ -97,9 +95,11 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		analyse();
 	}
 	
+	//Recalculate coefficient of calendar based on the other calendar (with updated event)
 	public Pair<List<CalendarStatus>, List<CalendarStatus>> recalculate(CalendarStatus other) {
 		List<CalendarStatus> successes = new LinkedList<CalendarStatus>();
 		List<CalendarStatus> fails = new LinkedList<CalendarStatus>();
+		//Set same free slots for event and alternatives
 		if(!slotsManager.getFreeSlots().equals(other.getFreeSlots())){
 			setFreeSlots(other.getFreeSlots());
 			if(this.hasAlternatives()){
@@ -107,19 +107,21 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 					alternative.setFreeSlots(this.getFreeSlots());
 			}
 			checkMaxDuration();
-			//other.checkMaxDuration();
 		}
 		double eventDuration = additionalEventTime;
 		if(this.containsProposal)
 			eventDuration += event.getDuration();
+		//Copy results from other calendar and reanalyse
 		copyOtherCalendar(other);
 		reAnalyse();
+		//if we are successful, add to successes
 		if(successful)
 			successes.add(this);
 		else
 			fails.add(this);
 		if(this.hasAlternatives()){
 			for(CalendarStatus alternative : alternatives){
+				//Similarly for alternatives - delete influences of main event and reanalyse
 				alternative.copyOtherCalendar(other);
 				alternative.deleteOtherInfluence(event.getSpheres(), -eventDuration);
 				alternative.reAnalyse();
@@ -129,18 +131,21 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 					fails.add(alternative);
 			}
 		}
-		//clearing alternatives - to be rebuilt
+		//clearing alternatives - will be rebuilt in analyser
 		clearAlternatives();
 		List<CalendarStatus> removed = new LinkedList<CalendarStatus>();
+		//Set two final lists - successes (based on best coefficient) and failures
 		if(!successes.isEmpty()){
 			Collections.sort(successes);
 			CalendarStatus best = successes.get(0);
+			//remove successes which are far away from our best
 			for(CalendarStatus success : successes){
 				if(success.getCoefficient() > 0.05 && success.getCoefficient() > best.getCoefficient()*(1+Analyser.ALTERNATIVE))
 					removed.add(success);
 			}
 			successes.removeAll(removed);
 			for(CalendarStatus failure : fails){
+				//Add failures which are still close to our best calendar
 				if(failure.getCoefficient() > 0.05 && failure.getCoefficient() > best.getCoefficient()*(1+Analyser.ALTERNATIVE))
 					removed.add(failure);
 				else
@@ -165,9 +170,8 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	private FreeSlotsManager getFreeSlotsManager() {
 		return slotsManager;
 	}
-	
-	////////////////////
 
+	//Copy results for each sphere
 	private void copySphereResults(Map<SphereName, SphereInfo> currentSphereResults) {
 		for (SphereName name : currentSphereResults.keySet()) {
 			SphereInfo currentInfo = currentSphereResults.get(name);
@@ -202,7 +206,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	public List<BaseCalendarSlot> getFreeSlots(){
 		return slotsManager.getFreeSlots();
 	}
-
+	//recalculate coefficient
 	private void setCurrentCoefficient() {
 		double res = 0;
 		for (SphereInfo info : sphereResults.values()) {
@@ -212,6 +216,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		coefficient = res;
 	}
 
+	//Update free slots: If we schedule new event or have a couple of alternatives, we need to remove some of slots
 	public void updateSlots() {
 		if(!this.containsProposal)
 			slotsManager.updateCurrentSlots(this);
@@ -272,6 +277,7 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 			coefficient = shortRes.getFirst();
 			additionalTime = shortRes.getSecond();
 		}
+		//if any change has been done...
 		if (additionalTime != 0) {
 			successful = true;
 			saveSphereInfos(additionalTime);
@@ -302,12 +308,14 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 		return res;
 	}
 
+	//Check for each time step whether it brings us closer to our goal and return max
 	private Pair<Double, Double> getRatioStatus(double step, Map<SphereName, SphereInfo> sphereResults, Map<SphereName, Double> influences) {
 		double currentExtraTime = 0;
 		double currentStatus = getCurrentRatioStatus(sphereResults, influences, 0.0);
 		double prevStatus = currentStatus;
 		int max = Analyser.TRIES;
 		double timeStep = step;
+		//timestep too low - set 1
 		if(timeStep > 0 && timeStep < 1){
 			timeStep = 1;
 			max = (int) Math.round(step*Analyser.TRIES);
@@ -323,17 +331,19 @@ public class CalendarStatus implements Comparable<CalendarStatus> {
 	}
 
 	/*
-	 * Work out which sphere is most out of line with target. Return all spheres
-	 * out of target is full optimisation
+	 * Work out which spheres are in deficit.
 	 */
 	public List<SphereName> getDeficitSpheres(boolean optimize) {
 		List<SphereName> deficits = new LinkedList<SphereName>();
+		//find all spheres in deficit
 		if (optimize) {
 			for (SphereName name : SphereName.values()) {
 				if (sphereResults.get(name).getRatioDifference() > 0)
 					deficits.add(name);
 			}
-		} else {
+		} 
+		//find major sphere in deficit
+		else {
 			double max = -1;
 			SphereName currentMajor = null;
 			for (SphereName name : SphereName.values()) {

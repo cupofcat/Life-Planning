@@ -27,7 +27,8 @@ public class FreeSlotsManager {
 	public void setFreeSlots(List<BaseCalendarSlot> slots){
 		freeSlots = slots;
 	}
-
+	
+	//Check whether there are any possible slots to allocate event and create corresponding cirtual calendar
 	public CalendarStatus checkProposal(Proposal proposal) {
 		List<BaseCalendarSlot> possibleSlots = getPossibleSlots(proposal);
 		if (possibleSlots != null) {
@@ -35,7 +36,8 @@ public class FreeSlotsManager {
 		}
 		return null;
 	}
-
+	
+	//Generate all possible slots, taking into account max duration and possible time slot
 	public List<BaseCalendarSlot> getPossibleSlots(Proposal proposal) {
 		List<BaseCalendarSlot> ret = new LinkedList<BaseCalendarSlot>();
 		Pair<Calendar, Calendar> possibleTimeSlot = proposal.getPossibleTimeSlot();
@@ -50,8 +52,6 @@ public class FreeSlotsManager {
 			slotStartDate = freeSlot.getStartDate();
 			slotEndDate = freeSlot.getEndDate();
 			/* proposal fits inside the free slot */
-
-			// Change comparisons here and check final output
 			while (possibleStartDate.compareTo(slotEndDate) < 0) {
 				if (possibleEndDate.compareTo(slotStartDate) > 0 && possibleStartDate.compareTo(slotEndDate) < 0) {
 
@@ -87,6 +87,7 @@ public class FreeSlotsManager {
 		return null;
 	}
 	
+	//Check whether our event's max duration has to be changed due to lack of free slots
 	public void updateEventMaxDuration() {
 		IEvent event = status.getEvent();
 		Calendar endDate = event.getEndDate();
@@ -105,7 +106,8 @@ public class FreeSlotsManager {
 			}
 		}
 	}
-
+	
+	//Check if any slots must disappear due to new events in calendar
 	public void updateCurrentSlots(CalendarStatus stat) {
 		IEvent takenSlot = stat.getEvent();
 		Calendar takenStartDate = takenSlot.getStartDate();
@@ -137,12 +139,8 @@ public class FreeSlotsManager {
 	public void sortFreeSlots(){
 		Collections.sort(freeSlots);
 	}
-
-	private void printSlot(BaseCalendarSlot hourSlot) {
-		List<BaseCalendarSlot> hourslots = new LinkedList<BaseCalendarSlot>();
-		hourslots.add(hourSlot);
-	}
-
+	
+	//Start slot for analysis of free slots
 	private BaseCalendarSlot generateStartingSlot(Calendar slotStart, Pair<Calendar, Calendar> possibleTimeSlot) {
 		Calendar possibleStart = possibleTimeSlot.getFirst();
 		Calendar possibleEnd = possibleTimeSlot.getSecond();
@@ -163,6 +161,7 @@ public class FreeSlotsManager {
 		BaseCalendarSlot chosenSlot = null;
 		double eventDuration = status.getEvent().getDuration() + status.getAdditionalEventTime();
 		int start = 0, end = 0;
+		//Best fit algorithm used below
 		for (BaseCalendarSlot slot : possibleSlots) {
 			if (chosenSlot == null) {
 				if (slot.getDuration() >= eventDuration) {
@@ -176,6 +175,7 @@ public class FreeSlotsManager {
 			else
 				break;
 		}
+		//Choose among equally long slots one at random
 		Random rand = new Random();
 		chosenSlot = possibleSlots.get(rand.nextInt(end - start) + start);
 		chosenSlot.setDuration(eventDuration);
@@ -191,7 +191,8 @@ public class FreeSlotsManager {
 		event.setStartDate(chosenSlot.getStartDate());
 		event.setEndDate(chosenSlot.getEndDate());
 	}
-
+	
+	//Split slot and add any addtional as a result
 	private void splitSlot(BaseCalendarSlot removedSlot, BaseCalendarSlot chosenSlot) {
 		if (removedSlot.getStartDate().before(chosenSlot.getStartDate())) {
 			freeSlots.add(new BaseCalendarSlot("Free Slot", null, removedSlot.getStartDate(), chosenSlot.getStartDate()));
