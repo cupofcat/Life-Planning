@@ -220,7 +220,7 @@ public class Analyser {
 				// list.addAll(rest);
 				//if (i != 0)
 				// UPDATE LATER ///
-				CalendarStatus toChange = nextStatus;
+				CalendarStatus toChange = rest.remove(0);
 				CalendarStatus changed = rest.remove(0);
 				List<CalendarStatus> removed = new LinkedList<CalendarStatus>();
 				int reps = 0;
@@ -247,7 +247,8 @@ public class Analyser {
 					list.addFirst(toChange);
 					restoreEvents(toChange);
 				}
-			} else {
+			}
+			else {
 				list.add(nextStatus);
 				//if (i != 0)
 					restoreEvents(nextStatus);
@@ -319,14 +320,40 @@ public class Analyser {
 		alternatives.remove(nextStatus);
 		nextStatus.addAlternatives(alternatives);
 		nextStatus.updateSlots();
+		
+		CalendarStatus toChange = currentStatus;
+		CalendarStatus changed = nextStatus;
+		List<CalendarStatus> removed = new LinkedList<CalendarStatus>();
+		int reps = 0;
+		CalendarStatus current;
+		do {
+			// Recursive first
+			Pair<List<CalendarStatus>, List<CalendarStatus>> res = toChange.recalculate(changed);
+			List<CalendarStatus> successes = res.getFirst();
+			CalendarStatus best = successes.remove(0);
+			best.addAlternatives(successes);
+			toChange = best;
+			// Removed - restore them ?
+			CalendarStatus tmp = toChange;
+			toChange = changed;
+			changed = tmp;
+			reps++;
+		} while (changed.hasImproved());
+		if (reps % 2 == 1) {
+			current = changed;
+			nextStatus = toChange;
+		} else {
+			current = toChange;
+			nextStatus = changed;
+		}		
+		removed.add(current);
 		List<CalendarStatus> rest = getSuggestions(nextStatus, optimizeFull, depth - 1);
 		if (rest != null) {
 			// list.addAll(rest);
 			// UPDATE LATER ///
-			CalendarStatus toChange = nextStatus;
-			CalendarStatus changed = rest.remove(0);
-			List<CalendarStatus> removed = new LinkedList<CalendarStatus>();
-			int reps = 0;
+			toChange = rest.remove(0);
+			changed = rest.remove(0);
+			reps = 0;
 			do {
 				// Recursive call
 				Pair<List<CalendarStatus>, List<CalendarStatus>> res = toChange.recalculate(changed);
@@ -340,17 +367,19 @@ public class Analyser {
 				changed = tmp;
 				reps++;
 			} while (changed.hasImproved());
-			list.addAll(rest);
 			if (reps % 2 == 1) {
-				list.addFirst(toChange);
-				list.addFirst(changed);
+				removed.add(changed);
+				removed.add(toChange);
 				restoreEvents(changed);
 			} else {
-				list.addFirst(changed);
-				list.addFirst(toChange);
+				removed.add(toChange);
+				removed.add(changed);
 				restoreEvents(toChange);
 			}
+			list.addAll(removed);
+			list.addAll(rest);
 		} else {
+			list.addAll(removed);
 			list.add(nextStatus);
 			restoreEvents(nextStatus);
 		}
